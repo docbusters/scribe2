@@ -1,4 +1,4 @@
-import type { DataValue } from "../data/DataValue.ts";
+import type { DataValue } from "../data/DataValue.js";
 
 export interface BaseComponent<T extends string, V extends DataValue> {
     id: string;

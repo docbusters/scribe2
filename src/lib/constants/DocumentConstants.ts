@@ -1,0 +1,1 @@
+export const DEFAULT_SECTION_SEPARATION = 20;

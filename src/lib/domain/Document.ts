@@ -1,6 +1,9 @@
-import type { Section } from "./Section.ts";
+import type { DefaultComponents } from "../registry/defaultRegistry.js";
+import type { Section } from "./Section.js";
 
-export interface Document {
+export interface Document<C = never> {
     title: string;
-    sections: Section[];
+    /** Separation in pixels between sections */
+    sectionSeparation?: number;
+    sections: Section<DefaultComponents | C>[];
 }

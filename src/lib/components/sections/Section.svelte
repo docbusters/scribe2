@@ -1,0 +1,27 @@
+<script lang="ts" generics="C extends BaseComponent<string, DataValue> = never">
+    import type { BaseComponent } from '../../domain/components/Component.ts';
+    import type { DataValue } from '../../domain/data/DataValue.ts';
+    import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
+	import type { Section } from '$lib/domain/Section.js';
+	import ParagraphSection from './ParagraphSection.svelte';
+	import BlockSection from './BlockSection.svelte';
+	import GridSection from './GridSection.svelte';
+	
+    interface SectionProps {
+        data: Section<DefaultComponents | C>;
+    }
+
+    let { data }: SectionProps = $props();
+
+</script>
+
+<section class="flex flex-col gap-2 w-full">
+    <h1>{data.title}</h1>
+    {#if data.type === 'paragraph-section'}
+        <ParagraphSection {data} />
+    {:else if data.type === 'block-section'}
+        <BlockSection {data} />
+    {:else if data.type === 'grid-section'}
+        <GridSection {data} />
+    {/if}
+</section>
