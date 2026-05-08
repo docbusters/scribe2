@@ -7,6 +7,7 @@
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { DEFAULT_SECTION_SEPARATION } from '$lib/constants/DocumentConstants.js';
+	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	
     interface ScribeProps {
         document: Document<C>;
@@ -16,15 +17,20 @@
     let { document, registry }: ScribeProps = $props();
 
     $effect.pre(() => {
+        // Initialize the global registry with the default components and any custom components provided via props
         globalRegistry.initialize({
             ...defaultRegistry,
             ...(registry || {})
         } as ComponentRegistry<C>);
     });
 
+    $effect.pre(() => {
+        // Initialize the data store with the initial values from the document's components
+        dataStore.initialize(document.bindings);
+    });
+
     const documentStyle = $derived.by(() => {
         const separation = document.sectionSeparation ?? DEFAULT_SECTION_SEPARATION;
-        
         return `gap: ${separation}px;`;
     });
 
