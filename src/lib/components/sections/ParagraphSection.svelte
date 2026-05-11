@@ -14,7 +14,7 @@
     let components = $derived(data.content);
 </script>
 
-<div id="paragraph-section">
+<div class="paragraph-section">
     {#each components as component, index (`${component.type}-${index}`)}
         {@const Component = globalRegistry.getComponent(component.type)}
         <Component componentData={component} />
@@ -22,7 +22,7 @@
 </div>
 
 <style>
-    #paragraph-section {
+    .paragraph-section {
         background-color: orange;
     }
 </style>

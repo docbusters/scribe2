@@ -1,4 +1,6 @@
-// Reexport your entry components here
+import type { Document } from './domain/Document.js';
+import type { ComponentRegistry } from './registry/ComponentRegistry.js';
+import type { ScribeProps } from './types/ScribeProps.js';
 
 // COMPONENTS
 export { default as Scribe } from './components/Scribe.svelte';
@@ -19,3 +21,23 @@ export type { ComponentRegistry, ScribeComponentProps } from './registry/Compone
 export type { DefaultComponents } from './registry/defaultRegistry.js';
 export type { BaseComponent, InlineComponent, BlockComponent } from './domain/components/Component.js';
 export type { TextComponent, TextInputComponent } from './domain/components/DefaultComponents.js';
+
+
+declare global {
+    interface HTMLElementTagNameMap {
+        'scribe-interpreter': HTMLElement & {
+            id?: string;
+            class?: string;
+            style?: string;
+            document: Document;
+            registry?: ComponentRegistry;
+        };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace svelteHTML {
+        interface IntrinsicElements {
+            'scribe-interpreter': ScribeProps;
+        }
+    }
+}

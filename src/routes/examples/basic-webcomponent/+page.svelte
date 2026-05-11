@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Scribe } from '../../../../dist/scribe.js';
+	import '../../../../dist/scribe.js';
+	import type { Document } from '../../../../dist/index.d.ts';
 
 	const basicExampleDocument: Document = {
-		title: 'Basic Example Document',
+		title: 'I am using the compiled webcomponent version of Scribe!!!',
 		sections: [
 			{
 				title: 'Introduction',
@@ -153,4 +154,4 @@
 	};
 </script>
 
-<Scribe document={basicExampleDocument} />
+<scribe-interpreter document={basicExampleDocument}></scribe-interpreter>

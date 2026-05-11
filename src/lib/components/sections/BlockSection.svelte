@@ -17,12 +17,12 @@
     let BlockComponent = $derived(globalRegistry.getComponent(component.type) as Component<ScribeComponentProps<typeof component>>);
 </script>
 
-<div id="block-section">
+<div class="block-section">
     <BlockComponent componentData={component} />
 </div>
 
 <style>
-    #block-section {
+    .block-section {
         display: flex;
         flex: 1;
         background-color: aquamarine;

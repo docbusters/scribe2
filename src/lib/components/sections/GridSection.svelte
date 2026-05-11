@@ -24,7 +24,7 @@
     };
 </script>
 
-<div id="grid-section" style={gridStyle}>
+<div class="grid-section" style={gridStyle}>
     {#each items as item, index (`${item.section.type}-${index}`)}
         <div style={getItemStyle(item)}>
             <Section data={item.section} />
@@ -33,7 +33,7 @@
 </div>
 
 <style>
-    #grid-section {
+    .grid-section {
         display: grid;
         background-color: crimson;
     }

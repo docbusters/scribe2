@@ -15,8 +15,8 @@
 
 </script>
 
-<section id="section">
-    <h1>{data.title}</h1>
+<section>
+    <h2>{data.title}</h2>
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} />
     {:else if data.type === 'block-section'}
@@ -27,7 +27,7 @@
 </section>
 
 <style>
-    #section {
+    section {
         width: 100%;
         display: flex;
         flex-direction: column;

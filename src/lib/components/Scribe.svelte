@@ -2,6 +2,9 @@
     customElement={{
         tag: "scribe-interpreter",
         props: {
+            id: { type: 'String' },
+            class: { type: 'String' },
+            style: { type: 'String' },
             registry: { type: 'Object' },
             document: { type: 'Object' },
         }
@@ -19,7 +22,13 @@
 	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import type { ScribeProps } from '$lib/types/ScribeProps.js';
 
-    let { document, registry }: ScribeProps = $props();
+    let { 
+        id,
+        class: className,
+        style,
+        document,
+        registry,
+    }: ScribeProps = $props();
 
     $effect.pre(() => {
         // Initialize the global registry with the default components and any custom components provided via props
@@ -44,7 +53,8 @@
 </script>
 
 {#if document}
-    <div id="scribe-document" style={documentStyle}>
+    <h1>{document.title}</h1>
+    <div id={id} style={`${documentStyle} ${style}`} class={`${className} scribe-document`}>
         {#each document.sections as section, index (index)}
             <Section data={section} />
         {/each}
@@ -52,7 +62,7 @@
 {/if}
 
 <style>
-    #scribe-document {
+    .scribe-document {
         width: 100%;
         display: flex;
         flex-direction: column;
