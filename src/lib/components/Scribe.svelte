@@ -1,3 +1,13 @@
+<svelte:options
+    customElement={{
+        tag: "scribe-interpreter",
+        props: {
+            registry: { type: 'Object' },
+            document: { type: 'Object' },
+        }
+    }}
+/>
+
 <script lang="ts" generics="C extends BaseComponent<string, DataValue> = never">
     import type { Document } from '../domain/Document.js';
     import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
@@ -25,8 +35,10 @@
     });
 
     $effect.pre(() => {
-        // Initialize the data store with the initial values from the document's components
-        dataStore.initialize(document.bindings);
+        if(document) {
+            // Initialize the data store with the initial values from the document's components
+            dataStore.initialize(document.bindings);
+        }
     });
 
     const documentStyle = $derived.by(() => {
@@ -36,8 +48,10 @@
 
 </script>
 
-<div class="w-full flex flex-col" style={documentStyle}>
-    {#each document.sections as section, index (index)}
-        <Section data={section} />
-    {/each}
-</div>
+{#if document}
+    <div class="w   -full flex flex-col" style={documentStyle}>
+        {#each document.sections as section, index (index)}
+            <Section data={section} />
+        {/each}
+    </div>
+{/if}

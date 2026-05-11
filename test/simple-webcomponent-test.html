@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebComponent test</title>
+    
+    <script type="module" src="../dist/scribe.js"></script>
+</head>
+<body>
+
+    <h1>Scribe HTML test</h1>
+
+    <scribe-interpreter id="scribe"></scribe-interpreter>
+
+</body>
+</html>
+
+<script>
+        const basicExampleDocument = {
+            title: 'Basic Example Document',
+            sections: [
+                {
+                    title: 'Introduction',
+                    type: 'paragraph-section',
+                    content: [
+                        {
+                            id: 'text-1',
+                            mode: 'inline',
+                            type: 'text',
+                            value: {
+                                type: 'string',
+                                value: 'This is a basic example document to demonstrate the structure of a Document with Sections and Components.'
+                            }
+                        },
+                        {
+						id: 'input-1',
+						mode: 'inline',
+						type: 'text-input',
+						value: {
+							type: 'binding',
+							id: 'name',
+						}
+					}
+                    ]
+                },
+                {
+                    title: 'First section',
+                    type: 'paragraph-section',
+                    content: [
+                        {
+                            id: 'text-2',
+                            mode: 'inline',
+                            type: 'text',
+                            value: {
+                                type: 'binding',
+                                id: 'name'
+                            }
+                        }
+                    ]
+                }
+            ],
+            bindings: {
+                name: { type: 'string', initialValue: 'I am a binded name!!!' }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scribeElement = document.getElementById('scribe');
+            
+            if (scribeElement) {
+                scribeElement.document = basicExampleDocument;
+            }
+        });
+</script>
