@@ -9,7 +9,6 @@
 />
 
 <script lang="ts" generics="C extends BaseComponent<string, DataValue> = never">
-    import type { Document } from '../domain/Document.js';
     import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
     import type { BaseComponent } from '../domain/components/Component.js';
     import type { DataValue } from '../domain/data/DataValue.js';
@@ -18,11 +17,7 @@
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { DEFAULT_SECTION_SEPARATION } from '$lib/constants/DocumentConstants.js';
 	import { dataStore } from '$lib/stores/data-store.svelte.js';
-	
-    interface ScribeProps {
-        document: Document<C>;
-        registry?: ComponentRegistry<C>;
-    }
+	import type { ScribeProps } from '$lib/types/ScribeProps.js';
 
     let { document, registry }: ScribeProps = $props();
 

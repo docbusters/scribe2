@@ -1,8 +1,7 @@
-import type { TextComponent } from '../domain/components/TextComponent.js';
 import type { ComponentRegistry } from './ComponentRegistry.js';
 import TextComponentSvelte from '../components/defaultComponents/TextComponentSvelte.svelte';
-import type { TextInputComponent } from '$lib/domain/components/InputComponent.js';
 import TextInputComponentSvelte from '$lib/components/defaultComponents/TextInputComponentSvelte.svelte';
+import type { TextComponent, TextInputComponent } from '$lib/domain/components/DefaultComponents.js';
 
 export type DefaultComponents = TextComponent | TextInputComponent;
 
