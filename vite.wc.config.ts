@@ -10,6 +10,7 @@ export default defineConfig({
 		})
 	],
 	build: {
+		cssCodeSplit: false,
 		lib: {
 			entry: 'src/lib/index.ts',
 			name: 'Scribe',
@@ -18,8 +19,8 @@ export default defineConfig({
 		},
 		rollupOptions: {
 			output: {
-				codeSplitting: false
-			}
+				codeSplitting: false,
+			},
 		},
 		outDir: 'dist',
 		emptyOutDir: true

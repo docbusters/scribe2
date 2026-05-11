@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$lib/styles/scribe.css';
 	import Scribe from '$lib/components/Scribe.svelte';
 	import type { Document } from '$lib/domain/Document.js';
 

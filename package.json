@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
-		"build:wc": "vite build -c vite.wc.config.ts && tsc -p tsconfig.types.json",
+		"build:wc": "vite build -c vite.wc.config.ts && node -e \"fs.copyFileSync('src/lib/styles/scribe.css', 'dist/scribe.css')\" && tsc -p tsconfig.types.json",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",
@@ -30,7 +30,8 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/scribe.js"
-		}
+		},
+		"./scribe.css": "./dist/scribe.css"
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0"

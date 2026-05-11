@@ -1,0 +1,31 @@
+:root {
+	--scribe-background: oklch(1 0 0);
+	--scribe-foreground: oklch(0.145 0 0);
+
+    --scribe-secondary: oklch(0.97 0 0);
+    --scribe-secondary-foreground: oklch(0.205 0 0);
+
+    /** Font family variables */
+    --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
+	--scribe-font-sans: 'Segoe UI', sans-serif; /* Font for sans-serif text */
+
+    /* Radius variables */
+    --radius: 0.625rem; /** Base radius for all elements */
+
+    /* Scaled radius values for different sizes */
+	--radius-sm: calc(var(--radius) * 0.6); 
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root .dark {
+    --scribe-background: oklch(0.145 0 0);
+	--scribe-foreground: oklch(0.985 0 0);
+
+    --scribe-secondary: oklch(0.269 0 0);
+    --scribe-secondary-foreground: oklch(0.985 0 0);
+}

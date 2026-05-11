@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../../../../dist/scribe.css';
 	import '../../../../dist/scribe.js';
 	import type { Document } from '../../../../dist/index.d.ts';
 
@@ -31,7 +32,7 @@
 						type: 'text',
 						value: {
 							type: 'binding',
-							id: 'name',
+							id: 'name'
 						}
 					},
 					{
@@ -40,7 +41,7 @@
 						type: 'text-input',
 						value: {
 							type: 'binding',
-							id: 'name',
+							id: 'name'
 						}
 					}
 				]
@@ -148,9 +149,9 @@
 				]
 			}
 		],
-        bindings: {
-            name: { type: 'string', initialValue: 'I am a binded name!!!' },
-        }
+		bindings: {
+			name: { type: 'string', initialValue: 'I am a binded name!!!' }
+		}
 	};
 </script>
 
