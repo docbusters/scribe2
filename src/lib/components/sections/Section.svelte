@@ -15,7 +15,7 @@
 
 </script>
 
-<section class="flex flex-col gap-2 w-full">
+<section id="section">
     <h1>{data.title}</h1>
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} />
@@ -25,3 +25,13 @@
         <GridSection {data} />
     {/if}
 </section>
+
+<style>
+    #section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+</style>
+

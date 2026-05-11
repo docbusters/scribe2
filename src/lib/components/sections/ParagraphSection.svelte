@@ -14,9 +14,15 @@
     let components = $derived(data.content);
 </script>
 
-<div class="bg-blue-300">
+<div id="paragraph-section">
     {#each components as component, index (`${component.type}-${index}`)}
         {@const Component = globalRegistry.getComponent(component.type)}
         <Component componentData={component} />
     {/each}
 </div>
+
+<style>
+    #paragraph-section {
+        background-color: orange;
+    }
+</style>

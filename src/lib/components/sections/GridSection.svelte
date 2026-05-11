@@ -24,10 +24,17 @@
     };
 </script>
 
-<div class="bg-purple-300 grid" style={gridStyle}>
+<div id="grid-section" style={gridStyle}>
     {#each items as item, index (`${item.section.type}-${index}`)}
-        <div class="bg-green-300" style={getItemStyle(item)}>
+        <div style={getItemStyle(item)}>
             <Section data={item.section} />
         </div>
     {/each}
 </div>
+
+<style>
+    #grid-section {
+        display: grid;
+        background-color: crimson;
+    }
+</style>

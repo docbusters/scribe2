@@ -49,9 +49,17 @@
 </script>
 
 {#if document}
-    <div class="w   -full flex flex-col" style={documentStyle}>
+    <div id="scribe-document" style={documentStyle}>
         {#each document.sections as section, index (index)}
             <Section data={section} />
         {/each}
     </div>
 {/if}
+
+<style>
+    #scribe-document {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
