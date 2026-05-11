@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Scribe from '$lib/components/Scribe.svelte';
-	import type { Document } from '$lib/domain/Document.js';
+	import { Scribe } from '../../../../dist/scribe.js';
 
 	const basicExampleDocument: Document = {
 		title: 'Basic Example Document',

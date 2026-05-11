@@ -1,3 +1,13 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import { resolve } from "$app/paths";
+
+</script>
+
+<h1>Welcome to Scribe Web component library!</h1>
+
+<h2>Examples</h2>
+<div class="flex flex-col gap-2">
+    <a href={resolve("/examples/basic")}>Basic example</a>
+    <a href={resolve("/examples/basic-webcomponent")}>Web component example</a>
+</div>
+
