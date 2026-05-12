@@ -1,17 +1,23 @@
 import type { DataValue } from "../data/DataValue.js";
 
-export interface BaseComponent<T extends string, V extends DataValue> {
+export interface ComponentConfig {
+    [key: string]: unknown;
+}
+
+// Añadimos un tercer genérico P (Props) que por defecto es un objeto vacío
+export interface BaseComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> {
     id: string;
     type: T;
     mode: 'inline' | 'block';
     value: V;
+    config?: P;
 }
 
-export interface InlineComponent<T extends string, V extends DataValue> extends BaseComponent<T, V> {
+export interface InlineComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> extends BaseComponent<T, V, P> {
     mode: 'inline';
 }
 
-export interface BlockComponent<T extends string, V extends DataValue> extends BaseComponent<T, V> {
+export interface BlockComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> extends BaseComponent<T, V, P> {
     mode: 'block';
 }
 

@@ -1,0 +1,9 @@
+<script lang="ts">
+	import '../../../../dist/scribe.css';
+	import '../../../../dist/scribe.js';
+	import { fullExampleDocument } from '$lib/examples/fullExample.js';
+</script>
+
+<div class="flex justify-center w-full py-10 border-box">
+	<scribe-interpreter document={fullExampleDocument}></scribe-interpreter>
+</div>
