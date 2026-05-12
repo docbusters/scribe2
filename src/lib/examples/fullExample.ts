@@ -98,6 +98,23 @@ export const fullExampleDocument: Document = {
             }
         },
         {
+            title: 'Table section',
+            type: 'block-section',
+            content: {
+                id: 'table-1',
+                type: 'table',
+                mode: 'block',
+                value: {
+                    type: 'binding',
+                    id: 'latex-string',
+                },
+                config: {
+                    cols: 3,
+                    rows: 2,
+                }
+            }
+        },
+        {
             title: 'Grid section',
             type: 'grid-section',
             columns: 2,

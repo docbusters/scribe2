@@ -15,3 +15,11 @@ export interface LatexComponentConfig extends ComponentConfig {
     emptyText?: string;
     errorText?: string;
 }
+
+export interface TableComponentConfig extends ComponentConfig {
+    /** Total number of columns */
+    cols: number;
+    /** Total number of rows */
+    rows: number;
+    
+}
