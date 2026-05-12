@@ -28,10 +28,14 @@
 
 <style>
     section {
-        width: 100%;
+        flex: 1;
+        gap: var(--scribe-section-heading-gap);
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        background-color: var(--scribe-section-background);
+        color: var(--scribe-section-foreground);
+        border-radius: var(--scribe-section-radius);
+        padding: 0.75rem 1.25rem;
     }
 </style>
 

@@ -35,6 +35,5 @@
 <style>
     .grid-section {
         display: grid;
-        background-color: crimson;
     }
 </style>

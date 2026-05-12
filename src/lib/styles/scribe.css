@@ -1,31 +1,72 @@
 :root {
-	--scribe-background: oklch(1 0 0);
-	--scribe-foreground: oklch(0.145 0 0);
+	/* Document-level variables */
+	--scribe-doc-background: oklch(1 0 0); /* Document background color */
+	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
+	--scribe-doc-width: 70vw; /* Maximum width of the document content */
+	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */
 
-    --scribe-secondary: oklch(0.97 0 0);
-    --scribe-secondary-foreground: oklch(0.205 0 0);
+    --scribe-secondary-background: oklch(0.97 0 0); /* Secondary background color for elements like cards, modals, etc. */
+    --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
+
+	/* Section-level variables */
+	--scribe-section-background: oklch(0.97 0 0); /* Background color for sections */
+	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
+	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
+	--scribe-section-separation: 0.75rem; /* Gap between sections */
+	--scribe-section-heading-gap: 1rem; /* Gap between section heading and content */
+
+	/* Misc. variables */
+	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
 
     /** Font family variables */
     --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
 	--scribe-font-sans: 'Segoe UI', sans-serif; /* Font for sans-serif text */
 
+	/* Font size variables */
+	--scribe-font-size-xs: 0.75rem;
+	--scribe-font-size-sm: 0.875rem;
+	--scribe-font-size-md: 1rem;
+	--scribe-font-size-lg: 1.125rem;
+	--scribe-font-size-xl: 1.25rem;
+	--scribe-font-size-2xl: 1.5rem;
+	--scribe-font-size-3xl: 1.875rem;
+	--scribe-font-size-4xl: 2.25rem;
+
+	--scribe-font-size-h1: var(--scribe-font-size-4xl); /* Font size for h1 */
+	--scribe-font-size-h2: var(--scribe-font-size-2xl); /* Font size for h2 */
+	--scribe-font-size-h3: var(--scribe-font-size-xl); /* Font size for h3 */
+	--scribe-font-size-body: var(--scribe-font-size-md); /* Font size for body text */
+
+	/* Font weight variables */
+	--scribe-font-weight-light: 300;
+	--scribe-font-weight-regular: 400;
+	--scribe-font-weight-semibold: 600;
+	--scribe-font-weight-bold: 700;
+
+	--scribe-font-weight-h1: var(--scribe-font-weight-bold); /* Font weight for h1 */
+	--scribe-font-weight-h2: var(--scribe-font-weight-semibold); /* Font weight for h2 */
+	--scribe-font-weight-h3: var(--scribe-font-weight-semibold); /* Font weight for h3 */
+	--scribe-font-weight-body: var(--scribe-font-weight-regular); /* Font weight for body text */
+
     /* Radius variables */
-    --radius: 0.625rem; /** Base radius for all elements */
+    --scribe-radius: 0.625rem; /** Base radius for all elements */
 
     /* Scaled radius values for different sizes */
-	--radius-sm: calc(var(--radius) * 0.6); 
-	--radius-md: calc(var(--radius) * 0.8);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) * 1.4);
-	--radius-2xl: calc(var(--radius) * 1.8);
-	--radius-3xl: calc(var(--radius) * 2.2);
-	--radius-4xl: calc(var(--radius) * 2.6);
+	--scribe-radius-sm: calc(var(--scribe-radius) * 0.6); 
+	--scribe-radius-md: calc(var(--scribe-radius) * 0.8);
+	--scribe-radius-lg: var(--scribe-radius);
+	--scribe-radius-xl: calc(var(--scribe-radius) * 1.4);
+	--scribe-radius-2xl: calc(var(--scribe-radius) * 1.8);
+	--scribe-radius-3xl: calc(var(--scribe-radius) * 2.2);
+	--scribe-radius-4xl: calc(var(--scribe-radius) * 2.6);
 }
 
 :root .dark {
-    --scribe-background: oklch(0.145 0 0);
-	--scribe-foreground: oklch(0.985 0 0);
+    --scribe-doc-background: oklch(0.145 0 0);
+	--scribe-doc-foreground: oklch(0.985 0 0);
 
     --scribe-secondary: oklch(0.269 0 0);
     --scribe-secondary-foreground: oklch(0.985 0 0);
+
+	/* ... */
 }

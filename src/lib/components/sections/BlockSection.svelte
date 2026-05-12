@@ -25,7 +25,6 @@
     .block-section {
         display: flex;
         flex: 1;
-        background-color: aquamarine;
     }
 </style>
 

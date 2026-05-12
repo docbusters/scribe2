@@ -7,27 +7,11 @@
 		title: 'Basic Example Document',
 		sections: [
 			{
-				title: 'Introduction',
-				type: 'paragraph-section',
-				content: [
-					{
-						id: 'text-1',
-						mode: 'inline',
-						type: 'text',
-						value: {
-							type: 'string',
-							value:
-								'This is a basic example document to demonstrate the structure of a Document with Sections and Components.'
-						}
-					}
-				]
-			},
-			{
 				title: 'First section',
 				type: 'paragraph-section',
 				content: [
 					{
-						id: 'text-2',
+						id: 'text-1',
 						mode: 'inline',
 						type: 'text',
 						value: {
@@ -43,8 +27,39 @@
 							type: 'binding',
 							id: 'name',
 						}
-					}
+					},
+					{
+						id: 'text-2',
+						mode: 'inline',
+						type: 'text',
+						value: {
+							type: 'string',
+							value: 'Place in the following input an url to an image:'
+						}
+					},
+					{
+						id: 'input-image',
+						mode: 'inline',
+						type: 'text-input',
+						value: {
+							type: 'binding',
+							id: 'image-url',
+						}
+					},
 				]
+			},
+			{
+				title: 'Image section',
+				type: 'block-section',
+				content: {
+					id: 'image-1',
+					type: 'image',
+					mode: 'block',
+					value: {
+						type: 'binding',
+						id: 'image-url',
+					}
+				}
 			},
 			{
 				title: 'Grid section',
@@ -151,8 +166,11 @@
 		],
         bindings: {
             name: { type: 'string', initialValue: 'I am a binded name!!!' },
+			'image-url': { type: 'string', initialValue: '' },
         }
 	};
 </script>
 
-<Scribe document={basicExampleDocument} />
+<div class="flex justify-center w-full py-10 border-box">
+	<Scribe document={basicExampleDocument} />
+</div>

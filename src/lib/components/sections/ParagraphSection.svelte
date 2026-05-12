@@ -23,9 +23,9 @@
 
 <style>
     .paragraph-section {
-        background-color: orange;
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: 0.5em;
         align-items: center;
     }

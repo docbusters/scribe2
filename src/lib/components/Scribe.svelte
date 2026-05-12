@@ -18,7 +18,6 @@
 	import { defaultRegistry } from '../registry/defaultRegistry.js';
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
-	import { DEFAULT_SECTION_SEPARATION } from '$lib/constants/DocumentConstants.js';
 	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import type { ScribeProps } from '$lib/types/ScribeProps.js';
 
@@ -38,17 +37,12 @@
 			dataStore.initialize(document.bindings);
 		}
 	});
-
-	const documentStyle = $derived.by(() => {
-		const separation = document.sectionSeparation ?? DEFAULT_SECTION_SEPARATION;
-		return `gap: ${separation}px;`;
-	});
 </script>
 
 {#if document}
-	<div {id} class={`${className} scribe-document`}>
+	<div {id} class={`${className} scribe-document md:w-full`}>
 		<h1>{document.title}</h1>
-		<div style={`${documentStyle} ${style}`} class="scribe-sections">
+		<div {style} class="scribe-sections">
 			{#each document.sections as section, index (index)}
 				<Section data={section} />
 			{/each}
@@ -58,27 +52,58 @@
 
 <style>
 	.scribe-document {
-		width: 100%;
+		width: var(--scribe-doc-width-mobile);
 		display: flex;
 		flex-direction: column;
-		background-color: var(--scribe-background);
+		gap: 1.5rem;
+		box-sizing: border-box;
+		background-color: var(--scribe-doc-background);
 		font-family: var(--scribe-font-sans);
-        color: var(--scribe-foreground);
+		font-weight: var(--scribe-font-weight-body);
+		font-size: var(--scribe-font-size-body);
+        color: var(--scribe-doc-foreground);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale; 
+	}
+
+	.scribe-document *,
+	.scribe-document *::before,
+	.scribe-document *::after {
+		box-sizing: inherit;
+	}
+
+	@media (width >= 48rem /* 768px */) {
+		.scribe-document {
+			width: var(--scribe-doc-width);
+		}
 	}
 
 	:global(h1) {
 		font-family: var(--scribe-font-heading);
+		font-weight: var(--scribe-font-weight-h1);
+		font-size: var(--scribe-font-size-h1);
+		margin: 0;
 	}
 	:global(h2) {
 		font-family: var(--scribe-font-heading);
+		font-weight: var(--scribe-font-weight-h2);
+		font-size: var(--scribe-font-size-h2);
+		margin: 0;
 	}
     :global(h3) {
         font-family: var(--scribe-font-heading);
+		font-weight: var(--scribe-font-weight-h3);
+		font-size: var(--scribe-font-size-h3);
+		margin: 0;
     }
+	:global(p) {
+		margin: 0;
+	}
 
 	.scribe-sections {
 		width: 100%;
 		display: flex;
+		gap: var(--scribe-section-separation);
 		flex-direction: column;
 	}
 </style>
