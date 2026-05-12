@@ -9,3 +9,6 @@ export type TextInputComponent = InlineComponent<'text-input', BindingValue>;
 
 /** Shows an image from the web */
 export type ImageComponent = BlockComponent<'image', StringValue | BindingValue>;
+
+/** Renders latex content */
+export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue>;

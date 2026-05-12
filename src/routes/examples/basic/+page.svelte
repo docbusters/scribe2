@@ -46,6 +46,24 @@
 							id: 'image-url',
 						}
 					},
+					{
+						id: 'text-latex',
+						mode: 'inline',
+						type: 'text',
+						value: {
+							type: 'string',
+							value: 'Place in the following input a latex expression: '
+						}
+					},
+					{
+						id: 'input-latex',
+						mode: 'inline',
+						type: 'text-input',
+						value: {
+							type: 'binding',
+							id: 'latex-string',
+						}
+					},
 				]
 			},
 			{
@@ -58,6 +76,19 @@
 					value: {
 						type: 'binding',
 						id: 'image-url',
+					}
+				}
+			},
+			{
+				title: 'Latex section',
+				type: 'block-section',
+				content: {
+					id: 'latex-1',
+					type: 'latex',
+					mode: 'block',
+					value: {
+						type: 'binding',
+						id: 'latex-string',
 					}
 				}
 			},
@@ -167,6 +198,7 @@
         bindings: {
             name: { type: 'string', initialValue: 'I am a binded name!!!' },
 			'image-url': { type: 'string', initialValue: '' },
+			'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
         }
 	};
 </script>

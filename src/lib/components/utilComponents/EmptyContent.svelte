@@ -1,0 +1,77 @@
+<script lang="ts">
+    /* eslint-disable svelte/no-at-html-tags */
+    interface EmptyContentProps {
+        message: string;
+        description?: string;
+        icon?: string;
+        isError?: boolean;
+        valueStyle?: string;
+        style?: string;
+    }
+
+    let { message, description, icon, isError = false, valueStyle, style }: EmptyContentProps = $props();
+
+</script>
+
+<div class="empty-container" style={style}>
+    {#if icon}
+        <div class={`icon ${isError ? 'icon-error' : ''}`}>
+            {@html icon}
+        </div>
+    {/if}
+    <span class={"message" + (isError ? " message-error" : "")}>
+        {message}
+    </span>
+    {#if description}
+        <span style={valueStyle} class="value">
+            {description}
+        </span>
+    {/if}
+</div>
+
+<style>
+
+    .empty-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+        border: 1px dashed var(--scribe-border-color);
+        border-radius: var(--scribe-radius-2xl);
+        background-color: var(--scribe-doc-background);
+        flex: 1;
+    }
+
+    .icon {
+        color: var(--scribe-secondary-foreground);
+        background-color: var(--scribe-secondary-background);
+        padding: 0.5rem;
+        border-radius: var(--scribe-radius-xl);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .icon-error {
+        background-color: var(--scribe-error-background);
+        color: var(--scribe-error-foreground);
+    }
+
+    .message {
+        color: var(--scribe-doc-foreground);
+        font-weight: var(--scribe-font-weight-semibold);
+        font-size: var(--scribe-font-size-sm);
+    }
+
+    .message-error {
+        color: var(--scribe-error-foreground);
+    }
+
+    .value {
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--scribe-radius-xl);
+        font-size: var(--scribe-font-size-xs);
+    }
+</style>

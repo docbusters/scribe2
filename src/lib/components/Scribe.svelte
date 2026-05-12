@@ -99,6 +99,11 @@
 	:global(p) {
 		margin: 0;
 	}
+	:global(span) {
+		font-family: var(--scribe-font-sans);
+		font-weight: var(--scribe-font-weight-body);
+		font-size: var(--scribe-font-size-body);
+	}
 
 	.scribe-sections {
 		width: 100%;
