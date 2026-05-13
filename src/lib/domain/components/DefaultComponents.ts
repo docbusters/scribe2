@@ -1,4 +1,4 @@
-import type { BindingValue, NumberValue, StringValue } from "../data/DataValue.ts";
+import type { BindingValue, ComponentValue, NumberValue, RecordValue, StringValue } from "../data/DataValue.ts";
 import type { BlockComponent, InlineComponent } from "./Component.ts";
 import type { ImageComponentConfig, LatexComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
 
@@ -15,4 +15,5 @@ export type ImageComponent = BlockComponent<'image', StringValue | BindingValue,
 export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue, LatexComponentConfig>;
 
 /** Renders a table */
-export type TableComponent = BlockComponent<'table', StringValue | BindingValue, TableComponentConfig>;
+export type TableComponent = BlockComponent<'table', RecordValue<TableCellIndex, ComponentValue>, TableComponentConfig>;
+export type TableCellIndex = `${number}:${number}`;

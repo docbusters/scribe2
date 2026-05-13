@@ -1,13 +1,12 @@
 import type { ComponentRegistry, ScribeComponentProps } from "$lib/registry/ComponentRegistry.js";
-import { defaultRegistry } from "$lib/registry/defaultRegistry.js";
 import type { Component } from "svelte";
-import type { BaseComponent } from "$lib/domain/components/Component.js";
+import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
 
-type UnknownComponent = BaseComponent<string, DataValue>;
+type UnknownComponent = BaseComponent<string, DataValue, ComponentConfig | undefined>;
 
 class GlobalRegistry {
-    components = $state<ComponentRegistry>(defaultRegistry);
+    components = $state<ComponentRegistry>();
 
     initialize<T extends UnknownComponent>(customComponents: ComponentRegistry<T>) {
         this.components = customComponents as unknown as ComponentRegistry;

@@ -17,12 +17,30 @@
         void value; 
         errorLoadingImage = false;
     });
+
+    const style = $derived.by(() => {
+        let styleString = '';
+
+        if (config?.position) {
+            styleString += `object-fit: ${config.position};`;
+        } else {
+            styleString += 'object-fit: cover;';
+        }
+
+        if (config?.align) {
+            styleString += `object-position: ${config.align};`;
+        } else {
+            styleString += 'object-position: center;';
+        }
+
+        return styleString;
+    })
 </script>
 
 {#key value}
     <div class="image-container" in:fade>
         {#if value && !errorLoadingImage}
-            <img onerror={() => errorLoadingImage = true} id={componentData.id} src={value} alt={componentData.id} />   
+            <img style={style} height={config?.height} width={config?.width} onerror={() => errorLoadingImage = true} id={componentData.id} src={value} alt={componentData.id} />   
         {:else if errorLoadingImage}
             <EmptyContent
                 style="padding: 2rem;"
@@ -43,7 +61,6 @@
 <style>
     img {
         width: 100%;
-        height: 100%;
         aspect-ratio: initial;
     }
 

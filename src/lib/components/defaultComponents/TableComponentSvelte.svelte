@@ -1,13 +1,32 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-unused-vars */
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TableComponent } from '$lib/domain/components/DefaultComponents.js';
+	import type { TableCellIndex, TableComponent } from '$lib/domain/components/DefaultComponents.js';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
+	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 
     let { componentData }: ScribeComponentProps<TableComponent> = $props();
 
-    const value = $derived(componentData.value);
+    const recordValue = $derived(componentData.value);
     const config = $derived(componentData.config);
+
+    const getCellValue = (cell: TableCellIndex) => {
+        if (!recordValue) return null;
+        const cellValue = recordValue.value[cell];
+        if (!cellValue) return null;
+
+        if (cellValue.type !== 'component') {
+            throw new Error(`Table cell ${cell} must be a component value!`);
+        }
+
+        const componentValue = cellValue.value;
+        console.log(componentValue)
+
+        return {
+            component: globalRegistry.getComponent(componentValue.type),
+            data: componentValue,
+        };
+    };
 </script>
 
 {#if config}
@@ -16,8 +35,11 @@
             {#each Array.from({ length: config.rows }) as _, rowIndex (`row-${rowIndex}`)}
                 <tr>
                     {#each Array.from({ length: config.cols }) as _, colIndex (`col-${colIndex}`)}
+                        {@const Component = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
-                            
+                            {#if Component}
+                                <Component.component componentData={Component.data} />
+                            {/if}
                         </td>
                     {/each}
                 </tr>
@@ -36,6 +58,8 @@
     table {
         border-collapse: collapse;
         flex: 1;
+        table-layout: fixed;
+        width: 100%;
     }
     td {
         border: 1px solid var(--scribe-border-color);

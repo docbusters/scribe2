@@ -9,6 +9,11 @@ export interface TextInputComponentConfig extends ComponentConfig {
 export interface ImageComponentConfig extends ComponentConfig {
     emptyText?: string;
     errorText?: string;
+    /** Applies cover by default */
+    position?: 'contain' | 'cover' | 'fill';
+    align?: 'left' | 'center' | 'right';
+    width?: string;
+    height?: string;
 }
 
 export interface LatexComponentConfig extends ComponentConfig {

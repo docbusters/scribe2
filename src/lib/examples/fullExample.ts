@@ -105,8 +105,87 @@ export const fullExampleDocument: Document = {
                 type: 'table',
                 mode: 'block',
                 value: {
-                    type: 'binding',
-                    id: 'latex-string',
+                    type: 'record',
+                    value: {
+                        '0:0': {
+                            type: 'component',
+                            value: {
+                                type: 'text',
+                                id: 'text-table',
+                                mode: 'inline',
+                                value: {
+                                    type: 'string',
+                                    value: 'That cell is linked to the input below ->'
+                                }
+                            }
+                        },
+                        '0:1': {
+                            type: 'component',
+                            value: {
+                                type: 'text',
+                                id: 'text-table-2',
+                                mode: 'inline',
+                                value: {
+                                    type: 'binding',
+                                    id: 'table-value-binding',
+                                }
+                            }
+                        },
+                        '1:0': {
+                            type: 'component',
+                            value: {
+                                type: 'text-input',
+                                id: 'input-table-1',
+                                mode: 'inline',
+                                value: {
+                                    type: 'binding',
+                                    id: 'table-value-binding',
+                                }
+                            }
+                        },
+                        '1:1': {
+                            type: 'component',
+                            value: {
+                                id: 'image-table',
+                                type: 'image',
+                                mode: 'block',
+                                value: {
+                                    type: 'string',
+                                    value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg',
+                                },
+                                config: {
+                                    height: '150px',
+                                    position: 'contain',
+                                    
+                                    align: 'center',
+                                }
+                            }
+                        },
+                        '0:2': {
+                            type: 'component',
+                            value: {
+                                type: 'text-input',
+                                id: 'input-table-1',
+                                mode: 'inline',
+                                value: {
+                                    type: 'binding',
+                                    id: 'table-latex-binding',
+                                }
+                            }
+                        },
+                        '1:2': {
+                            type: 'component',
+                            value: {
+                                type: 'latex',
+                                id: 'table-latex',
+                                mode: 'inline',
+                                value: {
+                                    type: 'binding',
+                                    id: 'table-latex-binding',
+                                }
+                            }
+                        }
+                    }
                 },
                 config: {
                     cols: 3,
@@ -221,5 +300,7 @@ export const fullExampleDocument: Document = {
         name: { type: 'string', initialValue: 'I am a binded name!!!' },
         'image-url': { type: 'string', initialValue: '' },
         'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
+        'table-value-binding': { type: 'string', initialValue: '67' },
+        'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
     }
 };

@@ -23,12 +23,15 @@
 
 	let { id, class: className = "", style, document, registry }: ScribeProps = $props();
 
+	let loading = $state(true);
+
 	$effect.pre(() => {
 		// Initialize the global registry with the default components and any custom components provided via props
 		globalRegistry.initialize({
 			...defaultRegistry,
 			...(registry || {})
 		} as ComponentRegistry<C>);
+		loading = false;
 	});
 
 	$effect.pre(() => {
@@ -39,16 +42,16 @@
 	});
 </script>
 
-{#if document}
-	<div {id} class={`${className} scribe-document md:w-full`}>
-		<h1>{document.title}</h1>
-		<div {style} class="scribe-sections">
+<div {id} class={`${className} scribe-document md:w-full`}>
+	<h1>{document.title}</h1>
+	<div {style} class="scribe-sections">
+		{#if !loading}
 			{#each document.sections as section, index (index)}
 				<Section data={section} />
 			{/each}
-		</div>
+		{/if}
 	</div>
-{/if}
+</div>
 
 <style>
 	.scribe-document {

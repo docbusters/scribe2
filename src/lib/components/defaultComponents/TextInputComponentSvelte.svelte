@@ -16,7 +16,7 @@
         }
 
         return styleString;
-    })
+    });
 </script>
 
 <input id={componentData.id} {style} placeholder={config?.placeholder} class="text-input" type="text" bind:value={dataStore.data[bindValue.id].value} />
