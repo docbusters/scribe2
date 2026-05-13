@@ -66,7 +66,8 @@
             direction: 'vertical',
             handle: '#edit-handle',
 			animation: 200,
-            ghostClass: 'bg-blue-100',
+            ghostClass: 'sortable-ghost',
+			dragClass: 'sortable-drag',
 
             onSort(event) {
                 const { oldIndex, newIndex } = event;
@@ -98,6 +99,15 @@
 </div>
 
 <style>
+	:global(.sortable-ghost) {
+		opacity: 1;
+		background-color: var(--scribe-selection-color) !important;
+	}
+
+	:global(.sortable-drag) {
+		opacity: 0;
+	}
+
 	.scribe-document {
 		width: var(--scribe-doc-width-mobile);
 		display: flex;

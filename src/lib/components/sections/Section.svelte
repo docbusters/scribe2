@@ -69,9 +69,5 @@
         padding: 0.1rem;
         transition: opacity 0.5s ease;
     }
-
-    :hover.edit-handle {
-        background-color: color-mix(in srgb, var(--scribe-section-background), black 10%);
-    }
 </style>
 
