@@ -5,6 +5,7 @@
 			id: { type: 'String' },
 			class: { type: 'String' },
 			style: { type: 'String' },
+			mode: { type: 'String' },
 			registry: { type: 'Object' },
 			document: { type: 'Object' }
 		}
@@ -20,10 +21,15 @@
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import type { ScribeProps } from '$lib/types/ScribeProps.js';
+	import Sortable from 'sortablejs';
+	import type { Document } from '$lib/domain/Document.js';
+	import { editStore } from '$lib/stores/edit-store.svelte.js';
 
-	let { id, class: className = "", style, document, registry }: ScribeProps = $props();
+	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
 
 	let loading = $state(true);
+	let dataOrder = $state<HTMLElement>();
+	let documentState = $state<Document<C>>(null!);
 
 	$effect.pre(() => {
 		// Initialize the global registry with the default components and any custom components provided via props
@@ -31,6 +37,15 @@
 			...defaultRegistry,
 			...(registry || {})
 		} as ComponentRegistry<C>);
+			
+		// If using edit mode, initialize the data store with the document's initial bindings
+		if (mode === 'edit' && document) {
+			editStore.initialize(document);
+			documentState = document;
+		} else {
+			documentState = document;
+		}
+
 		loading = false;
 	});
 
@@ -40,14 +55,43 @@
 			dataStore.initialize(document.bindings);
 		}
 	});
+
+	// Sortable initialization
+	$effect(() => {
+		if (mode !== 'edit') return;
+		if (!dataOrder) return;
+
+		const instance = Sortable.create(dataOrder, {
+            sort: true,
+            direction: 'vertical',
+            handle: '#edit-handle',
+			animation: 200,
+            ghostClass: 'bg-blue-100',
+
+            onSort(event) {
+                const { oldIndex, newIndex } = event;
+                if (oldIndex === undefined || newIndex === undefined) return;
+				editStore.moveSection(oldIndex, newIndex);
+            },
+		});
+
+		return () => {
+			if (instance) {
+				instance.destroy();
+			}
+		};
+	})
 </script>
 
 <div {id} class={`${className} scribe-document md:w-full`}>
-	<h1>{document.title}</h1>
-	<div {style} class="scribe-sections">
+	<div class="title-container">
+		<h1>{documentState.title}</h1>
+		<button onclick={() => console.log($state.snapshot(documentState))}>Print document</button>
+	</div>
+	<div {style} bind:this={dataOrder} class="scribe-sections">
 		{#if !loading}
-			{#each document.sections as section, index (index)}
-				<Section data={section} />
+			{#each documentState.sections as section, index (index)}
+				<Section data={section} {mode} />
 			{/each}
 		{/if}
 	</div>
@@ -73,6 +117,11 @@
 	.scribe-document *::before,
 	.scribe-document *::after {
 		box-sizing: inherit;
+	}
+
+	.title-container {
+		display: flex;
+		gap: 2rem;
 	}
 
 	@media (width >= 48rem /* 768px */) {

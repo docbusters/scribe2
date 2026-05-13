@@ -20,7 +20,6 @@
         }
 
         const componentValue = cellValue.value;
-        console.log(componentValue)
 
         return {
             component: globalRegistry.getComponent(componentValue.type),

@@ -44,6 +44,7 @@
 		"@sveltejs/package": "^2.5.7",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@types/node": "^22",
+		"@types/sortablejs": "^1.15.9",
 		"eslint": "^10.2.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.17.0",
@@ -64,6 +65,7 @@
 		"@tailwindcss/vite": "^4.3.0",
 		"katex": "^0.16.45",
 		"prettier-plugin-tailwindcss": "^0.8.0",
+		"sortablejs": "^1.15.7",
 		"tailwindcss": "^4.3.0"
 	}
 }

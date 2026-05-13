@@ -4,12 +4,14 @@
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { GridSection } from '$lib/domain/Section.js';
 	import Section from './Section.svelte';
+	import type { ScribeMode } from '../../types/ScribeProps.js';
 	
     interface GridSectionProps {
         data: GridSection<DefaultComponents | C>;
+        mode: ScribeMode;
     }
 
-    let { data }: GridSectionProps = $props();
+    let { data, mode }: GridSectionProps = $props();
 
     const items = $derived(data.content);
     const gridStyle = $derived(`grid-template-columns: repeat(${data.columns}, 1fr); grid-template-rows: repeat(${data.rows}, 1fr); grid-column-gap: ${data.gapX}px; grid-row-gap: ${data.gapY}px;`);
@@ -27,7 +29,7 @@
 <div class="grid-section" style={gridStyle}>
     {#each items as item, index (`${item.section.type}-${index}`)}
         <div style={getItemStyle(item)}>
-            <Section data={item.section} />
+            <Section data={item.section} {mode} isNested />
         </div>
     {/each}
 </div>

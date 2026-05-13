@@ -6,28 +6,40 @@
 	import ParagraphSection from './ParagraphSection.svelte';
 	import BlockSection from './BlockSection.svelte';
 	import GridSection from './GridSection.svelte';
+	import type { ScribeMode } from '../../types/ScribeProps.js';
 	
     interface SectionProps {
         data: Section<DefaultComponents | C>;
+        mode: ScribeMode;
+        isNested?: boolean;
     }
 
-    let { data }: SectionProps = $props();
+    let { data, mode, isNested = false }: SectionProps = $props();
+
+    let isEditMode = $derived(mode === 'edit' && !isNested);
 
 </script>
 
-<section>
+<section class={isEditMode ? 'section-edit' : ''}>
+    {#if isEditMode}
+        <div id="edit-handle" class="edit-handle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+        </div>
+    {/if}
+
     <h2>{data.title}</h2>
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} />
     {:else if data.type === 'block-section'}
         <BlockSection {data} />
     {:else if data.type === 'grid-section'}
-        <GridSection {data} />
+        <GridSection {data} {mode} />
     {/if}
 </section>
 
 <style>
     section {
+        position: relative;
         flex: 1;
         gap: var(--scribe-section-heading-gap);
         display: flex;
@@ -36,6 +48,30 @@
         color: var(--scribe-section-foreground);
         border-radius: var(--scribe-section-radius);
         padding: 0.75rem 1.25rem;
+    }
+
+    .section-edit {
+        padding-left: 1.75rem;
+    }
+
+    :hover.section-edit .edit-handle {
+        opacity: 1;
+    }
+
+    .edit-handle {
+        opacity: 0;
+        position: absolute;
+        left: 0.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: grab;
+        border-radius: var(--scribe-radius-sm);
+        padding: 0.1rem;
+        transition: opacity 0.5s ease;
+    }
+
+    :hover.edit-handle {
+        background-color: color-mix(in srgb, var(--scribe-section-background), black 10%);
     }
 </style>
 

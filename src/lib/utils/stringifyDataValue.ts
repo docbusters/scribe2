@@ -2,7 +2,6 @@ import type { DataValue } from "$lib/domain/data/DataValue.js";
 import { dataStore } from "$lib/stores/data-store.svelte.js";
 
 export const stringifyDataValue = (value: DataValue): string => {
-    console.log('Stringifying value:', value);
     switch (value.type) {
         case 'string':
             return value.value;
