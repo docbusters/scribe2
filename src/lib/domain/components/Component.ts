@@ -4,7 +4,6 @@ export interface ComponentConfig {
     [key: string]: unknown;
 }
 
-// Añadimos un tercer genérico P (Props) que por defecto es un objeto vacío
 export interface BaseComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> {
     id: string;
     type: T;
@@ -22,5 +21,5 @@ export interface BlockComponent<T extends string, V extends DataValue, P extends
 }
 
 // Utility types to extract inline and block components from a union of components
-export type ExtractInline<C> = C extends { mode: 'inline' } ? C : never;
-export type ExtractBlock<C> = C extends { mode: 'block' } ? C : never;
+export type ExtractInline<C> = C extends { mode: 'inline'; id: string } ? C : never;
+export type ExtractBlock<C> = C extends { mode: 'block'; id: string } ? C : never;

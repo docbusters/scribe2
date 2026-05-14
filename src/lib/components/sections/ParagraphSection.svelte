@@ -4,12 +4,14 @@
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { ParagraphSection } from '$lib/domain/Section.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
+	import type { ScribeMode } from '$lib/types/ScribeProps.js';
 	
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;
+        mode: ScribeMode;
     }
 
-    let { data }: ParagraphSectionProps = $props();
+    let { data, mode }: ParagraphSectionProps = $props();
 
     let components = $derived(data.content);
 </script>
@@ -19,25 +21,26 @@
     {@const Component = globalRegistry.getComponent(component.type)}
         {#if component.mode === 'block'}
             <div class="block-component-container">
-                <Component componentData={component} />
+                <Component componentData={component} sectionId={data.id} {mode} />
             </div>
         {:else}
-            <Component componentData={component} />
+            <div class="inline-component-container">
+                <Component componentData={component} sectionId={data.id} {mode} />
+            </div>
         {/if}
     {/each}
 </div>
 
 <style>
-    .paragraph-section {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.5em;
-        align-items: center;
-    }
-
     .block-component-container {
         display: flex;
         width: 100%;
+        margin: 1rem 0;
+    }
+
+    .inline-component-container {
+        display: inline;
+        margin-right: 0.5rem;
+        line-height: 1.5rem;
     }
 </style>

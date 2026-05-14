@@ -35,9 +35,9 @@
 
     <h2>{data.title}</h2>
     {#if data.type === 'paragraph-section'}
-        <ParagraphSection {data} />
+        <ParagraphSection {data} {mode} />
     {:else if data.type === 'block-section'}
-        <BlockSection {data} />
+        <BlockSection {data} {mode} />
     {:else if data.type === 'grid-section'}
         <GridSection {data} {mode} />
     {/if}

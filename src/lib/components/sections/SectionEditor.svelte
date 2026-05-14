@@ -1,3 +1,10 @@
+<svelte:options customElement={{
+    props: {
+        sectionId: { type: 'String' },
+        disabled: { type: 'Boolean' }
+    }
+}} />
+
 <script lang="ts">
 	import type { HTMLAttributes } from "svelte/elements";
 	import Button from "../utilComponents/Button.svelte";

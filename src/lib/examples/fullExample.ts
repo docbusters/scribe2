@@ -13,27 +13,9 @@ export const fullExampleDocument: Document = {
                     mode: 'inline',
                     type: 'text',
                     value: {
-                        type: 'binding',
-                        id: 'name',
-                    },
-                },
-                {
-                    id: 'input-1',
-                    mode: 'inline',
-                    type: 'text-input',
-                    value: {
-                        type: 'binding',
-                        id: 'name',
-                    }
-                },
-                {
-                    id: 'text-2',
-                    mode: 'inline',
-                    type: 'text',
-                    value: {
                         type: 'string',
-                        value: 'Place in the following input an url to an image:'
-                    }
+                        value: 'Hello! I am a full example document showcasing all the features of Scribe. Feel free to explore and test all the components and functionalities included in this document. Place in the following input an url to an image:'
+                    },
                 },
                 {
                     id: 'input-image',

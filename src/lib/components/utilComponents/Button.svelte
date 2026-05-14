@@ -1,3 +1,10 @@
+<svelte:options customElement={{
+    props: {
+        variant: { type: 'String' },
+        size: { type: 'String' }
+    }
+}} />
+
 <script lang="ts">
 	import { Button } from "bits-ui";
 	import type { HTMLButtonAttributes } from "svelte/elements";
@@ -7,7 +14,7 @@
     size?: "default" | "sm" | "lg" | "icon" | "icon-sm";
   }
 
-  let { children, style = "", class: className = "", variant = "default", size = "default", ...others }: ButtonProps = $props();
+  let { children, style = "", class: className = "", variant = "default", size = "default", ...restProps }: ButtonProps = $props();
 
   const variantStyles: Record<string, string> = {
     default: "background-color: var(--scribe-primary); color: var(--scribe-primary-foreground); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
@@ -31,7 +38,7 @@
 <Button.Root
   style={mergedStyle}
   class="scribe-btn {className}"
-  {...others}
+  {...restProps}
 >
   {@render children?.()}
 </Button.Root>

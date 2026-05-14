@@ -1,4 +1,7 @@
+import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
+import type { DataValue } from "$lib/domain/data/DataValue.js";
 import type { Document } from "$lib/domain/Document.js";
+import type { ParagraphSection } from "$lib/domain/Section.js";
 import { generateRandomId } from "$lib/utils/generateRandomId.js";
 
 /** Handles document modifications when the document is in edit mode */
@@ -8,6 +11,8 @@ class EditStore<C> {
     initialize(document: Document<C>) {
         this.document = document;
     }
+
+    /* * SECTION MANAGEMENT * */
 
     /** Adds a new section below the specified section */
     addSectionBelow(sectionId: string) {
@@ -65,6 +70,42 @@ class EditStore<C> {
         const sections = [...this.document.sections];
         sections.splice(index, 1);
         this.document = { ...this.document, sections };
+        return true;
+    }
+
+    /* * COMPONENT MANAGEMENT * */
+
+    getComponentValue(sectionId: string, componentId: string) {
+        const sectionIndex = this.document.sections.findIndex(section => section.id === sectionId);
+        if (sectionIndex === -1) {
+            console.warn("Section not found for setting component value:", sectionId);
+            return null;
+        }
+        const section = this.document.sections[sectionIndex] as ParagraphSection<C>;
+        const componentIndex = section.content.findIndex(component => component.id === componentId);
+        if (componentIndex === -1) {
+            console.warn("Component not found for setting value:", componentId);
+            return null;
+        }
+        const component = (section.content[componentIndex] as unknown as BaseComponent<string, DataValue, ComponentConfig>);
+        return component.value;
+    }
+
+    setComponentValue(sectionId: string, componentId: string, newValue: DataValue) {
+        const sectionIndex = this.document.sections.findIndex(section => section.id === sectionId);
+        if (sectionIndex === -1) {
+            console.warn("Section not found for setting component value:", sectionId);
+            return false;
+        }
+        const section = this.document.sections[sectionIndex] as ParagraphSection<C>;
+        const componentIndex = section.content.findIndex(component => component.id === componentId);
+        if (componentIndex === -1) {
+            console.warn("Component not found for setting value:", componentId);
+            return false;
+        }
+        const component = (section.content[componentIndex] as unknown as BaseComponent<string, DataValue, ComponentConfig>);
+        component.value = newValue;
+
         return true;
     }
 }
