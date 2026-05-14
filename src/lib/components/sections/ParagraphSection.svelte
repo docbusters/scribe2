@@ -16,8 +16,14 @@
 
 <div class="paragraph-section">
     {#each components as component, index (`${component.type}-${index}`)}
-        {@const Component = globalRegistry.getComponent(component.type)}
-        <Component componentData={component} />
+    {@const Component = globalRegistry.getComponent(component.type)}
+        {#if component.mode === 'block'}
+            <div class="block-component-container">
+                <Component componentData={component} />
+            </div>
+        {:else}
+            <Component componentData={component} />
+        {/if}
     {/each}
 </div>
 
@@ -28,5 +34,10 @@
         flex-wrap: wrap;
         gap: 0.5em;
         align-items: center;
+    }
+
+    .block-component-container {
+        display: flex;
+        width: 100%;
     }
 </style>

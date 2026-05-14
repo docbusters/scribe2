@@ -7,7 +7,7 @@ export interface ParagraphSection<C> {
     id: string;
     type: "paragraph-section";
     title: string;
-    content: ExtractInline<C>[]; // Only admits inline components
+    content: (ExtractInline<C> | ExtractBlock<C>)[]; // Admits inline and block components
 }
 
 /** Contains a single component that cannot be used inline */

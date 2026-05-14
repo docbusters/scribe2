@@ -49,6 +49,19 @@ export const fullExampleDocument: Document = {
                     }
                 },
                 {
+                    id: 'image-1',
+                    type: 'image',
+                    mode: 'block',
+                    value: {
+                        type: 'binding',
+                        id: 'image-url',
+                    },
+                    config: {
+                        emptyText: 'No image URL provided. Please enter an URL in the input above.',
+                        errorText: 'The provided URL is not a valid image. Please check the URL and try again.',
+                    }
+                },
+                {
                     id: 'text-latex',
                     mode: 'inline',
                     type: 'text',
@@ -66,39 +79,16 @@ export const fullExampleDocument: Document = {
                         id: 'latex-string',
                     }
                 },
-            ]
-        },
-        {
-            id: 'section-2',
-            title: 'Image section',
-            type: 'block-section',
-            content: {
-                id: 'image-1',
-                type: 'image',
-                mode: 'block',
-                value: {
-                    type: 'binding',
-                    id: 'image-url',
+                {
+                    id: 'latex-1',
+                    type: 'latex',
+                    mode: 'block',
+                    value: {
+                        type: 'binding',
+                        id: 'latex-string',
+                    }
                 },
-                config: {
-                    emptyText: 'No image URL provided. Please enter an URL in the input above.',
-                    errorText: 'The provided URL is not a valid image. Please check the URL and try again.',
-                }
-            },
-        },
-        {
-            id: 'section-3',
-            title: 'Latex section',
-            type: 'block-section',
-            content: {
-                id: 'latex-1',
-                type: 'latex',
-                mode: 'block',
-                value: {
-                    type: 'binding',
-                    id: 'latex-string',
-                }
-            }
+            ]
         },
         {
             id: 'section-4',
