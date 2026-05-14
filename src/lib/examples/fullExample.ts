@@ -4,6 +4,7 @@ export const fullExampleDocument: Document = {
     title: 'Full Example Document',
     sections: [
         {
+            id: 'section-1',
             title: 'First section',
             type: 'paragraph-section',
             content: [
@@ -68,6 +69,7 @@ export const fullExampleDocument: Document = {
             ]
         },
         {
+            id: 'section-2',
             title: 'Image section',
             type: 'block-section',
             content: {
@@ -85,6 +87,7 @@ export const fullExampleDocument: Document = {
             },
         },
         {
+            id: 'section-3',
             title: 'Latex section',
             type: 'block-section',
             content: {
@@ -98,6 +101,7 @@ export const fullExampleDocument: Document = {
             }
         },
         {
+            id: 'section-4',
             title: 'Table section',
             type: 'block-section',
             content: {
@@ -194,6 +198,7 @@ export const fullExampleDocument: Document = {
             }
         },
         {
+            id: 'section-5',
             title: 'Grid section',
             type: 'grid-section',
             columns: 2,
@@ -205,6 +210,7 @@ export const fullExampleDocument: Document = {
                     row: 1,
                     column: 1,
                     section: {
+                        id: 'section-5-1',
                         title: 'Nested section 1',
                         type: 'paragraph-section',
                         content: [
@@ -224,6 +230,7 @@ export const fullExampleDocument: Document = {
                     row: 2,
                     column: 2,
                     section: {
+                        id: 'section-5-2',
                         title: 'Nested section 2',
                         type: 'paragraph-section',
                         content: [
@@ -243,6 +250,7 @@ export const fullExampleDocument: Document = {
                     row: 1,
                     column: 2,
                     section: {
+                        id: 'section-5-3',
                         title: 'I am a grid inside a grid (sectionception)',
                         type: 'grid-section',
                         columns: 2,
@@ -255,6 +263,7 @@ export const fullExampleDocument: Document = {
                                 column: 1,
                                 colspan: 2,
                                 section: {
+                                    id: 'section-5-3',
                                     title: 'Nested nested section 1',
                                     type: 'paragraph-section',
                                     content: [
@@ -275,6 +284,7 @@ export const fullExampleDocument: Document = {
                                 row: 2,
                                 column: 2,
                                 section: {
+                                    id: 'section-5-4',
                                     title: 'Nested nested section 2',
                                     type: 'paragraph-section',
                                     content: [

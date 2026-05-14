@@ -63,9 +63,11 @@
 	],
 	"dependencies": {
 		"@tailwindcss/vite": "^4.3.0",
+		"bits-ui": "^2.18.1",
 		"katex": "^0.16.45",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"sortablejs": "^1.15.7",
-		"tailwindcss": "^4.3.0"
+		"tailwindcss": "^4.3.0",
+		"uuid": "^14.0.0"
 	}
 }

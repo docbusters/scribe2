@@ -4,6 +4,7 @@ export type Section<C> = ParagraphSection<C> | BlockSection<C> | GridSection<C>;
 
 /** Contains a list of inline components */
 export interface ParagraphSection<C> {
+    id: string;
     type: "paragraph-section";
     title: string;
     content: ExtractInline<C>[]; // Only admits inline components
@@ -11,6 +12,7 @@ export interface ParagraphSection<C> {
 
 /** Contains a single component that cannot be used inline */
 export interface BlockSection<C> {
+    id: string;
     type: "block-section";
     title: string;
     content: ExtractBlock<C>; // Only admits block components
@@ -18,6 +20,7 @@ export interface BlockSection<C> {
 
 /** Allows creating a grid layout with nested sections */
 export interface GridSection<C> {
+    id: string;
     type: "grid-section";
     title: string;
     rows: number;

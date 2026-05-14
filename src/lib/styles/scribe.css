@@ -5,7 +5,9 @@
 	--scribe-doc-width: 70vw; /* Maximum width of the document content */
 	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */
 
-    --scribe-secondary-background: oklch(0.97 0 0); /* Secondary background color for elements like cards, modals, etc. */
+	--scribe-primary: oklch(0.205 0 0); /* Primary background color for elements like buttons, etc. */
+  	--scribe-primary-foreground: oklch(0.985 0 0); /* Text color for elements with primary background */
+    --scribe-secondary: oklch(0.94 0 0); /* Secondary background color for elements like cards, modals, etc. */
     --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
 
 	/* Section-level variables */
@@ -13,13 +15,16 @@
 	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
 	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
 	--scribe-section-separation: 0.75rem; /* Gap between sections */
-	--scribe-section-heading-gap: 1rem; /* Gap between section heading and content */
+	--scribe-section-heading-gap: 1.5rem; /* Gap between section heading and content */
 
 	/* Misc. variables */
 	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
 	--scribe-selection-color: oklch(0.6194 0.2085 255.62 / 25%); /* Color for text selection */
-	--scribe-error-background: oklch(from var(--scribe-error-foreground) l c h / 15%); /* Background color for error states */
-	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error states */
+	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
+	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
+	--scribe-popover: oklch(1 0 0);
+  	--scribe-popover-foreground: oklch(0.145 0 0);
+	--scribe-muted: oklch(0.97 0 0);
 
     /** Font family variables */
     --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
@@ -44,6 +49,7 @@
 	/* Font weight variables */
 	--scribe-font-weight-light: 300;
 	--scribe-font-weight-regular: 400;
+	--scribe-font-weight-medium: 500;
 	--scribe-font-weight-semibold: 600;
 	--scribe-font-weight-bold: 700;
 

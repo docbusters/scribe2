@@ -55,7 +55,7 @@
     }
 
     .icon-error {
-        background-color: var(--scribe-error-background);
+        background-color: oklch(from var(--scribe-error-foreground) l c h / 15%);
         color: var(--scribe-error-foreground);
     }
 

@@ -3,15 +3,15 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>WebComponent Styles test</title>
+		<title>WebComponent JSON test</title>
 
 		<script type="module" src="../dist/scribe.js"></script>
 		<link rel="stylesheet" href="../dist/scribe.css" />
 	</head>
 	<body>
-		<h1>Scribe with Styles test</h1>
+		<h1>Scribe with JSON test</h1>
 
-		<scribe-interpreter id="scribe" mode="view" />
+		<scribe-interpreter id="scribe" mode="edit" />
 	</body>
 </html>
 
@@ -23,11 +23,3 @@
 		scribeElement.document = data;
 	}
 </script>
-
-<style>
-	:root {
-		--scribe-doc-background: #086a22;
-		--scribe-doc-foreground: #f0f0f0;
-		--scribe-font-heading: 'courier new', sans-serif;
-	}
-</style>

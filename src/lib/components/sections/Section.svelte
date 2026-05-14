@@ -7,6 +7,8 @@
 	import BlockSection from './BlockSection.svelte';
 	import GridSection from './GridSection.svelte';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
+	import SectionEditor from './SectionEditor.svelte';
+	import { fade } from 'svelte/transition';
 	
     interface SectionProps {
         data: Section<DefaultComponents | C>;
@@ -20,10 +22,14 @@
 
 </script>
 
-<section class={isEditMode ? 'section-edit' : ''}>
+<section class={isEditMode ? 'section-edit' : ''} in:fade>
     {#if isEditMode}
         <div id="edit-handle" class="edit-handle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+        </div>
+
+        <div class="section-editor">
+            <SectionEditor sectionId={data.id} />
         </div>
     {/if}
 
@@ -54,20 +60,32 @@
         padding-left: 1.75rem;
     }
 
-    :hover.section-edit .edit-handle {
+    :hover.section-edit .edit-handle, :hover.section-edit .section-editor {
         opacity: 1;
     }
 
     .edit-handle {
         opacity: 0;
         position: absolute;
-        left: 0.25rem;
+        left: 0.1rem;
         top: 50%;
         transform: translateY(-50%);
         cursor: grab;
         border-radius: var(--scribe-radius-sm);
         padding: 0.1rem;
         transition: opacity 0.5s ease;
+    }
+
+    .section-editor {
+        position: absolute;
+        bottom: 50%;
+        transform: translateY(50%) translateX(90%);
+        right: 0;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        padding: 0.25rem 1rem;
+        border-radius: 1rem;
     }
 </style>
 
