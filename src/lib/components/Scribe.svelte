@@ -25,6 +25,7 @@
 	import type { Document } from '$lib/domain/Document.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
+	import ComponentToolbar from './utilComponents/ComponentToolbar.svelte';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
 
 	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
@@ -127,6 +128,8 @@
 			{/if}
 		</div>
 	{/if}
+
+	<ComponentToolbar />
 </div>
 
 <style>
@@ -219,6 +222,10 @@
         border-radius: var(--scribe-radius-xl);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-popover */
         outline: none;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
     }
 
     :global(.dropdown-content:focus-visible) {

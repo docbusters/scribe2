@@ -3,6 +3,7 @@
 	import type { TextComponent } from '$lib/domain/components/DefaultComponents.js';
 	import type { StringValue } from '$lib/domain/data/DataValue.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
@@ -57,6 +58,20 @@
                 if (isAtEnd) {
                     console.log('At end of text, should move to next component');
                 }
+                break;
+            }
+            case '/': {
+                const isSpaceBefore = isAtStart || /\s$/.test(textBefore);
+                const isSpaceAfter = isAtEnd || /^\s/.test(textAfter);
+
+                // If the slash is part of a word, do nothing special
+                if (!isSpaceBefore || !isSpaceAfter) {
+                    return;
+                }
+
+                // Show the add component dropdown
+                const rect = range.getBoundingClientRect();
+                toolbarStore.open(rect.x, rect.bottom);
                 break;
             }
         }

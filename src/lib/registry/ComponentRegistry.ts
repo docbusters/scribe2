@@ -11,7 +11,14 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     mode: ScribeMode;
 }
 
-export type ComponentRegistry<TComponent extends BaseComponent<string, DataValue, ComponentConfig | undefined> = never> = {
-    [K in (DefaultComponents | TComponent)['type']]: Component<ScribeComponentProps<Extract<DefaultComponents | TComponent, { type: K }>>>;
+export type ComponentRegistry<
+    TComponent extends BaseComponent<string, DataValue, ComponentConfig | undefined> = never
+> = {
+    [C in DefaultComponents | TComponent as C['type']]: {
+        name: string;
+        description: string;
+        icon: string;
+        component: Component<ScribeComponentProps<C>>;
+    };
 };
 

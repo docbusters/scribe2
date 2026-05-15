@@ -1,5 +1,3 @@
-import type { ExtractBlock, ExtractInline } from "./components/Component.js";
-
 export type Section<C> = ParagraphSection<C> | GridSection<C>;
 
 /** Contains a list of inline components */
@@ -7,7 +5,7 @@ export interface ParagraphSection<C> {
     id: string;
     type: "paragraph-section";
     title: string;
-    content: Record<string, ExtractInline<C> | ExtractBlock<C>>; // Admits inline and block components
+    content: Record<string, C>; // Admits components defined in C
 }
 
 /** Allows creating a grid layout with nested sections */

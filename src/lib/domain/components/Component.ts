@@ -19,7 +19,3 @@ export interface InlineComponent<T extends string, V extends DataValue, P extend
 export interface BlockComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> extends BaseComponent<T, V, P> {
     mode: 'block';
 }
-
-// Utility types to extract inline and block components from a union of components
-export type ExtractInline<C> = C extends { mode: 'inline'; id: string } ? C : never;
-export type ExtractBlock<C> = C extends { mode: 'block'; id: string } ? C : never;

@@ -24,7 +24,8 @@
 	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
 	--scribe-popover: oklch(1 0 0);
   	--scribe-popover-foreground: oklch(0.145 0 0);
-	--scribe-muted: oklch(0.97 0 0);
+	--scribe-muted: oklch(0.97 0 0); /* Background color for muted elements like disabled buttons, etc. */
+	--scribe-muted-foreground: oklch(0.556 0 0); /* Text color for muted elements */
 
     /** Font family variables */
     --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
