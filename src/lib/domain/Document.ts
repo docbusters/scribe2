@@ -4,7 +4,7 @@ import type { Section } from "./Section.js";
 
 export interface Document<C = never> {
     title: string;
-    sections: Section<DefaultComponents | C>[];
+    sections: Record<string, Section<DefaultComponents | C>>;
     bindings: Record<BindingValue['id'], BindingsDefinition>;
 }
 

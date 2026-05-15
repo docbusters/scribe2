@@ -5,7 +5,7 @@
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 
-    let { componentData }: ScribeComponentProps<TableComponent> = $props();
+    let { componentData, mode, sectionId }: ScribeComponentProps<TableComponent> = $props();
 
     const recordValue = $derived(componentData.value);
     const config = $derived(componentData.config);
@@ -37,7 +37,7 @@
                         {@const Component = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
                             {#if Component}
-                                <Component.component componentData={Component.data} />
+                                <Component.component componentData={Component.data} {mode} {sectionId} />
                             {/if}
                         </td>
                     {/each}

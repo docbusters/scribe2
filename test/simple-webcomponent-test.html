@@ -18,12 +18,12 @@
 <script>
 	const basicExampleDocument = {
 		title: 'Basic Example Document',
-		sections: [
-			{
+		sections: {
+			'section-1': {
 				title: 'Introduction',
 				type: 'paragraph-section',
-				content: [
-					{
+				content: {
+					'text-1': {
 						id: 'text-1',
 						mode: 'inline',
 						type: 'text',
@@ -33,35 +33,38 @@
 								'This is a basic example document to demonstrate the structure of a Document with Sections and Components.'
 						}
 					},
-					{
+					'input-1': {
 						id: 'input-1',
 						mode: 'inline',
 						type: 'text-input',
 						value: {
 							type: 'binding',
-							id: 'name'
+							id: 'image-url'
+						},
+						config: {
+							placeholder: 'Image URL'
 						}
 					}
-				]
+				}
 			},
-			{
-				title: 'First section',
+			'section-2': {
+				title: 'Image section',
 				type: 'paragraph-section',
-				content: [
-					{
-						id: 'text-2',
+				content: {
+					'image': {
+						id: 'image',
 						mode: 'inline',
-						type: 'text',
+						type: 'image',
 						value: {
 							type: 'binding',
-							id: 'name'
+							id: 'image-url'
 						}
 					}
-				]
+				}
 			}
-		],
+		},
 		bindings: {
-			name: { type: 'string', initialValue: 'I am a binded name!!!' }
+			'image-url': { type: 'string', initialValue: '' }
 		}
 	};
 

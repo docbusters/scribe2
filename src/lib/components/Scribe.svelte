@@ -25,12 +25,14 @@
 	import type { Document } from '$lib/domain/Document.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
+	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
 
 	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
 
 	let loading = $state(true);
 	let dataOrder = $state<HTMLElement>();
 	let documentState = $derived<Document<C>>(mode === 'edit' ? editStore.document as Document<C> : document);
+	let sections = $derived(Object.values(documentState?.sections || {}));
 
 	$effect.pre(() => {
 		// Initialize the global registry with the default components and any custom components provided via props
@@ -89,17 +91,37 @@
 			}
 		};
 	})
+
+	let title = $derived(parseStringForContentEditable(documentState.title));
+
+	function handleTitleChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
+        const target = event.target as HTMLDivElement;
+		console.log('New doc title value:', target.innerText);
+        editStore.setDocumentTitle(target.innerText);
+    }
 </script>
 
 <div {id} class={`${className} scribe-document md:w-full`}>
+	{#if mode === 'edit'}
+		<Button variant="outline" onclick={() => console.log($state.snapshot(documentState))}>Print document (debugging)</Button>
+	{/if}
 	{#if documentState}
 		<div class="title-container">
-			<h1>{documentState.title}</h1>
-			<Button variant="outline" onclick={() => console.log($state.snapshot(documentState))}>Print document</Button>
+			{#key title}
+				<h1 class="document-title" contenteditable={mode === 'edit'} onblur={handleTitleChange}>
+					{#each title as line, index (index)}
+						{#if line === ''}
+							<br>
+						{:else}
+							{line}
+						{/if}
+					{/each}
+				</h1>
+			{/key}
 		</div>
 		<div {style} bind:this={dataOrder} class="scribe-sections">
 			{#if !loading}
-				{#each documentState.sections as section, index (index)}
+				{#each sections as section, index (index)}
 					<Section data={section} {mode} />
 				{/each}
 			{/if}
@@ -139,10 +161,12 @@
 	}
 
 	.title-container {
-		display: flex;
-		gap: 2rem;
-		align-items: center;
-		justify-content: space-between;
+		display: inline;
+	}
+
+	.document-title {
+		outline: none;
+        display: inline;
 	}
 
 	@media (width >= 48rem /* 768px */) {

@@ -4,11 +4,12 @@
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { Section } from '$lib/domain/Section.js';
 	import ParagraphSection from './ParagraphSection.svelte';
-	import BlockSection from './BlockSection.svelte';
 	import GridSection from './GridSection.svelte';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import SectionEditor from './SectionEditor.svelte';
 	import { fade } from 'svelte/transition';
+	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
 	
     interface SectionProps {
         data: Section<DefaultComponents | C>;
@@ -19,6 +20,12 @@
     let { data, mode, isNested = false }: SectionProps = $props();
 
     let isEditMode = $derived(mode === 'edit' && !isNested);
+    let sectionTitle = $derived(parseStringForContentEditable(data.title));
+
+    function handleTitleChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
+        const target = event.target as HTMLDivElement;
+        editStore.editSectionTitle(data.id, target.innerText);
+    }
 
 </script>
 
@@ -32,12 +39,22 @@
             <SectionEditor sectionId={data.id} />
         </div>
     {/if}
-
-    <h2>{data.title}</h2>
+    
+    <div class="section-title-container">
+        {#key sectionTitle}
+            <h2 contenteditable={isEditMode} onblur={handleTitleChange} class="section-title">
+                {#each sectionTitle as line, index (index)}
+                    {#if line === ''}
+                        <br>
+                    {:else}
+                        {line}
+                    {/if}
+                {/each}
+            </h2>
+        {/key}
+    </div>
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} {mode} />
-    {:else if data.type === 'block-section'}
-        <BlockSection {data} {mode} />
     {:else if data.type === 'grid-section'}
         <GridSection {data} {mode} />
     {/if}
@@ -54,6 +71,15 @@
         color: var(--scribe-section-foreground);
         border-radius: var(--scribe-section-radius);
         padding: 0.75rem 1.25rem;
+    }
+
+    .section-title-container {
+        display: inline;
+    }
+
+    .section-title {
+        outline: none;
+        display: inline;
     }
 
     .section-edit {

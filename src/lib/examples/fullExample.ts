@@ -2,13 +2,13 @@ import type { Document } from "$lib/domain/Document.js";
 
 export const fullExampleDocument: Document = {
     title: 'Full Example Document',
-    sections: [
-        {
+    sections: {
+        'section-1': {
             id: 'section-1',
             title: 'First section',
             type: 'paragraph-section',
-            content: [
-                {
+            content: {
+                'text-1': {
                     id: 'text-1',
                     mode: 'inline',
                     type: 'text',
@@ -17,7 +17,7 @@ export const fullExampleDocument: Document = {
                         value: 'Hello! I am a full example document showcasing all the features of Scribe. Feel free to explore and test all the components and functionalities included in this document. Place in the following input an url to an image:'
                     },
                 },
-                {
+                'input-image': {
                     id: 'input-image',
                     mode: 'inline',
                     type: 'text-input',
@@ -30,7 +30,7 @@ export const fullExampleDocument: Document = {
                         expandWithContent: true,
                     }
                 },
-                {
+                'image-1': {
                     id: 'image-1',
                     type: 'image',
                     mode: 'block',
@@ -43,7 +43,7 @@ export const fullExampleDocument: Document = {
                         errorText: 'The provided URL is not a valid image. Please check the URL and try again.',
                     }
                 },
-                {
+                'text-latex': {
                     id: 'text-latex',
                     mode: 'inline',
                     type: 'text',
@@ -52,7 +52,7 @@ export const fullExampleDocument: Document = {
                         value: 'Place in the following input a latex expression: '
                     }
                 },
-                {
+                'input-latex': {
                     id: 'input-latex',
                     mode: 'inline',
                     type: 'text-input',
@@ -61,7 +61,7 @@ export const fullExampleDocument: Document = {
                         id: 'latex-string',
                     }
                 },
-                {
+                'latex-1': {
                     id: 'latex-1',
                     type: 'latex',
                     mode: 'block',
@@ -70,106 +70,84 @@ export const fullExampleDocument: Document = {
                         id: 'latex-string',
                     }
                 },
-            ]
+            },
         },
-        {
+        'section-4': {
             id: 'section-4',
             title: 'Table section',
-            type: 'block-section',
+            type: 'paragraph-section',
             content: {
-                id: 'table-1',
-                type: 'table',
-                mode: 'block',
-                value: {
-                    type: 'record',
+                'table-1': {
+                    id: 'table-1',
+                    type: 'table',
+                    mode: 'block',
                     value: {
-                        '0:0': {
-                            type: 'component',
-                            value: {
-                                type: 'text',
-                                id: 'text-table',
-                                mode: 'inline',
+                        type: 'record',
+                        value: {
+                            '0:0': {
+                                type: 'component',
                                 value: {
-                                    type: 'string',
-                                    value: 'That cell is linked to the input below ->'
+                                    type: 'text',
+                                    id: 'text-table',
+                                    mode: 'inline',
+                                    value: {
+                                        type: 'string',
+                                        value: 'I am normal text'
+                                    }
                                 }
-                            }
-                        },
-                        '0:1': {
-                            type: 'component',
-                            value: {
-                                type: 'text',
-                                id: 'text-table-2',
-                                mode: 'inline',
+                            },
+                            '1:1': {
+                                type: 'component',
                                 value: {
-                                    type: 'binding',
-                                    id: 'table-value-binding',
+                                    id: 'image-table',
+                                    type: 'image',
+                                    mode: 'block',
+                                    value: {
+                                        type: 'string',
+                                        value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg',
+                                    },
+                                    config: {
+                                        height: '150px',
+                                        position: 'contain',
+                                        
+                                        align: 'center',
+                                    }
                                 }
-                            }
-                        },
-                        '1:0': {
-                            type: 'component',
-                            value: {
-                                type: 'text-input',
-                                id: 'input-table-1',
-                                mode: 'inline',
+                            },
+                            '0:2': {
+                                type: 'component',
                                 value: {
-                                    type: 'binding',
-                                    id: 'table-value-binding',
+                                    type: 'text-input',
+                                    id: 'input-table-1',
+                                    mode: 'inline',
+                                    value: {
+                                        type: 'binding',
+                                        id: 'table-latex-binding',
+                                    }
                                 }
-                            }
-                        },
-                        '1:1': {
-                            type: 'component',
-                            value: {
-                                id: 'image-table',
-                                type: 'image',
-                                mode: 'block',
+                            },
+                            '1:2': {
+                                type: 'component',
                                 value: {
-                                    type: 'string',
-                                    value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg',
-                                },
-                                config: {
-                                    height: '150px',
-                                    position: 'contain',
-                                    
-                                    align: 'center',
-                                }
-                            }
-                        },
-                        '0:2': {
-                            type: 'component',
-                            value: {
-                                type: 'text-input',
-                                id: 'input-table-1',
-                                mode: 'inline',
-                                value: {
-                                    type: 'binding',
-                                    id: 'table-latex-binding',
-                                }
-                            }
-                        },
-                        '1:2': {
-                            type: 'component',
-                            value: {
-                                type: 'latex',
-                                id: 'table-latex',
-                                mode: 'inline',
-                                value: {
-                                    type: 'binding',
-                                    id: 'table-latex-binding',
+                                    type: 'latex',
+                                    id: 'table-latex',
+                                    mode: 'inline',
+                                    value: {
+                                        type: 'binding',
+                                        id: 'table-latex-binding',
+                                    }
                                 }
                             }
                         }
+                    },
+                    config: {
+                        cols: 3,
+                        rows: 2,
                     }
-                },
-                config: {
-                    cols: 3,
-                    rows: 2,
                 }
             }
         },
-        {
+        'section-5': {
             id: 'section-5',
             title: 'Grid section',
             type: 'grid-section',
@@ -185,8 +163,8 @@ export const fullExampleDocument: Document = {
                         id: 'section-5-1',
                         title: 'Nested section 1',
                         type: 'paragraph-section',
-                        content: [
-                            {
+                        content: {
+                            'text-4': {
                                 id: 'text-4',
                                 mode: 'inline',
                                 type: 'text',
@@ -195,7 +173,7 @@ export const fullExampleDocument: Document = {
                                     value: 'This is a nested section inside the grid.'
                                 }
                             }
-                        ]
+                        }
                     }
                 },
                 {
@@ -205,8 +183,8 @@ export const fullExampleDocument: Document = {
                         id: 'section-5-2',
                         title: 'Nested section 2',
                         type: 'paragraph-section',
-                        content: [
-                            {
+                        content: {
+                            'text-5': {
                                 id: 'text-5',
                                 mode: 'inline',
                                 type: 'text',
@@ -215,7 +193,7 @@ export const fullExampleDocument: Document = {
                                     value: 'This is another nested section inside the grid.'
                                 }
                             }
-                        ]
+                        }
                     }
                 },
                 {
@@ -238,8 +216,8 @@ export const fullExampleDocument: Document = {
                                     id: 'section-5-3',
                                     title: 'Nested nested section 1',
                                     type: 'paragraph-section',
-                                    content: [
-                                        {
+                                    content: {
+                                        'text-6': {
                                             id: 'text-6',
                                             mode: 'inline',
                                             type: 'text',
@@ -249,7 +227,7 @@ export const fullExampleDocument: Document = {
                                                     'This is a nested section inside the nested grid. I occupy 2 columns!'
                                             }
                                         }
-                                    ]
+                                    }
                                 }
                             },
                             {
@@ -259,8 +237,8 @@ export const fullExampleDocument: Document = {
                                     id: 'section-5-4',
                                     title: 'Nested nested section 2',
                                     type: 'paragraph-section',
-                                    content: [
-                                        {
+                                    content: {
+                                       'text-7': {
                                             id: 'text-7',
                                             mode: 'inline',
                                             type: 'text',
@@ -269,7 +247,7 @@ export const fullExampleDocument: Document = {
                                                 value: 'This is another nested section inside the nested grid.'
                                             }
                                         }
-                                    ]
+                                    }
                                 }
                             }
                         ]
@@ -277,12 +255,11 @@ export const fullExampleDocument: Document = {
                 }
             ]
         }
-    ],
+    },
     bindings: {
         name: { type: 'string', initialValue: 'I am a binded name!!!' },
         'image-url': { type: 'string', initialValue: '' },
         'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
-        'table-value-binding': { type: 'string', initialValue: '67' },
         'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
     }
 };

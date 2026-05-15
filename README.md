@@ -25,11 +25,13 @@ This command basically uses `vite.wc.config.ts` to generate the web component in
 
 ## Examples
 
-- [**Simple plain html example**](/test/simple-webcomponent-test.html): Shows the library usage with the default components.
+- [**Simple plain html example**](/test/simple-webcomponent-test.html): Shows the library usage with a basic example.
 
 - [**Simple JSON html example**](/test/simple-webcomponent-test-json.html): Shows the library usage using an external JSON to declare the document schema.
 
-- [**Simple html with styles example**](/test/simple-webcomponent-test-styles.html.html): Shows the library usage with custom styles
+- [**Simple html with styles example**](/test/simple-webcomponent-test-styles.html): Shows the library usage with custom styles
+
+- [**Simple html in edit mode**](/test/simple-webcomponent-test-edit.html): Shows the library usage in edit mode
 
 ## Styling
 
@@ -43,7 +45,9 @@ To style the default components, CSS variables can be used. It is recommended us
 	--scribe-doc-width: 70vw; /* Maximum width of the document content */
 	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */
 
-    --scribe-secondary-background: oklch(0.97 0 0); /* Secondary background color for elements like cards, modals, etc. */
+	--scribe-primary: oklch(0.205 0 0); /* Primary background color for elements like buttons, etc. */
+  	--scribe-primary-foreground: oklch(0.985 0 0); /* Text color for elements with primary background */
+    --scribe-secondary: oklch(0.94 0 0); /* Secondary background color for elements like cards, modals, etc. */
     --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
 
 	/* Section-level variables */
@@ -51,14 +55,21 @@ To style the default components, CSS variables can be used. It is recommended us
 	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
 	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
 	--scribe-section-separation: 0.75rem; /* Gap between sections */
-	--scribe-section-heading-gap: 1rem; /* Gap between section heading and content */
+	--scribe-section-heading-gap: 1.5rem; /* Gap between section heading and content */
 
 	/* Misc. variables */
 	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
+	--scribe-selection-color: oklch(0.6194 0.2085 255.62 / 25%); /* Color for text selection */
+	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
+	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
+	--scribe-popover: oklch(1 0 0);
+  	--scribe-popover-foreground: oklch(0.145 0 0);
+	--scribe-muted: oklch(0.97 0 0);
 
     /** Font family variables */
     --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
 	--scribe-font-sans: 'Segoe UI', sans-serif; /* Font for sans-serif text */
+	--scribe-font-mono: 'Segoe UI Mono', monospace; /* Font for monospace text */
 
 	/* Font size variables */
 	--scribe-font-size-xs: 0.75rem;
@@ -78,6 +89,7 @@ To style the default components, CSS variables can be used. It is recommended us
 	/* Font weight variables */
 	--scribe-font-weight-light: 300;
 	--scribe-font-weight-regular: 400;
+	--scribe-font-weight-medium: 500;
 	--scribe-font-weight-semibold: 600;
 	--scribe-font-weight-bold: 700;
 
@@ -100,12 +112,7 @@ To style the default components, CSS variables can be used. It is recommended us
 }
 
 :root .dark {
-    --scribe-doc-background: oklch(0.145 0 0);
-	--scribe-doc-foreground: oklch(0.985 0 0);
-
-    --scribe-secondary: oklch(0.269 0 0);
-    --scribe-secondary-foreground: oklch(0.985 0 0);
-
+	/* Overwrite the values as desired for dark mode */
 	/* ... */
 }
 ```

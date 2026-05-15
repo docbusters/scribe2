@@ -13,7 +13,7 @@
 
     let { data, mode }: ParagraphSectionProps = $props();
 
-    let components = $derived(data.content);
+    let components = $derived(Object.values(data.content));
 </script>
 
 <div class="paragraph-section">

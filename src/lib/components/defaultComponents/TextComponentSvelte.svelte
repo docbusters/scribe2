@@ -3,6 +3,7 @@
 	import type { TextComponent } from '$lib/domain/components/DefaultComponents.js';
 	import type { StringValue } from '$lib/domain/data/DataValue.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
@@ -61,22 +62,24 @@
         }
     }
 
-    let value = $derived(componentData.value.value.split('\n'));
+    let value = $derived(parseStringForContentEditable(componentData.value.value));
 </script>
 
-<div role="textbox" tabindex="0" class="edit-text" contenteditable={mode === 'edit'} onblur={handleTextChange} onkeydown={handleKeyDown}>
-    {#if mode === 'view'}
-        {componentData.value.value}
-    {:else if mode === 'edit'}
-        {#each value as line, index (index)}
-            {#if line === ''}
-                <br>
-            {:else}
-                {line}
-            {/if}
-        {/each}
-    {/if}
-</div>
+{#key value}
+    <div role="textbox" tabindex="0" class="edit-text" contenteditable={mode === 'edit'} onblur={handleTextChange} onkeydown={handleKeyDown}>
+        {#if mode === 'view'}
+            {componentData.value.value}
+        {:else if mode === 'edit'}
+            {#each value as line, index (index)}
+                {#if line === ''}
+                    <br>
+                {:else}
+                    {line}
+                {/if}
+            {/each}
+        {/if}
+    </div>
+{/key}
 
 <style>
     .edit-text {
