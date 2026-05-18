@@ -5,7 +5,8 @@
 	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
 
-    let components = $derived(Object.entries(globalRegistry.components || {}));
+    // We dont want to insert text components as they can be added by simply writing
+    let components = $derived(Object.entries(globalRegistry.components || {}).filter(([key]) => key !== 'text'));
 
     function insertChildComponent(componentType: string) {
         if (!toolbarStore.sectionId) return;

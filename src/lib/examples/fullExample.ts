@@ -151,17 +151,7 @@ export const fullExampleDocument: Document = {
             id: 'empty-section',
             title: 'Empty section',
             type: 'paragraph-section',
-            content: {
-                'text-empty': {
-                    id: 'text-empty',
-                    mode: 'inline',
-                    type: 'text',
-                    value: {
-                        type: 'string',
-                        value: ''
-                    }
-                }
-            },
+            content: {},
         },
         'section-5': {
             id: 'section-5',

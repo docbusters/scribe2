@@ -174,7 +174,7 @@ class EditStore<C> {
     /** Add a new component to a section. If componentId is null, the component will be appended to the end */
     addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false) {
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
-        if (!section) return false;
+        if (!section) return null;
 
         // Generate a new id and build the component
         const newId = generateRandomId(componentType);
@@ -195,7 +195,7 @@ class EditStore<C> {
         // If no target component is specified, just append to the end
         if (!componentId) {
             section.content[newId] = newComponent;
-            return true;
+            return newId;
         }
 
         // Reconstruct the section content object to preserve order and insert after or replace the target
@@ -210,11 +210,11 @@ class EditStore<C> {
                 entries.splice(targetIndex + 1, 0, [newId, newComponent]);
             }
             section.content = Object.fromEntries(entries);
-            return true;
+            return newId;
         } else {
             console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
             section.content[newId] = newComponent;
-            return true;
+            return newId;
         }
     }
 

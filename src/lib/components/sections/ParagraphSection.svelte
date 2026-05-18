@@ -1,6 +1,6 @@
 <script lang="ts" generics="C extends BaseComponent<string, DataValue> = never">
     import type { BaseComponent } from '../../domain/components/Component.ts';
-    import type { DataValue } from '../../domain/data/DataValue.ts';
+    import type { DataValue, StringValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { ParagraphSection } from '$lib/domain/Section.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
@@ -13,7 +13,18 @@
 
     let { data, mode }: ParagraphSectionProps = $props();
 
-    let components = $derived(Object.values(data.content));
+    // We add a ghost component at the end of the section in edit mode to allow adding new components by typing
+    let ghostComponent = {
+        id: '',
+        type: 'text',
+        mode: 'inline',
+        value: { type: 'string', value: '' } as StringValue
+    } as unknown as DefaultComponents;
+
+    let components = $derived.by(() => {
+        const comps = Object.values(data.content);
+        return mode === 'edit' ? [...comps, ghostComponent] : comps;
+    });
 </script>
 
 <div class="paragraph-section">

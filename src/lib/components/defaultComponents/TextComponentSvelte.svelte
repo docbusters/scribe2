@@ -14,7 +14,20 @@
         const target = event.target as HTMLDivElement;
         const newValue: StringValue = { type: 'string', value: target.innerText };
         console.log('New value:', newValue);
-        editStore.setComponentValue(sectionId, componentData.id, newValue);
+        const success = editStore.setComponentValue(sectionId, componentData.id, newValue);
+        
+        // If the component is not found, we can assume it is a blank space
+        if (!success) {
+            // We add a new text component with the value and remove the ghost component
+            const newId = editStore.addComponent(sectionId, null, 'text');
+            if (typeof newId === 'string') {
+                editStore.setComponentValue(sectionId, newId, newValue);
+                
+                // Clear the ghost component UI visually
+                target.innerText = '';
+                isEmpty = true;
+            }
+        }
     }
 
     function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement; }) {
@@ -186,7 +199,7 @@
         position: relative;
     }
 
-    .edit-text.is-empty::before {
+    .edit-text.is-empty:focus::before {
         content: attr(data-placeholder);
         color: var(--scribe-muted-foreground);
         pointer-events: none;
