@@ -8,8 +8,8 @@
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import SectionEditor from './SectionEditor.svelte';
 	import { fade } from 'svelte/transition';
-	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
+	import SectionTitle from '../utilComponents/SectionTitle.svelte';
 	
     interface SectionProps {
         data: Section<DefaultComponents | C>;
@@ -21,12 +21,6 @@
 
     let isEditMode = $derived(mode === 'edit' && !isNested);
     let sectionTitle = $derived(parseStringForContentEditable(data.title));
-
-    function handleTitleChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
-        const target = event.target as HTMLDivElement;
-        editStore.editSectionTitle(data.id, target.innerText);
-    }
-
 </script>
 
 <section class={isEditMode ? 'section-edit' : ''} in:fade>
@@ -41,17 +35,7 @@
     {/if}
     
     <div class="section-title-container">
-        {#key sectionTitle}
-            <h2 contenteditable={isEditMode} onblur={handleTitleChange} class="section-title">
-                {#each sectionTitle as line, index (index)}
-                    {#if line === ''}
-                        <br>
-                    {:else}
-                        {line}
-                    {/if}
-                {/each}
-            </h2>
-        {/key}
+        <SectionTitle {isEditMode} sectionId={data.id} text={sectionTitle} />
     </div>
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} {mode} />
@@ -74,11 +58,6 @@
     }
 
     .section-title-container {
-        display: inline;
-    }
-
-    .section-title {
-        outline: none;
         display: inline;
     }
 

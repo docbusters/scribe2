@@ -5,6 +5,7 @@
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
+    import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
@@ -31,8 +32,7 @@
         postRange.selectNodeContents(target);
         postRange.setStart(range.endContainer, range.endOffset);
         
-        // Clean possible \n or \r from the end of the text, as contenteditable can sometimes add these
-        const textAfter = postRange.toString().replace(/[\n\r]+$/, '');
+        const textAfter = postRange.toString();
 
         const isAtStart = textBefore.length === 0;
         const isAtEnd = textAfter.length === 0;
@@ -48,15 +48,19 @@
                 }
                 break;
             }
-            case 'ArrowLeft': {
+            case 'ArrowLeft':
+            case 'ArrowUp': {
                 if (isAtStart) {
-                    console.log('At start of text, should move to previous component');
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'up');
                 }
                 break;
             }
-            case 'ArrowRight': {
+            case 'ArrowRight':
+            case 'ArrowDown': {
                 if (isAtEnd) {
-                    console.log('At end of text, should move to next component');
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'down');
                 }
                 break;
             }
@@ -65,7 +69,7 @@
                 const isSpaceAfter = isAtEnd || /^\s/.test(textAfter);
 
                 // If the slash is part of a word, do nothing special
-                if (!isSpaceBefore || !isSpaceAfter) {
+                if (!isSpaceBefore && !isSpaceAfter) {
                     return;
                 }
 
@@ -78,10 +82,68 @@
     }
 
     let value = $derived(parseStringForContentEditable(componentData.value.value));
+
+    let textDiv: HTMLDivElement | null = $state(null);
+
+    function handleFocusStart() {
+        if (!textDiv) return;
+        textDiv.focus();
+        
+        // Move cursor to the start
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.setStart(textDiv, 0);
+        range.collapse(true);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+    }
+
+    function handleFocusEnd() {
+        if (!textDiv) return;
+        textDiv.focus();
+        
+        // Move cursor to the end
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(textDiv);
+        range.collapse(false);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+    }
+
+    $effect(() => {
+        if (!textDiv) return;
+
+        const onFocusStart = (e: Event) => {
+            e.preventDefault();
+            handleFocusStart();
+        };
+
+        const onFocusEnd = (e: Event) => {
+            e.preventDefault();
+            handleFocusEnd();
+        };
+
+        textDiv.addEventListener('scribe-focus-start', onFocusStart);
+        textDiv.addEventListener('scribe-focus-end', onFocusEnd);
+
+        return () => {
+            textDiv?.removeEventListener('scribe-focus-start', onFocusStart);
+            textDiv?.removeEventListener('scribe-focus-end', onFocusEnd);
+        };
+    });
 </script>
 
 {#key value}
-    <div role="textbox" tabindex="0" class="edit-text" contenteditable={mode === 'edit'} onblur={handleTextChange} onkeydown={handleKeyDown}>
+    <div 
+        bind:this={textDiv}
+        data-scribe-focusable="true"
+        role="textbox" 
+        tabindex="0" 
+        class="edit-text" 
+        contenteditable={mode === 'edit'} 
+        onblur={handleTextChange} 
+        onkeydown={handleKeyDown}>
         {#if mode === 'view'}
             {componentData.value.value}
         {:else if mode === 'edit'}

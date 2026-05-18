@@ -24,12 +24,19 @@ class EditStore<C> {
 
     /* * SECTION MANAGEMENT * */
 
+    private findSection(sectionId: string) {
+        const section = this.document.sections[sectionId];
+        if (!section) {
+            console.warn("Section not found:", sectionId);
+            return null;
+        }
+        return section;
+    }
+
     /** Adds a new section below the specified section */
     addSectionBelow(sectionId: string) {
-        if (!this.document.sections[sectionId]) {
-            console.warn("Section not found for adding new section:", sectionId);
-            return false;
-        }
+        const section = this.findSection(sectionId);
+        if (!section) return false;
         
         const newSectionId = generateRandomId("section");
         const newSection = {
@@ -64,11 +71,8 @@ class EditStore<C> {
 
     /** Duplicates a section and adds it after the original */
     duplicateSection(sectionId: string) {
-        if (!this.document.sections[sectionId]) {
-            console.warn("Section not found for duplication:", sectionId);
-            return false;
-        }
-        const sectionToDuplicate = this.document.sections[sectionId];
+        const sectionToDuplicate = this.findSection(sectionId);
+        if (!sectionToDuplicate) return false;
         const newSectionId = generateRandomId("section");
         const duplicatedSection = { ...sectionToDuplicate, id: newSectionId };
         
@@ -85,10 +89,8 @@ class EditStore<C> {
 
     /** Deletes a section from the document */
     deleteSection(sectionId: string) {
-        if (!this.document.sections[sectionId]) {
-            console.warn("Section not found for deletion:", sectionId);
-            return false;
-        }
+        const section = this.findSection(sectionId);
+        if (!section) return false;
         const newSections = { ...this.document.sections };
         delete newSections[sectionId];
         this.document.sections = newSections;
@@ -96,10 +98,8 @@ class EditStore<C> {
     }
 
     editSectionTitle(sectionId: string, newTitle: string) {
-        if (!this.document.sections[sectionId]) {
-            console.warn("Section not found for editing title:", sectionId);
-            return false;
-        }
+        const section = this.findSection(sectionId);
+        if (!section) return false;
         this.document.sections[sectionId] = {
             ...this.document.sections[sectionId],
             title: newTitle
@@ -109,35 +109,60 @@ class EditStore<C> {
 
     /* * COMPONENT MANAGEMENT * */
 
-    getComponentValue(sectionId: string, componentId: string) {
-        const section = this.document.sections[sectionId] as ParagraphSection<C>;
-        if (!section) {
-            console.warn("Section not found for setting component value:", sectionId);
-            return null;
+    /** Searches recursively for a component within a nested value structure */
+    private searchComponentInValue(value: DataValue, targetId: string): BaseComponent<string, DataValue, ComponentConfig> | null {
+        if (!value) return null;
+
+        if (value.type === "component") {
+            const nestedComponent = value.value as BaseComponent<string, DataValue, ComponentConfig>;
+            if (nestedComponent.id === targetId) {
+                return nestedComponent;
+            }
+            return this.searchComponentInValue(nestedComponent.value, targetId);
+        } else if (value.type === "array") {
+            for (const item of value.value) {
+                const found = this.searchComponentInValue(item as DataValue, targetId);
+                if (found) return found;
+            }
+        } else if (value.type === "record") {
+            for (const item of Object.values(value.value)) {
+                const found = this.searchComponentInValue(item as DataValue, targetId);
+                if (found) return found;
+            }
         }
+        return null;
+    }
+
+    /** Finds a component within a section. This method will also find nested components */
+    private findComponent(sectionId: string, componentId: string) {
+        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        if (!section) return null;
+
+        // First attempt to find the component at the top level of the section content
         const component = section.content[componentId] as unknown as BaseComponent<string, DataValue, ComponentConfig>;
-        if (!component) {
-            console.warn("Component not found for setting value:", componentId);
-            return null;
+        // If found return it immediately
+        if (component) return component;
+
+        // If not found, we try to find nested components within component values
+        for (const topLevelComponent of Object.values(section.content)) {
+            const castedComp = topLevelComponent as unknown as BaseComponent<string, DataValue, ComponentConfig>;
+            const found = this.searchComponentInValue(castedComp.value, componentId);
+            if (found) return found;
         }
+
+        return null;
+    }
+
+    getComponentValue(sectionId: string, componentId: string) {
+        const component = this.findComponent(sectionId, componentId);
+        if (!component) return null;
         return component.value;
     }
 
     setComponentValue(sectionId: string, componentId: string, newValue: DataValue) {
-        const section = this.document.sections[sectionId] as ParagraphSection<C>;
-        if (!section) {
-            console.warn("Section not found for setting component value:", sectionId);
-            return false;
-        }
-        const component = section.content[componentId] as unknown as BaseComponent<string, DataValue, ComponentConfig>;
-        if (!component) {
-            console.warn("Component not found for setting value:", componentId);
-            return false;
-        }
+        const component = this.findComponent(sectionId, componentId);
+        if (!component) return false;
         component.value = newValue;
-
-        // Force a reactivity update depending on Svelte 5 state behavior
-        this.document.sections[sectionId] = section;
         
         return true;
     }
