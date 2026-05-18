@@ -10,6 +10,7 @@
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
+        if (isEmpty) return;
         const target = event.target as HTMLDivElement;
         const newValue: StringValue = { type: 'string', value: target.innerText };
         console.log('New value:', newValue);
@@ -64,24 +65,39 @@
                 }
                 break;
             }
-            case '/': {
+            case ' ': {
+                if (!event.ctrlKey) return;
+
                 const isSpaceBefore = isAtStart || /\s$/.test(textBefore);
                 const isSpaceAfter = isAtEnd || /^\s/.test(textAfter);
 
-                // If the slash is part of a word, do nothing special
+                // If the space is part of a word, do nothing special
                 if (!isSpaceBefore && !isSpaceAfter) {
                     return;
                 }
 
                 // Show the add component dropdown
-                const rect = range.getBoundingClientRect();
-                toolbarStore.open(rect.x, rect.bottom);
+                let rect = range.getBoundingClientRect();
+
+                // If the div is empty we center the dropdown based on the div's bounding rect
+                if (rect.x === 0 && rect.y === 0) {
+                    rect = target.getBoundingClientRect();
+                }
+                toolbarStore.open(rect.x, rect.bottom, sectionId, componentData.id, isEmpty);
+
+                event.preventDefault(); // Prevent adding an actual space character
                 break;
             }
         }
     }
 
     let value = $derived(parseStringForContentEditable(componentData.value.value));
+    let isEmpty = $derived(componentData.value.value === '');
+
+    function handleInput(event: Event) {
+        const target = event.target as HTMLDivElement;
+        isEmpty = (target.textContent || '').length === 0;
+    }
 
     let textDiv: HTMLDivElement | null = $state(null);
 
@@ -141,8 +157,12 @@
         role="textbox" 
         tabindex="0" 
         class="edit-text" 
+        class:scribe-animation-pulse={isEmpty && mode === 'edit'}
+        class:is-empty={isEmpty && mode === 'edit'}
+        data-placeholder="Press Ctrl + Space to add a component..."
         contenteditable={mode === 'edit'} 
         onblur={handleTextChange} 
+        oninput={handleInput}
         onkeydown={handleKeyDown}>
         {#if mode === 'view'}
             {componentData.value.value}
@@ -161,6 +181,16 @@
 <style>
     .edit-text {
         outline: none;
-        display: inline;
+        display: inline-block;
+        min-height: 1em;
+        position: relative;
+    }
+
+    .edit-text.is-empty::before {
+        content: attr(data-placeholder);
+        color: var(--scribe-muted-foreground);
+        pointer-events: none;
+        user-select: none;
+        cursor: text;
     }
 </style>

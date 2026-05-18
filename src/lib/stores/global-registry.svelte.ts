@@ -18,6 +18,14 @@ class GlobalRegistry {
         }
         return comp.component;
     }
+
+    getEmptyComponent(type: string) {
+        const comp = this.components[type];
+        if (!comp) {
+            throw new Error(`Component of type ${type} not found in registry`);
+        }
+        return comp.empty;
+    }
 }
 
 export const globalRegistry = new GlobalRegistry();

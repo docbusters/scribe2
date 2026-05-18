@@ -248,4 +248,19 @@
     :global(.dropdown-item[data-highlighted]) {
         background-color: var(--scribe-muted);
     }
+
+	/* Animations */
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	/* Apply the animation to a class, mimicking Tailwind's timing */
+	:global(.scribe-animation-pulse) {
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	}
 </style>

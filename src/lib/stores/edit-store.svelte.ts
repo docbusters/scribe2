@@ -1,10 +1,13 @@
 import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
-import type { Document } from "$lib/domain/Document.js";
+import type { BindingsDefinition, Document } from "$lib/domain/Document.js";
 import type { ParagraphSection } from "$lib/domain/Section.js";
+import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import { generateRandomId } from "$lib/utils/generateRandomId.js";
+import { dataStore } from "./data-store.svelte.ts";
+import { globalRegistry } from "./global-registry.svelte.ts";
 
-/** Handles document modifications when the document is in edit mode */
+/** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C> {
     document = $state<Document<C>>(null!);
 
@@ -165,6 +168,66 @@ class EditStore<C> {
         component.value = newValue;
         
         return true;
+    }
+
+
+    /** Add a new component to a section. If componentId is null, the component will be appended to the end */
+    addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false) {
+        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        if (!section) return false;
+
+        // Generate a new id and build the component
+        const newId = generateRandomId(componentType);
+        const emptyComponent = globalRegistry.getEmptyComponent(componentType);
+
+        // Generate a default value based on the value type
+        const value = generateDefaultDataValue(emptyComponent.value);
+
+        const newComponent = {
+            ...emptyComponent,
+            id: newId,
+            value,
+        } as C;
+
+        console.log(newComponent);
+        console.log(this.document.bindings);
+
+        // If no target component is specified, just append to the end
+        if (!componentId) {
+            section.content[newId] = newComponent;
+            return true;
+        }
+
+        // Reconstruct the section content object to preserve order and insert after or replace the target
+        const entries = Object.entries(section.content);
+        const targetIndex = entries.findIndex(([key]) => key === componentId);
+
+        if (targetIndex !== -1) {
+            // Target is a top-level component in the section
+            if (replaceComponent) {
+                entries.splice(targetIndex, 1, [newId, newComponent]);
+            } else {
+                entries.splice(targetIndex + 1, 0, [newId, newComponent]);
+            }
+            section.content = Object.fromEntries(entries);
+            return true;
+        } else {
+            console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
+            section.content[newId] = newComponent;
+            return true;
+        }
+    }
+
+    /* * BINDINGS MANAGEMENT * */
+    addBinding(definition: BindingsDefinition) {
+        // Add the new binding to the document
+        const newId = generateRandomId("binding");
+        this.document.bindings[newId] = definition;
+
+        // Also initialize the binding value in the data store
+        dataStore.addBinding(newId, definition);
+
+        return newId;
     }
 }
 

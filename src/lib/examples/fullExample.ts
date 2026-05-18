@@ -147,6 +147,22 @@ export const fullExampleDocument: Document = {
                 }
             }
         },
+        'empty-section': {
+            id: 'empty-section',
+            title: 'Empty section',
+            type: 'paragraph-section',
+            content: {
+                'text-empty': {
+                    id: 'text-empty',
+                    mode: 'inline',
+                    type: 'text',
+                    value: {
+                        type: 'string',
+                        value: ''
+                    }
+                }
+            },
+        },
         'section-5': {
             id: 'section-5',
             title: 'Grid section',

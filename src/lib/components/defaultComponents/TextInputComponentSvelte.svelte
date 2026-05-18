@@ -74,6 +74,7 @@
     id={componentData.id} 
     data-scribe-focusable="true"
     onkeydown={handleKeyDown}
+    autocomplete="off"
     {style} 
     placeholder={config?.placeholder} 
     class="text-input" 

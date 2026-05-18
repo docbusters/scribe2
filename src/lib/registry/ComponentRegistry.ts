@@ -19,6 +19,8 @@ export type ComponentRegistry<
         description: string;
         icon: string;
         component: Component<ScribeComponentProps<C>>;
+        /** Contains the default configuration for the component when inserted. Id will be generated automatically */
+        empty:  Omit<C, 'id' | 'value'> & { value: C['value']['type'] };
     };
 };
 

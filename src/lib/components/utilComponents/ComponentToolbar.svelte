@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { editStore } from '$lib/stores/edit-store.svelte.js';
     /* eslint-disable svelte/no-at-html-tags */
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
 
     let components = $derived(Object.entries(globalRegistry.components || {}));
+
+    function insertChildComponent(componentType: string) {
+        if (!toolbarStore.sectionId) return;
+        editStore.addComponent(toolbarStore.sectionId, toolbarStore.componentId, componentType, toolbarStore.shouldReplaceComponent);
+        toolbarStore.close();
+    }
 </script>
 
 <DropdownMenu.Root bind:open={toolbarStore.isOpen}>
@@ -19,7 +26,7 @@
 	<DropdownMenu.Content class="dropdown-content" side="bottom" align="start">
         {#each components as [componentType, component] (component.name)}
             <DropdownMenu.Item class="dropdown-item" onclick={() => {
-                console.log('Add component:', componentType);
+                insertChildComponent(componentType);
                 toolbarStore.close();
             }}>
                 <div class="dropdown-item-icon">
