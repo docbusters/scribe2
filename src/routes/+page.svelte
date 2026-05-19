@@ -10,5 +10,6 @@
     <a href={resolve("/examples/full")}>Full example</a>
     <a href={resolve("/examples/full-edit")}>Full example editable</a>
     <a href={resolve("/examples/full-webcomponent")}>Web component example</a>
+    <a href={resolve("/examples/edit-empty")}>Edit mode empty</a>
 </div>
 
