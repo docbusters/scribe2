@@ -20,7 +20,7 @@
     default: "background-color: var(--scribe-primary); color: var(--scribe-primary-foreground); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
     destructive: "background-color: var(--scribe-error); color: white; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
     outline: "background-color: var(--scribe-doc-background); color: var(--scribe-doc-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
+    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground);  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
     ghost: "background-color: transparent; color: inherit; box-shadow: none;",
   };
 

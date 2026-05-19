@@ -83,8 +83,8 @@
 
     .section-editor {
         position: absolute;
-        bottom: 50%;
-        transform: translateY(50%) translateX(90%);
+        bottom: 0;
+        transform: translateY(0%) translateX(90%);
         right: 0;
         z-index: 10;
         opacity: 0;

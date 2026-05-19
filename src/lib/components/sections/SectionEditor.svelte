@@ -16,7 +16,7 @@
         disabled?: boolean;
     }
 
-    let { sectionId, disabled = false, ...restProps }: SectionEditorProps = $props();
+    let { sectionId, disabled = false, class: className, ...restProps }: SectionEditorProps = $props();
 
     function handleAdd() {
         editStore.addSectionBelow(sectionId);
@@ -32,7 +32,7 @@
 
 </script>
 
-<div class={`section-editor-container ${restProps.class || ''}`} {...restProps}>
+<div class={`section-editor-container ${className || ''}`} {...restProps}>
     <Button {disabled} size="icon-sm" variant="ghost" title="Add section below" onclick={handleAdd}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
     </Button>

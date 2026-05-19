@@ -170,6 +170,13 @@ class EditStore<C> {
         return true;
     }
 
+    setComponentConfig(sectionId: string, componentId: string, newConfig: ComponentConfig) {
+        const component = this.findComponent(sectionId, componentId);
+        if (!component) return false;
+        component.config = newConfig;
+        return true;
+    }
+
 
     /** Add a new component to a section. If componentId is null, the component will be appended to the end */
     addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false) {
@@ -188,9 +195,6 @@ class EditStore<C> {
             id: newId,
             value,
         } as C;
-
-        console.log(newComponent);
-        console.log(this.document.bindings);
 
         // If no target component is specified, just append to the end
         if (!componentId) {

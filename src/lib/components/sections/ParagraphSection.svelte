@@ -51,7 +51,6 @@
 
     .inline-component-container {
         display: inline;
-        margin-right: 0.5rem;
         line-height: 1.5rem;
     }
 </style>

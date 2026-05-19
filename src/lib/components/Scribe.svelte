@@ -27,6 +27,7 @@
 	import Button from './utilComponents/Button.svelte';
 	import ComponentToolbar from './utilComponents/ComponentToolbar.svelte';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
+	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 
 	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
 
@@ -129,7 +130,10 @@
 		</div>
 	{/if}
 
-	<ComponentToolbar />
+	{#if mode === 'edit'}
+		<ComponentToolbar />
+		<TextFormatToolbar />
+	{/if}
 </div>
 
 <style>

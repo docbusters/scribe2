@@ -6,12 +6,17 @@
 	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
+	import { textFormatToolbarStore } from '$lib/stores/text-format-toolbar-store.svelte.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
-    function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
+    let value = $derived(parseStringForContentEditable(componentData.value.value));
+    let isEmpty = $derived(componentData.value.value === '');
+    let config = $derived(componentData.config || {});
+
+    function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
         if (isEmpty) return;
-        const target = event.target as HTMLDivElement;
+        const target = event.target as HTMLSpanElement;
         const newValue: StringValue = { type: 'string', value: target.innerText };
         console.log('New value:', newValue);
         const success = editStore.setComponentValue(sectionId, componentData.id, newValue);
@@ -30,7 +35,7 @@
         }
     }
 
-    function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement; }) {
+    function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) {
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
 
@@ -62,17 +67,37 @@
                 }
                 break;
             }
-            case 'ArrowLeft':
-            case 'ArrowUp': {
+            case 'ArrowLeft': {
                 if (isAtStart) {
                     event.preventDefault();
                     navigateToAdjacentComponent(target, 'up');
                 }
                 break;
             }
-            case 'ArrowRight':
-            case 'ArrowDown': {
+            case 'ArrowUp': {
+                const caretRect = range.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                
+                // If the distance from the top edge is less than the height of the cursor we are on the first line
+                if (isAtStart || (caretRect.top >= 0 && (caretRect.top - targetRect.top) <= caretRect.height)) {
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'up');
+                }
+                break;
+            }
+            case 'ArrowRight': {
                 if (isAtEnd) {
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'down');
+                }
+                break;
+            }
+            case 'ArrowDown': {
+                const caretRect = range.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                
+                // If the distance from the bottom edge is less than the height of the cursor we are on the last line
+                if (isAtEnd || (caretRect.bottom > 0 && (targetRect.bottom - caretRect.bottom) <= caretRect.height)) {
                     event.preventDefault();
                     navigateToAdjacentComponent(target, 'down');
                 }
@@ -104,15 +129,49 @@
         }
     }
 
-    let value = $derived(parseStringForContentEditable(componentData.value.value));
-    let isEmpty = $derived(componentData.value.value === '');
-
     function handleInput(event: Event) {
-        const target = event.target as HTMLDivElement;
+        const target = event.target as HTMLSpanElement;
         isEmpty = (target.textContent || '').length === 0;
     }
 
-    let textDiv: HTMLDivElement | null = $state(null);
+    function handleSelectionChange() {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            textFormatToolbarStore.close();
+            return;
+        }
+
+        // Check if the selection is within our text div
+        if (textDiv && textDiv.contains(selection.anchorNode)) {
+            const range = selection.getRangeAt(0);
+            
+            // Calculate the selected text indexes
+            const preRange = range.cloneRange();
+            preRange.selectNodeContents(textDiv);
+            preRange.setEnd(range.startContainer, range.startOffset);
+            
+            const startIndex = preRange.toString().length;
+            const selectedText = range.toString();
+            const endIndex = startIndex + selectedText.length;
+            
+            // Get the position of the start of the selection to position the toolbar
+            const startRange = range.cloneRange();
+            startRange.collapse(true);
+            const rect = startRange.getBoundingClientRect();
+
+            console.log('Selection changed:', { startIndex, endIndex, selectedText });
+            
+            // Obtain the position to display the toolbar
+            const selectionRange = {
+                start: startIndex,
+                end: endIndex,
+                text: selectedText
+            }
+            textFormatToolbarStore.open(rect.x, rect.top, sectionId, componentData.id, selectionRange, componentData.config || null);
+        }
+    }
+
+    let textDiv: HTMLSpanElement | null = $state(null);
 
     function handleFocusStart() {
         if (!textDiv) return;
@@ -164,7 +223,7 @@
 </script>
 
 {#key value}
-    <div 
+    <span 
         bind:this={textDiv}
         data-scribe-focusable="true"
         role="textbox" 
@@ -172,11 +231,18 @@
         class="edit-text" 
         class:scribe-animation-pulse={isEmpty && mode === 'edit'}
         class:is-empty={isEmpty && mode === 'edit'}
+        class:is-bold={config.bold}
+        class:is-italic={config.italic}
+        class:is-underline={config.underline}
+        class:is-strikethrough={config.strikethrough}
         data-placeholder="Press Ctrl + Space to add a component..."
         contenteditable={mode === 'edit'} 
         onblur={handleTextChange} 
         oninput={handleInput}
-        onkeydown={handleKeyDown}>
+        onkeydown={handleKeyDown}
+        onkeyup={handleSelectionChange}
+        onpointerup={handleSelectionChange}
+    >
         {#if mode === 'view'}
             {componentData.value.value}
         {:else if mode === 'edit'}
@@ -188,15 +254,20 @@
                 {/if}
             {/each}
         {/if}
-    </div>
+    </span>
 {/key}
 
 <style>
     .edit-text {
         outline: none;
-        display: inline-block;
-        min-height: 1em;
+        display: inline;
         position: relative;
+    }
+
+    .edit-text.is-empty {
+        display: inline-block;
+        min-width: 1ch;
+        min-height: 1em;
     }
 
     .edit-text.is-empty:focus::before {
@@ -205,5 +276,21 @@
         pointer-events: none;
         user-select: none;
         cursor: text;
+    }
+
+    .is-bold {
+        font-weight: var(--scribe-font-weight-bold);
+    }
+
+    .is-italic {
+        font-style: italic;
+    }
+
+    .is-underline {
+        text-decoration: underline;
+    }
+
+    .is-strikethrough {
+        text-decoration: line-through;
     }
 </style>
