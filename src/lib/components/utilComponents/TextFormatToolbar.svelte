@@ -4,7 +4,7 @@
 
 	let toolbarRef: HTMLDivElement | null = $state(null);
 
-    let currentConfig = $derived(textFormatToolbarStore.currentConfig);
+    let activeFormats = $derived(textFormatToolbarStore.activeFormats);
 
 	function handleOutsideClick(event: PointerEvent) {
 		if (textFormatToolbarStore.isOpen && toolbarRef && !toolbarRef.contains(event.target as Node)) {
@@ -20,16 +20,16 @@
 <svelte:window onpointerdown={handleOutsideClick} />
 
 <div bind:this={toolbarRef} class:text-toolbar-visible={textFormatToolbarStore.isOpen} class="text-toolbar-container" style="top: {textFormatToolbarStore.position.y}px; left: {textFormatToolbarStore.position.x}px;">
-    <Button size="icon-sm" variant={currentConfig?.bold ? "secondary" : "ghost"} title="Bold" onclick={() => applyFormat('bold')}>
+    <Button size="icon-sm" variant={activeFormats.bold ? "secondary" : "ghost"} title="Bold" onclick={() => applyFormat('bold')}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold-icon lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>
     </Button>
-    <Button size="icon-sm" variant={currentConfig?.italic ? "secondary" : "ghost"} title="Italic" onclick={() => applyFormat('italic')}>
+    <Button size="icon-sm" variant={activeFormats.italic ? "secondary" : "ghost"} title="Italic" onclick={() => applyFormat('italic')}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic-icon lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
     </Button>
-    <Button size="icon-sm" variant={currentConfig?.underline ? "secondary" : "ghost"} title="Underline" onclick={() => applyFormat('underline')}>
+    <Button size="icon-sm" variant={activeFormats.underline ? "secondary" : "ghost"} title="Underline" onclick={() => applyFormat('underline')}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline-icon lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>
     </Button>
-    <Button size="icon-sm" variant={currentConfig?.strikeThrough ? "secondary" : "ghost"} title="Strikethrough" onclick={() => applyFormat('strikethrough')}>
+    <Button size="icon-sm" variant={activeFormats.strikethrough ? "secondary" : "ghost"} title="Strikethrough" onclick={() => applyFormat('strikethrough')}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-strikethrough-icon lucide-strikethrough"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" x2="20" y1="12" y2="12"/></svg>
     </Button>
 </div>

@@ -49,20 +49,7 @@ export const fullExampleDocument: Document = {
                     type: 'text',
                     value: {
                         type: 'string',
-                        value: 'Place in the following input a '
-                    }
-                },
-                'text-latex-2': {
-                    id: 'text-latex-2',
-                    mode: 'inline',
-                    type: 'text',
-                    value: {
-                        type: 'string',
-                        value: 'latex expression: '
-                    },
-                    config: {
-                        bold: true,
-                        italic: true,
+                        value: 'Place in the following input a *latex expression*: '
                     }
                 },
                 'input-latex': {

@@ -166,6 +166,7 @@ class EditStore<C> {
         const component = this.findComponent(sectionId, componentId);
         if (!component) return false;
         component.value = newValue;
+        console.log(`Updated component ${componentId} value:`, newValue);
         
         return true;
     }

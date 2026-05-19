@@ -7,18 +7,110 @@
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
 	import { textFormatToolbarStore } from '$lib/stores/text-format-toolbar-store.svelte.js';
+	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '$lib/constants/DocumentConstants.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
     let value = $derived(parseStringForContentEditable(componentData.value.value));
     let isEmpty = $derived(componentData.value.value === '');
-    let config = $derived(componentData.config || {});
+
+    function parseTokens(text: string) {
+        const tokens = [];
+        let currentText = '';
+        let bold = false;
+        let italic = false;
+        let strikethrough = false;
+        let underline = false;
+
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            // If we find a backslash, we add the next character as a normal character to escape formatting
+            if (char === '\\') {
+                if (i + 1 < text.length) {
+                    currentText += text[i + 1];
+                    i++;
+                } else {
+                    currentText += char;
+                }
+                continue;
+            }
+
+            // Toggle formatting states when we encounter formatting characters
+            if (char === BOLD_CHAR) {
+                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
+                currentText = '';
+                bold = !bold;
+            } else if (char === ITALIC_CHAR) {
+                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
+                currentText = '';
+                italic = !italic;
+            } else if (char === STRIKETHROUGH_CHAR) {
+                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
+                currentText = '';
+                strikethrough = !strikethrough;
+            } else if (char === UNDERLINE_CHAR) {
+                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
+                currentText = '';
+                underline = !underline;
+            } else {
+                currentText += char;
+            }
+        }
+        if (currentText || tokens.length === 0) {
+            tokens.push({ text: currentText, bold, italic, strikethrough, underline });
+        }
+
+        return tokens;
+    }
+
+    function parseDOM(node: Node): string {
+        if (node.nodeType === Node.TEXT_NODE) {
+            let text = node.textContent || '';
+            // Scape special characters to prevent them from being interpreted as formatting when we parse the string again
+            text = text.replace(/([\\*_~+])/g, '\\$1');
+            return text;
+        } else if (node.nodeName === 'BR') {
+            return '\n';
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as HTMLElement;
+            let childText = '';
+            for (const child of Array.from(el.childNodes)) {
+                childText += parseDOM(child);
+            }
+            
+            // When we find a span, we check the formatting classes
+            if (el.tagName === 'SPAN') {
+                const isBold = el.classList.contains('is-bold');
+                const isItalic = el.classList.contains('is-italic');
+                const isStrikethrough = el.classList.contains('is-strikethrough');
+                const isUnderline = el.classList.contains('is-underline');
+                
+                // If the span has any class we wrap the text with the corresponding characters
+                if (isBold || isItalic || isStrikethrough || isUnderline) {
+                    let prefix = '';
+                    let suffix = '';
+                    if (isBold) { prefix += BOLD_CHAR; suffix = BOLD_CHAR + suffix; }
+                    if (isItalic) { prefix += ITALIC_CHAR; suffix = ITALIC_CHAR + suffix; }
+                    if (isStrikethrough) { prefix += STRIKETHROUGH_CHAR; suffix = STRIKETHROUGH_CHAR + suffix; }
+                    if (isUnderline) { prefix += UNDERLINE_CHAR; suffix = UNDERLINE_CHAR + suffix; }
+                    return prefix + childText + suffix;
+                }
+            }
+            return childText;
+        }
+        return '';
+    }
 
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
         if (isEmpty) return;
         const target = event.target as HTMLSpanElement;
-        const newValue: StringValue = { type: 'string', value: target.innerText };
-        console.log('New value:', newValue);
+        
+        let newContent = '';
+        for (const child of Array.from(target.childNodes)) {
+            newContent += parseDOM(child);
+        }
+
+        const newValue: StringValue = { type: 'string', value: newContent };
         const success = editStore.setComponentValue(sectionId, componentData.id, newValue);
         
         // If the component is not found, we can assume it is a blank space
@@ -167,7 +259,7 @@
                 end: endIndex,
                 text: selectedText
             }
-            textFormatToolbarStore.open(rect.x, rect.top, sectionId, componentData.id, selectionRange, componentData.config || null);
+            textFormatToolbarStore.open(rect.x, rect.top, sectionId, componentData.id, selectionRange);
         }
     }
 
@@ -231,29 +323,28 @@
         class="edit-text" 
         class:scribe-animation-pulse={isEmpty && mode === 'edit'}
         class:is-empty={isEmpty && mode === 'edit'}
-        class:is-bold={config.bold}
-        class:is-italic={config.italic}
-        class:is-underline={config.underline}
-        class:is-strikethrough={config.strikethrough}
         data-placeholder="Press Ctrl + Space to add a component..."
         contenteditable={mode === 'edit'} 
         onblur={handleTextChange} 
         oninput={handleInput}
         onkeydown={handleKeyDown}
-        onkeyup={handleSelectionChange}
-        onpointerup={handleSelectionChange}
+        onkeyup={mode === 'edit' ? handleSelectionChange : undefined}
+        onpointerup={mode === 'edit' ? handleSelectionChange : undefined}
     >
-        {#if mode === 'view'}
-            {componentData.value.value}
-        {:else if mode === 'edit'}
-            {#each value as line, index (index)}
-                {#if line === ''}
-                    <br>
-                {:else}
-                    {line}
-                {/if}
-            {/each}
-        {/if}
+        {#each value as line, index (index)}
+            {#if line === ''}
+                <br>
+            {:else}
+                {#each parseTokens(line) as token, index (index)}
+                    <span 
+                        class:is-bold={token.bold} 
+                        class:is-italic={token.italic} 
+                        class:is-underline={token.underline} 
+                        class:is-strikethrough={token.strikethrough}
+                    >{token.text}</span>
+                {/each}
+            {/if}
+        {/each}
     </span>
 {/key}
 

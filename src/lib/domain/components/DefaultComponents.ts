@@ -1,9 +1,9 @@
 import type { BindingValue, ComponentValue, RecordValue, StringValue } from "../data/DataValue.ts";
 import type { BlockComponent, InlineComponent } from "./Component.ts";
-import type { ImageComponentConfig, LatexComponentConfig, TableComponentConfig, TextComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
+import type { ImageComponentConfig, LatexComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
 
 /** Shows a line of text accepting a string value */
-export type TextComponent = InlineComponent<'text', StringValue, TextComponentConfig>;
+export type TextComponent = InlineComponent<'text', StringValue>;
 
 /** Shows a text input field */
 export type TextInputComponent = InlineComponent<'text-input', BindingValue, TextInputComponentConfig>;

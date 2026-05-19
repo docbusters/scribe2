@@ -1,12 +1,5 @@
 import type { ComponentConfig } from "./Component.ts";
 
-export interface TextComponentConfig extends ComponentConfig {
-    bold?: boolean;
-    italic?: boolean;
-    underline?: boolean;
-    strikethrough?: boolean;
-}
-
 export interface TextInputComponentConfig extends ComponentConfig {
     placeholder?: string;
     /** If true, the input will expand to fit its content */
