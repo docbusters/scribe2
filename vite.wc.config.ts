@@ -12,6 +12,21 @@ export default defineConfig({
 		}
 	},
 	plugins: [
+		{
+			name: 'patch-sortablejs',
+			transform(code, id) {
+				if (id.includes('sortablejs')) {
+					return {
+						code: code.replace(
+							'var elemCSS = css(elem);',
+							'var elemCSS = css(elem) || {};'
+						),
+						map: null
+					};
+				}
+				return null;
+			}
+		},
 		svelte({
 			compilerOptions: {
 				customElement: true 
