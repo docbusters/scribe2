@@ -7,8 +7,7 @@ export function getSelection(el?: HTMLElement | null): Selection | null {
     if (!el) return window.getSelection();
     const rootNode = el.getRootNode();
     if (rootNode && 'getSelection' in rootNode) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (rootNode as any).getSelection();
+        return (rootNode as Document).getSelection();
     }
     return window.getSelection();
 }

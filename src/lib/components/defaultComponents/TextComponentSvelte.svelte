@@ -164,7 +164,7 @@
             case 'ArrowLeft': {
                 if (isAtStart) {
                     event.preventDefault();
-                    navigateToAdjacentComponent(target, 'up');
+                    navigateToAdjacentComponent(target, 'left');
                 }
                 break;
             }
@@ -182,7 +182,7 @@
             case 'ArrowRight': {
                 if (isAtEnd) {
                     event.preventDefault();
-                    navigateToAdjacentComponent(target, 'down');
+                    navigateToAdjacentComponent(target, 'right');
                 }
                 break;
             }

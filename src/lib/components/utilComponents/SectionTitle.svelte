@@ -40,7 +40,13 @@
         const isAtEnd = textAfter.length === 0;
 
         switch (event.key) {
-            case 'ArrowLeft':
+            case 'ArrowLeft': {
+                if (isAtStart) {
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'left');
+                }
+                break;
+            }
             case 'ArrowUp': {
                 if (isAtStart) {
                     event.preventDefault();
@@ -48,7 +54,13 @@
                 }
                 break;
             }
-            case 'ArrowRight':
+            case 'ArrowRight': {
+                if (isAtEnd) {
+                    event.preventDefault();
+                    navigateToAdjacentComponent(target, 'right');
+                }
+                break;
+            }
             case 'ArrowDown': {
                 if (isAtEnd) {
                     event.preventDefault();
