@@ -72,16 +72,8 @@
 			dragClass: 'sortable-drag',
 
             onEnd(event) {
-                const { oldIndex, newIndex, item, from } = event;
+                const { oldIndex, newIndex } = event;
                 if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
-                
-				// IMPORTANT: We revert the change because the document re rendering will handle the new order
-                const nextSibling = from.children[oldIndex < newIndex ? oldIndex : oldIndex + 1];
-                if (nextSibling) {
-                    from.insertBefore(item, nextSibling);
-                } else {
-                    from.appendChild(item);
-                }
 
 				editStore.moveSection(oldIndex, newIndex);
             },
@@ -123,8 +115,12 @@
 		</div>
 		<div {style} bind:this={dataOrder} class="scribe-sections">
 			{#if !loading}
-				{#each sections as section, index (index)}
+				{#each sections as section (section.id)}
 					<Section data={section} {mode} />
+				{:else}
+					<Button variant="outline" onclick={() => editStore.addSectionBelow(null)}>
+						Add first section
+					</Button>
 				{/each}
 			{/if}
 		</div>

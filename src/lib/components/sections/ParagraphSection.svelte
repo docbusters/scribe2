@@ -28,7 +28,7 @@
 </script>
 
 <div class="paragraph-section">
-    {#each components as component, index (`${component.type}-${index}`)}
+    {#each components as component, index (`${data.id}-${component.id}-${index}`)}
     {@const Component = globalRegistry.getComponent(component.type)}
         {#if component.mode === 'block'}
             <div class="block-component-container">

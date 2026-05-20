@@ -341,7 +341,7 @@
         oninput={handleInput}
         onkeydown={handleKeyDown}
     >
-        {#each value as line, index (index)}
+        {#each value as line, index (`${componentData.id}-${index}`)}
             {#if line === ''}
                 <br>
             {:else}

@@ -1,7 +1,7 @@
 import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "$lib/domain/Document.js";
-import type { ParagraphSection } from "$lib/domain/Section.js";
+import type { ParagraphSection, Section } from "$lib/domain/Section.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import { generateRandomId } from "$lib/utils/generateRandomId.js";
 import { dataStore } from "./data-store.svelte.ts";
@@ -37,10 +37,7 @@ class EditStore<C> {
     }
 
     /** Adds a new section below the specified section */
-    addSectionBelow(sectionId: string) {
-        const section = this.findSection(sectionId);
-        if (!section) return false;
-        
+    addSectionBelow(sectionId: string | null) {
         const newSectionId = generateRandomId("section");
         const newSection = {
             id: newSectionId,
@@ -48,14 +45,24 @@ class EditStore<C> {
             title: "New Section",
             content: {}
         } as Document<C>["sections"][string];
-        
+
         const newSections: typeof this.document.sections = {};
-        for (const [key, section] of Object.entries(this.document.sections)) {
-            newSections[key] = section;
-            if (key === sectionId) {
-                newSections[newSectionId] = newSection;
+
+        if (sectionId === null) {
+            this.document.sections = { [newSectionId]: newSection, ...this.document.sections };
+            return true;
+        } else {
+            const target = this.findSection(sectionId);
+            if (!target) return false;
+
+            for (const [key, sec] of Object.entries(this.document.sections)) {
+                newSections[key] = sec;
+                if (key === sectionId) {
+                    newSections[newSectionId] = newSection;
+                }
             }
         }
+
         this.document.sections = newSections;
         return true;
     }
@@ -77,8 +84,26 @@ class EditStore<C> {
         const sectionToDuplicate = this.findSection(sectionId);
         if (!sectionToDuplicate) return false;
         const newSectionId = generateRandomId("section");
-        const duplicatedSection = { ...sectionToDuplicate, id: newSectionId };
-        
+        const newContent: typeof sectionToDuplicate.content = {};
+
+        // Generate a new id for each of the components in the duplicated section to ensure uniqueness
+        for (const comp of Object.values(sectionToDuplicate.content)) {
+            const typedComp = comp as BaseComponent<string, DataValue, ComponentConfig>;
+            const dupComp = this.duplicateComponent(typedComp);
+
+            // Add the duplicated component to the new content map with its new ID
+            newContent[dupComp.id] = {
+                ...dupComp,
+            } as C;
+        }
+
+        // Create the duplicated section with the new ID and the brand new content map
+        const duplicatedSection = { 
+            ...sectionToDuplicate, 
+            id: newSectionId,
+            content: newContent 
+        } as Section<C>;
+
         const newSections: typeof this.document.sections = {};
         for (const [key, section] of Object.entries(this.document.sections)) {
             newSections[key] = section;
@@ -154,6 +179,58 @@ class EditStore<C> {
         }
 
         return null;
+    }
+
+    /** Duplicates a component and assigns it a new ID. Also handles nested components that may be present in values */
+    private duplicateComponent(comp: BaseComponent<string, DataValue, ComponentConfig>): BaseComponent<string, DataValue, ComponentConfig> {
+        const newCompId = generateRandomId(comp.type);
+        const clonedComponent = { ...comp, id: newCompId } as BaseComponent<string, DataValue, ComponentConfig>;
+
+        // Verify the component value as it may have nested components that also need new IDs
+        const value = {...clonedComponent.value};
+        if (value.type === "component") {
+            const nestedComp = value.value as BaseComponent<string, DataValue, ComponentConfig>;
+            const newNestedCompId = generateRandomId(nestedComp.type);
+            value.value = {
+                ...nestedComp,
+                id: newNestedCompId
+            };
+        } else if (value.type === "array") {
+            value.value = value.value.map(item => {
+                if (item.type === "component") {
+                    const nestedComp = item.value as BaseComponent<string, DataValue, ComponentConfig>;
+                    const newNestedCompId = generateRandomId(nestedComp.type);
+                    return {
+                        ...item,
+                        value: {
+                            ...nestedComp,
+                            id: newNestedCompId
+                        }
+                    };
+                }
+                return item;
+            });
+        } else if (value.type === "record") {
+            const newRecord: Record<string, DataValue> = {};
+            for (const [key, item] of Object.entries(value.value)) {
+                if (item.type === "component") {
+                    const nestedComp = item.value as BaseComponent<string, DataValue, ComponentConfig>;
+                    const newNestedCompId = generateRandomId(nestedComp.type);
+                    newRecord[key] = {
+                        ...item,
+                        value: {
+                            ...nestedComp,
+                            id: newNestedCompId
+                        }
+                    };
+                } else {
+                    newRecord[key] = item;
+                }
+            }
+            value.value = newRecord;
+        }
+
+        return clonedComponent;
     }
 
     getComponentValue(sectionId: string, componentId: string) {
