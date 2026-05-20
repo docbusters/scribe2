@@ -226,10 +226,17 @@
         isEmpty = (target.textContent || '').length === 0;
     }
 
-    function handleSelectionChange() {
+    function handleSelectionChange(event?: Event) {
+        // If the event is triggered by a click inside the toolbar, we ignore it to prevent the toolbar from closing immediately after opening
+        if (event && event.target && (event.target as Element).closest && (event.target as Element).closest('.text-toolbar-container')) {
+            return;
+        }
+
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-            textFormatToolbarStore.close();
+            if (textFormatToolbarStore.componentId === componentData.id) {
+                textFormatToolbarStore.close();
+            }
             return;
         }
 
@@ -314,6 +321,11 @@
     });
 </script>
 
+<svelte:document
+    onpointerup={mode === 'edit' ? handleSelectionChange : undefined}
+    onkeyup={mode === 'edit' ? handleSelectionChange : undefined}
+/>
+
 {#key value}
     <span 
         bind:this={textDiv}
@@ -328,8 +340,6 @@
         onblur={handleTextChange} 
         oninput={handleInput}
         onkeydown={handleKeyDown}
-        onkeyup={mode === 'edit' ? handleSelectionChange : undefined}
-        onpointerup={mode === 'edit' ? handleSelectionChange : undefined}
     >
         {#each value as line, index (index)}
             {#if line === ''}
