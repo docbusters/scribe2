@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { editStore } from "../../stores/edit-store.svelte.js";
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
+    import { getSelection } from '../../utils/selection.js';
+
 
     interface SectionTitleProps {
         isEditMode: boolean;
@@ -18,7 +20,7 @@
     }
 
     function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLHeadingElement; }) {
-        const selection = window.getSelection();
+        const selection = getSelection(titleElement);
         if (!selection || selection.rangeCount === 0) return;
 
         const target = event.currentTarget;
@@ -62,7 +64,7 @@
         titleElement.focus();
         
         // Move cursor to the start
-        const selection = window.getSelection();
+        const selection = getSelection(titleElement);
         const range = document.createRange();
         range.setStart(titleElement, 0);
         range.collapse(true);
@@ -75,7 +77,7 @@
         titleElement.focus();
         
         // Move cursor to the end
-        const selection = window.getSelection();
+        const selection = getSelection(titleElement);
         const range = document.createRange();
         range.selectNodeContents(titleElement);
         range.collapse(false);

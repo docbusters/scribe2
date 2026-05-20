@@ -7,8 +7,11 @@
     let activeFormats = $derived(textFormatToolbarStore.activeFormats);
 
 	function handleOutsideClick(event: PointerEvent) {
-		if (textFormatToolbarStore.isOpen && toolbarRef && !toolbarRef.contains(event.target as Node)) {
-			textFormatToolbarStore.close();
+		if (textFormatToolbarStore.isOpen && toolbarRef) {
+			const path = event.composedPath();
+			if (!path.includes(toolbarRef)) {
+				textFormatToolbarStore.close();
+			}
 		}
 	}
 

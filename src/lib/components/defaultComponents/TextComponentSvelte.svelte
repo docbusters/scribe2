@@ -8,6 +8,8 @@
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.js';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '$lib/constants/DocumentConstants.js';
+	import { getSelection } from '../../utils/selection.js';
+
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
 
@@ -128,7 +130,7 @@
     }
 
     function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) {
-        const selection = window.getSelection();
+        const selection = getSelection(textDiv);
         if (!selection || selection.rangeCount === 0) return;
 
         const target = event.currentTarget;
@@ -228,11 +230,15 @@
 
     function handleSelectionChange(event?: Event) {
         // If the event is triggered by a click inside the toolbar, we ignore it to prevent the toolbar from closing immediately after opening
-        if (event && event.target && (event.target as Element).closest && (event.target as Element).closest('.text-toolbar-container')) {
-            return;
+        if (event && typeof event.composedPath === 'function') {
+            const path = event.composedPath();
+            const insideToolbar = path.some(el => el instanceof HTMLElement && (el.matches('.text-toolbar-container') || el.closest('.text-toolbar-container')));
+            if (insideToolbar) {
+                return;
+            }
         }
 
-        const selection = window.getSelection();
+        const selection = getSelection(textDiv);
         if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
             if (textFormatToolbarStore.componentId === componentData.id) {
                 textFormatToolbarStore.close();
@@ -277,7 +283,7 @@
         textDiv.focus();
         
         // Move cursor to the start
-        const selection = window.getSelection();
+        const selection = getSelection(textDiv);
         const range = document.createRange();
         range.setStart(textDiv, 0);
         range.collapse(true);
@@ -290,7 +296,7 @@
         textDiv.focus();
         
         // Move cursor to the end
-        const selection = window.getSelection();
+        const selection = getSelection(textDiv);
         const range = document.createRange();
         range.selectNodeContents(textDiv);
         range.collapse(false);

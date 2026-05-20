@@ -3,8 +3,9 @@ export function navigateToAdjacentComponent(
     direction: 'up' | 'down'
 ): boolean {
     // Use a data attribute to identify focusable components in the editor
+    const rootNode = currentElement.getRootNode() as Document | ShadowRoot;
     const focusableElements = Array.from(
-        document.querySelectorAll('[data-scribe-focusable]')
+        rootNode.querySelectorAll('[data-scribe-focusable]')
     ) as HTMLElement[];
 
     const currentIndex = focusableElements.indexOf(currentElement);
