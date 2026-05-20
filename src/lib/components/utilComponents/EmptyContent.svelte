@@ -46,7 +46,7 @@
 
     .icon {
         color: var(--scribe-secondary-foreground);
-        background-color: var(--scribe-secondary-background);
+        background-color: var(--scribe-secondary);
         padding: 0.5rem;
         border-radius: var(--scribe-radius-xl);
         display: flex;

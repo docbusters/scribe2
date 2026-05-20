@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { editStore } from "$lib/stores/edit-store.svelte.js";
+	import { editStore } from "../../stores/edit-store.svelte.js";
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
 
     interface SectionTitleProps {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from "./Button.svelte";
-	import { textFormatToolbarStore, type TextFormatCommand } from "$lib/stores/text-format-toolbar-store.svelte.js";
+	import { textFormatToolbarStore, type TextFormatCommand } from "../../stores/text-format-toolbar-store.svelte.js";
 
 	let toolbarRef: HTMLDivElement | null = $state(null);
 

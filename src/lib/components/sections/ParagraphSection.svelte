@@ -3,7 +3,7 @@
     import type { DataValue, StringValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { ParagraphSection } from '$lib/domain/Section.js';
-	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
+	import { globalRegistry } from '../../stores/global-registry.svelte.js';
 	import type { ScribeMode } from '$lib/types/ScribeProps.js';
 	
     interface ParagraphSectionProps {

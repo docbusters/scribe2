@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextInputComponent } from '$lib/domain/components/DefaultComponents.js';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { dataStore } from '../../stores/data-store.svelte.js';
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
 
     let { componentData }: ScribeComponentProps<TextInputComponent> = $props();
@@ -88,5 +88,6 @@
         border: 1px solid #ccc;
         border-radius: 0.5em;
         min-width: 10rem;
+        margin: 0 0.5rem;
     }
 </style>

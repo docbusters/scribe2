@@ -8,7 +8,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from "svelte/elements";
 	import Button from "../utilComponents/Button.svelte";
-	import { editStore } from "$lib/stores/edit-store.svelte.js";
+	import { editStore } from "../../stores/edit-store.svelte.js";
 
 	
     interface SectionEditorProps extends HTMLAttributes<HTMLDivElement> {

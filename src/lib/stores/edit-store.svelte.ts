@@ -4,8 +4,8 @@ import type { BindingsDefinition, Document } from "$lib/domain/Document.js";
 import type { ParagraphSection, Section } from "$lib/domain/Section.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import { generateRandomId } from "$lib/utils/generateRandomId.js";
-import { dataStore } from "./data-store.svelte.ts";
-import { globalRegistry } from "./global-registry.svelte.ts";
+import { dataStore } from "./data-store.svelte.js";
+import { globalRegistry } from "./global-registry.svelte.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C> {

@@ -18,12 +18,12 @@
 	import type { DataValue } from '../domain/data/DataValue.js';
 	import { defaultRegistry } from '../registry/defaultRegistry.js';
 	import Section from './sections/Section.svelte';
-	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { globalRegistry } from '../stores/global-registry.svelte.js';
+	import { dataStore } from '../stores/data-store.svelte.js';
 	import type { ScribeProps } from '$lib/types/ScribeProps.js';
 	import Sortable from 'sortablejs';
 	import type { Document } from '$lib/domain/Document.js';
-	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { editStore } from '../stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
 	import ComponentToolbar from './utilComponents/ComponentToolbar.svelte';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';

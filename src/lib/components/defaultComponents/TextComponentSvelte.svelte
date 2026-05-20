@@ -2,11 +2,11 @@
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextComponent } from '$lib/domain/components/DefaultComponents.js';
 	import type { StringValue } from '$lib/domain/data/DataValue.js';
-	import { editStore } from '$lib/stores/edit-store.svelte.js';
-	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
+	import { editStore } from '../../stores/edit-store.svelte.js';
+	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
 	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
     import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
-	import { textFormatToolbarStore } from '$lib/stores/text-format-toolbar-store.svelte.js';
+	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.js';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '$lib/constants/DocumentConstants.js';
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();

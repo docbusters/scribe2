@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { editStore } from '../../stores/edit-store.svelte.js';
     /* eslint-disable svelte/no-at-html-tags */
-	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
-	import { toolbarStore } from '$lib/stores/toolbar-store.svelte.js';
+	import { globalRegistry } from '../../stores/global-registry.svelte.js';
+	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
 
     // We dont want to insert text components as they can be added by simply writing
