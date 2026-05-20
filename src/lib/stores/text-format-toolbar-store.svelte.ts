@@ -142,20 +142,64 @@ export class TextFormatToolbarStore {
         else if (command === 'strikethrough') char = STRIKETHROUGH_CHAR;
         else if (command === 'underline') char = UNDERLINE_CHAR;
 
-        const beforeText = origText.substring(0, mStart);
-        const selectedText = origText.substring(mStart, mEnd);
+        // Check the active format to toggle it correctly
+        const targetState = !this.activeFormats[command];
+        
+        // Check if the format is currently active
+        let isFormatActive = false;
+        let beforeText = "";
+        for (let i = 0; i < mStart; i++) {
+            const c = origText[i];
+            if (c === '\\') {
+                beforeText += c;
+                if (i + 1 < mStart) {
+                    beforeText += origText[i + 1];
+                    i++;
+                }
+            } else if (c === char) {
+                isFormatActive = !isFormatActive;
+                beforeText += c;
+            } else {
+                beforeText += c;
+            }
+        }
+
+        // Clean the selected text from the formatting character to get the actual text that will be wrapped with the formatting character if toggled on.
+        let isFormatActiveAfter = isFormatActive;
+        let cleanSelected = "";
+        for (let i = mStart; i < mEnd; i++) {
+            const c = origText[i];
+            if (c === '\\') {
+                cleanSelected += c;
+                if (i + 1 < mEnd) {
+                    cleanSelected += origText[i + 1];
+                    i++;
+                }
+            } else if (c === char) {
+                isFormatActiveAfter = !isFormatActiveAfter;
+                // Omit the formatting character
+            } else {
+                cleanSelected += c;
+            }
+        }
+
+        // Build the final text
         const afterText = origText.substring(mEnd);
 
-        let newText;
-        
-        // Remove formatting if it's already wrapped in this formatting character
-        if (selectedText.startsWith(char) && selectedText.endsWith(char) && selectedText.length >= 2) {
-            newText = beforeText + selectedText.substring(1, selectedText.length - 1) + afterText;
-        } else if (beforeText.endsWith(char) && afterText.startsWith(char)) {
-            newText = beforeText.substring(0, beforeText.length - 1) + selectedText + afterText.substring(1);
-        } else {
-            // Apply formatting
-            newText = beforeText + char + selectedText + char + afterText;
+        let newText = beforeText;
+        if (targetState !== isFormatActive) {
+            newText += char;
+        }
+        newText += cleanSelected;
+        if (targetState !== isFormatActiveAfter) {
+            newText += char;
+        }
+        newText += afterText;
+
+        // Clean up empty toggles
+        const emptyToggle = char + char;
+        while (newText.includes(emptyToggle)) {
+            newText = newText.replace(emptyToggle, '');
         }
 
         editStore.setComponentValue(this.sectionId, this.componentId, { type: 'string', value: newText });
