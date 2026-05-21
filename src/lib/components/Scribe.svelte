@@ -134,12 +134,12 @@
 </div>
 
 <style>
-	:global(.sortable-ghost) {
+	:global(.scribe-document .sortable-ghost) {
 		opacity: 1;
 		background-color: var(--scribe-selection-color) !important;
 	}
 
-	:global(.sortable-drag) {
+	:global(.scribe-document .sortable-drag) {
 		opacity: 0;
 	}
 
@@ -179,28 +179,28 @@
 		}
 	}
 
-	:global(h1) {
+	:global(.scribe-document h1) {
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h1);
 		font-size: var(--scribe-font-size-h1);
 		margin: 0;
 	}
-	:global(h2) {
+	:global(.scribe-document h2) {
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h2);
 		font-size: var(--scribe-font-size-h2);
 		margin: 0;
 	}
-    :global(h3) {
+    :global(.scribe-document h3) {
         font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h3);
 		font-size: var(--scribe-font-size-h3);
 		margin: 0;
     }
-	:global(p) {
+	:global(.scribe-document p) {
 		margin: 0;
 	}
-	:global(span) {
+	:global(.scribe-document span) {
 		font-family: var(--scribe-font-sans);
 		font-weight: var(--scribe-font-weight-body);
 		font-size: var(--scribe-font-size-body);
@@ -215,7 +215,7 @@
 
 	/* Dropdown Styles */
 
-	:global(.dropdown-content) {
+	:global(.scribe-dropdown-content) {
         width: 229px;
         padding: 0.375rem 0.25rem;
         background-color: var(--scribe-popover);
@@ -229,11 +229,11 @@
 		gap: 0.5rem;
     }
 
-    :global(.dropdown-content:focus-visible) {
+    :global(.scribe-dropdown-content:focus-visible) {
         outline: none;
     }
 
-    :global(.dropdown-item) {
+    :global(.scribe-dropdown-item) {
         display: flex;
         align-items: center;
         height: 2.5rem;
@@ -246,7 +246,7 @@
         box-shadow: none !important;
     }
 
-    :global(.dropdown-item[data-highlighted]) {
+    :global(.scribe-dropdown-item[data-highlighted]) {
         background-color: var(--scribe-muted);
     }
 

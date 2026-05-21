@@ -37,7 +37,7 @@
 </Button.Root>
 
 <style>
-  :global(.scribe-btn) {
+  :global(.scribe-document .scribe-btn) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -52,18 +52,18 @@
     border: none;
   }
 
-  :global(.scribe-btn:active) {
+  :global(.scribe-document .scribe-btn:active) {
     transform: scale(0.98);
   }
 
-  :global(.scribe-btn:hover) {
+  :global(.scribe-document .scribe-btn:hover) {
     opacity: 0.9;
   }
 
-  :global(.scribe-btn[style*="border:"]) {
+  :global(.scribe-document .scribe-btn[style*="border:"]) {
     border-color: var(--border, #e5e7eb);
   }
-  :global(.scribe-btn[style*="border:"]:hover), :global(.scribe-btn[style*="transparent"]:not([style*="underline"]):hover) {
+  :global(.scribe-document .scribe-btn[style*="border:"]:hover), :global(.scribe-document .scribe-btn[style*="transparent"]:not([style*="underline"]):hover) {
     background-color: var(--accent, #f1f5f9) !important;
     color: var(--accent-foreground, #0f172a) !important;
   }

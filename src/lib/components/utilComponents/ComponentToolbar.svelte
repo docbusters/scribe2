@@ -24,9 +24,9 @@
         </DropdownMenu.Trigger>
     </div>
 
-	<DropdownMenu.Content class="dropdown-content" side="bottom" align="start">
+	<DropdownMenu.Content class="scribe-dropdown-content" side="bottom" align="start">
         {#each components as [componentType, component] (component.name)}
-            <DropdownMenu.Item class="dropdown-item" onclick={() => {
+            <DropdownMenu.Item class="scribe-dropdown-item" onclick={() => {
                 insertChildComponent(componentType);
                 toolbarStore.close();
             }}>
