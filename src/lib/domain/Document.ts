@@ -3,6 +3,7 @@ import type { BindingValue, PrimitiveValue } from "./data/DataValue.ts";
 import type { Section } from "./Section.js";
 
 export interface Document<C = never> {
+    id: string;
     title: string;
     sections: Record<string, Section<DefaultComponents | C>>;
     bindings: Record<BindingValue['id'], BindingsDefinition>;
