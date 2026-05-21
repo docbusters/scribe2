@@ -1,10 +1,3 @@
-<svelte:options customElement={{
-    props: {
-        variant: { type: 'String' },
-        size: { type: 'String' }
-    }
-}} />
-
 <script lang="ts">
 	import { Button } from "bits-ui";
 	import type { HTMLButtonAttributes } from "svelte/elements";

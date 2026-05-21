@@ -1,5 +1,5 @@
-import type { DataValue } from "$lib/domain/data/DataValue.js";
-import { dataStore } from "$lib/stores/data-store.svelte.js";
+import type { DataValue } from "../domain/data/DataValue.js";
+import { dataStore } from "../stores/data-store.svelte.js";
 
 export const stringifyDataValue = (value: DataValue): string => {
     switch (value.type) {

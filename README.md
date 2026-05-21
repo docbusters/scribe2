@@ -23,6 +23,31 @@ npm run build:wc
 
 This command basically uses `vite.wc.config.ts` to generate the web component in a single js and `tsconfig.types.json` to generate the corresponding types. It also copies the styles `scribe.css` into the `dist` folder.
 
+## Testing the library locally in other package
+
+In order to test the library in other package via npm, a tgz file can be generated and installed directly:
+
+```bash
+npm pack
+```
+
+Now simply place the file in the new project and install it:
+
+```bash
+npm i ../scribe2-0.0.1.tgz
+```
+
+Make sure it is intalled correctly in `package.json`
+
+```json
+...
+"dependencies": {
+    "scribe2": "../scribe2-0.0.1.tgz",
+    ...
+}
+...
+```
+
 ## Examples
 
 - [**Simple plain html example**](/test/simple-webcomponent-test.html): Shows the library usage with a basic example.

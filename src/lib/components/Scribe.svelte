@@ -1,6 +1,7 @@
 <svelte:options
 	customElement={{
 		tag: 'scribe-interpreter',
+		shadow: 'none',
 		props: {
 			id: { type: 'String' },
 			class: { type: 'String' },
@@ -20,13 +21,13 @@
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { dataStore } from '../stores/data-store.svelte.js';
-	import type { ScribeProps } from '$lib/types/ScribeProps.js';
+	import type { ScribeProps } from '../types/ScribeProps.js';
 	import Sortable from 'sortablejs';
-	import type { Document } from '$lib/domain/Document.js';
+	import type { Document } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
 	import ComponentToolbar from './utilComponents/ComponentToolbar.svelte';
-	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
+	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 
 	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();

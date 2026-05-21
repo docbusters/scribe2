@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
-	import type { ImageComponent } from '$lib/domain/components/DefaultComponents.js';
+	import { stringifyDataValue } from '../../utils/stringifyDataValue.js';
+	import type { ImageComponent } from '../../domain/components/DefaultComponents.js';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { fade } from 'svelte/transition';
 

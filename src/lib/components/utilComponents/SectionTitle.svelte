@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { editStore } from "../../stores/edit-store.svelte.js";
-    import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
+    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.js';
     import { getSelection } from '../../utils/selection.js';
 
 

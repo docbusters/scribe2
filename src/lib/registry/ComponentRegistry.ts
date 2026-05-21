@@ -1,8 +1,8 @@
-import type { BaseComponent, ComponentConfig } from '$lib/domain/components/Component.js';
-import type { DataValue } from '$lib/domain/data/DataValue.js';
+import type { BaseComponent, ComponentConfig } from '../domain/components/Component.js';
+import type { DataValue } from '../domain/data/DataValue.js';
 import type { Component } from 'svelte';
 import type { DefaultComponents } from './defaultRegistry.js';
-import type { ScribeMode } from '$lib/types/ScribeProps.js';
+import type { ScribeMode } from '../types/ScribeProps.js';
 
 /** Props that should be implemented by every user-defined component */
 export interface ScribeComponentProps<T extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {

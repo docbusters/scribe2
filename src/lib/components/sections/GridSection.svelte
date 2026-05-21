@@ -2,7 +2,7 @@
     import type { BaseComponent } from '../../domain/components/Component.ts';
     import type { DataValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
-	import type { GridSection } from '$lib/domain/Section.js';
+	import type { GridSection } from '../../domain/Section.js';
 	import Section from './Section.svelte';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	

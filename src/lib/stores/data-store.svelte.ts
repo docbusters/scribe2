@@ -1,6 +1,6 @@
-import type { BindingValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
-import type { BindingsDefinition, Document } from "$lib/domain/Document.js";
-import { getEmptyPrimitiveValue } from "$lib/utils/getEmptyPrimitiveValue.js";
+import type { BindingValue, PrimitiveValue } from "../domain/data/DataValue.js";
+import type { BindingsDefinition, Document } from "../domain/Document.js";
+import { getEmptyPrimitiveValue } from "../utils/getEmptyPrimitiveValue.js";
 
 class DataStore {
     data: Record<BindingValue['id'], PrimitiveValue> = $state({});

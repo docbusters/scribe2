@@ -11,6 +11,7 @@
     "src/lib/**/*.ts"
   ],
   "exclude": [
-    "src/lib/**/*.svelte"
+    "src/lib/**/*.svelte",
+    "dist"
   ]
 }

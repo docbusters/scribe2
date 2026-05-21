@@ -1,6 +1,6 @@
-import type { ComponentRegistry } from "$lib/registry/ComponentRegistry.js";
-import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
-import type { DataValue } from "$lib/domain/data/DataValue.js";
+import type { ComponentRegistry } from "../registry/ComponentRegistry.js";
+import type { BaseComponent, ComponentConfig } from "../domain/components/Component.js";
+import type { DataValue } from "../domain/data/DataValue.js";
 
 type UnknownComponent = BaseComponent<string, DataValue, ComponentConfig | undefined>;
 

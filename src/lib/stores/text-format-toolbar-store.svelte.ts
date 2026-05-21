@@ -1,6 +1,6 @@
-import type { StringValue } from "$lib/domain/data/DataValue.js";
+import type { StringValue } from "../domain/data/DataValue.js";
 import { editStore } from "./edit-store.svelte.js";
-import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '$lib/constants/DocumentConstants.js';
+import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../constants/DocumentConstants.js';
 
 export type TextFormatCommand = 'bold' | 'italic' | 'underline' | 'strikethrough';
 

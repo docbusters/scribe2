@@ -1,7 +1,7 @@
-import type { BaseComponent } from "$lib/domain/components/Component.js";
-import type { DataValue } from "$lib/domain/data/DataValue.js";
-import type { Document } from "$lib/domain/Document.js";
-import type { ComponentRegistry } from "$lib/registry/ComponentRegistry.js";
+import type { BaseComponent } from "../domain/components/Component.js";
+import type { DataValue } from "../domain/data/DataValue.js";
+import type { Document } from "../domain/Document.js";
+import type { ComponentRegistry } from "../registry/ComponentRegistry.js";
 
 export type ScribeMode = "edit" | "view";
 

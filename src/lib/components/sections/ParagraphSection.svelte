@@ -2,9 +2,9 @@
     import type { BaseComponent } from '../../domain/components/Component.ts';
     import type { DataValue, StringValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
-	import type { ParagraphSection } from '$lib/domain/Section.js';
+	import type { ParagraphSection } from '../../domain/Section.js';
 	import { globalRegistry } from '../../stores/global-registry.svelte.js';
-	import type { ScribeMode } from '$lib/types/ScribeProps.js';
+	import type { ScribeMode } from '../../types/ScribeProps.js';
 	
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;

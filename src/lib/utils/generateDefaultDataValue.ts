@@ -1,5 +1,5 @@
-import type { DataValue } from "$lib/domain/data/DataValue.js";
-import { editStore } from "$lib/stores/edit-store.svelte.js";
+import type { DataValue } from "../domain/data/DataValue.js";
+import { editStore } from "../stores/edit-store.svelte.js";
 import { generateRandomId } from "./generateRandomId.js";
 
 export function generateDefaultDataValue(type: DataValue['type']): DataValue {

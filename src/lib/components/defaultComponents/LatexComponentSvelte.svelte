@@ -2,8 +2,8 @@
     /* eslint-disable svelte/no-at-html-tags */ // There is no risk of XSS since katex handles the rendering
     import katex from 'katex';
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
-	import type { LatexComponent } from '$lib/domain/components/DefaultComponents.js';
+	import { stringifyDataValue } from '../../utils/stringifyDataValue.js';
+	import type { LatexComponent } from '../../domain/components/DefaultComponents.js';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { fade } from 'svelte/transition';
 

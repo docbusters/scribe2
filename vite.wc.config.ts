@@ -29,7 +29,14 @@ export default defineConfig({
 		},
 		svelte({
 			compilerOptions: {
-				customElement: true 
+				css: 'injected'
+			},
+			dynamicCompileOptions({ filename }) {
+				if (filename.includes('Scribe.svelte')) {
+					return {
+						customElement: true
+					};
+				}
 			}
 		})
 	],

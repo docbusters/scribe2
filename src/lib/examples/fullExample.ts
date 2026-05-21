@@ -1,4 +1,4 @@
-import type { Document } from "$lib/domain/Document.js";
+import type { Document } from "../domain/Document.js";
 
 export const fullExampleDocument: Document = {
     title: 'Full Example Document',

@@ -2,13 +2,13 @@
     import type { BaseComponent } from '../../domain/components/Component.ts';
     import type { DataValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
-	import type { Section } from '$lib/domain/Section.js';
+	import type { Section } from '../../domain/Section.js';
 	import ParagraphSection from './ParagraphSection.svelte';
 	import GridSection from './GridSection.svelte';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import SectionEditor from './SectionEditor.svelte';
 	import { fade } from 'svelte/transition';
-	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
+	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.js';
 	import SectionTitle from '../utilComponents/SectionTitle.svelte';
 	
     interface SectionProps {

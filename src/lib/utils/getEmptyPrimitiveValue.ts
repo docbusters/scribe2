@@ -1,4 +1,4 @@
-import type { PrimitiveValue } from "$lib/domain/data/DataValue.js";
+import type { PrimitiveValue } from "../domain/data/DataValue.js";
 
 export function getEmptyPrimitiveValue<T extends PrimitiveValue['type']>(
     type: T

@@ -2,8 +2,15 @@ import type { Document } from './domain/Document.js';
 import type { ComponentRegistry } from './registry/ComponentRegistry.js';
 import type { ScribeMode, ScribeProps } from './types/ScribeProps.js';
 
+import ScribeComponent from './components/Scribe.svelte';
+
 // COMPONENTS
-export { default as Scribe } from './components/Scribe.svelte';
+export interface ScribeConstructor {
+    new (): HTMLElement & ScribeProps;
+    prototype: HTMLElement & ScribeProps;
+}
+
+export const Scribe = ScribeComponent as unknown as ScribeConstructor;
 export { defaultRegistry } from './registry/defaultRegistry.js';
 
 // TYPES
@@ -39,6 +46,17 @@ declare global {
     namespace svelteHTML {
         interface IntrinsicElements {
             'scribe-interpreter': ScribeProps;
+        }
+    }
+
+    namespace JSX {
+        interface IntrinsicElements {
+            'scribe-interpreter': ScribeProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                [key: string]: any;
+            };
         }
     }
 }

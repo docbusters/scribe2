@@ -1,13 +1,13 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TextComponent } from '$lib/domain/components/DefaultComponents.js';
-	import type { StringValue } from '$lib/domain/data/DataValue.js';
+	import type { TextComponent } from '../../domain/components/DefaultComponents.js';
+	import type { StringValue } from '../../domain/data/DataValue.js';
 	import { editStore } from '../../stores/edit-store.svelte.js';
 	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
-	import { parseStringForContentEditable } from '$lib/utils/parseStringForContentEditable.js';
-    import { navigateToAdjacentComponent } from '$lib/utils/focusNavigation.js';
+	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.js';
+    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.js';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.js';
-	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '$lib/constants/DocumentConstants.js';
+	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.js';
 	import { getSelection } from '../../utils/selection.js';
 
 
