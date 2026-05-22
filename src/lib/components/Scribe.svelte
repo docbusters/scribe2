@@ -8,7 +8,8 @@
 			style: { type: 'String' },
 			mode: { type: 'String' },
 			registry: { type: 'Object' },
-			document: { type: 'Object' }
+			document: { type: 'Object' },
+			ondocumentchange: { type: 'Object' }
 		}
 	}}
 />
@@ -30,7 +31,7 @@
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 
-	let { id, class: className = "", style, document, registry, mode = 'view', onchange }: ScribeProps = $props();
+	let { id, class: className = "", style, document, registry, mode = 'view', ondocumentchange }: ScribeProps = $props();
 
 	let loading = $state(true);
 	let rootElement = $state<HTMLElement | null>(null);
@@ -100,7 +101,7 @@
 			}
 			
 			// Trigger Svelte callback if provided
-			onchange?.(docSnapshot);
+			ondocumentchange?.(docSnapshot);
 			
 			// Dispatch native custom DOM event for web component integration
 			if (rootElement) {

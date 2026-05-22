@@ -12,5 +12,5 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     mode?: ScribeMode;
     document: Document<C>;
     registry?: ComponentRegistry<C>;
-    onchange?: (document: Document<C>) => void;
+    ondocumentchange?: (document: Document<C>) => void;
 }
