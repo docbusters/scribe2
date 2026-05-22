@@ -69,5 +69,6 @@
         overflow: hidden;
         min-height: 133px;
         border-radius: var(--scribe-radius-2xl);
+        padding: 0.25rem;
     }
 </style>

@@ -60,5 +60,6 @@
     td {
         border: 1px solid var(--scribe-border-color);
         padding: 0.5rem;
+        position: relative;
     }
 </style>

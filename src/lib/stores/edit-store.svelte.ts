@@ -89,7 +89,7 @@ class EditStore<C> {
         // Generate a new id for each of the components in the duplicated section to ensure uniqueness
         for (const comp of Object.values(sectionToDuplicate.content)) {
             const typedComp = comp as BaseComponent<string, DataValue, ComponentConfig>;
-            const dupComp = this.duplicateComponent(typedComp);
+            const dupComp = this.cloneComponent(typedComp);
 
             // Add the duplicated component to the new content map with its new ID
             newContent[dupComp.id] = {
@@ -182,7 +182,7 @@ class EditStore<C> {
     }
 
     /** Duplicates a component and assigns it a new ID. Also handles nested components that may be present in values */
-    private duplicateComponent(comp: BaseComponent<string, DataValue, ComponentConfig>): BaseComponent<string, DataValue, ComponentConfig> {
+    private cloneComponent(comp: BaseComponent<string, DataValue, ComponentConfig>): BaseComponent<string, DataValue, ComponentConfig> {
         const newCompId = generateRandomId(comp.type);
         const clonedComponent = { ...comp, id: newCompId } as BaseComponent<string, DataValue, ComponentConfig>;
 
@@ -252,6 +252,35 @@ class EditStore<C> {
         const component = this.findComponent(sectionId, componentId);
         if (!component) return false;
         component.config = newConfig;
+        return true;
+    }
+
+    /** Duplicates a component within a section and adds it right after the original component */
+    duplicateComponent(sectionId: string, componentId: string) {
+        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        if (!section) return false;
+        const componentToDuplicate = this.findComponent(sectionId, componentId);
+        if (!componentToDuplicate) return false;
+
+        const dupComp = this.cloneComponent(componentToDuplicate as BaseComponent<string, DataValue, ComponentConfig>);
+
+        const entries = Object.entries(section.content);
+        const targetIndex = entries.findIndex(([key]) => key === componentId);
+        if (targetIndex !== -1) {
+            entries.splice(targetIndex + 1, 0, [dupComp.id, dupComp as C]);
+            section.content = Object.fromEntries(entries);
+            return dupComp.id;
+        }
+        return null;
+    }
+
+    /** Deletes a component from a section */
+    deleteComponent(sectionId: string, componentId: string) {
+        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        if (!section) return false;
+        const newContent = { ...section.content };
+        delete newContent[componentId];
+        section.content = newContent;
         return true;
     }
 

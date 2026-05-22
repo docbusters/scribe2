@@ -46,10 +46,12 @@
         display: flex;
         width: 100%;
         margin: 1rem 0;
+        position: relative;
     }
 
     .inline-component-container {
         display: inline;
         line-height: 1.5rem;
+        position: relative;
     }
 </style>
