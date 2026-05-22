@@ -21,5 +21,9 @@
 	const scribeElement = document.getElementById('scribe');
 	if (scribeElement) {
 		scribeElement.document = data;
+
+		scribeElement.addEventListener('documentchange', (event) => {
+			console.log('Document modified:', event.detail);
+		});
 	}
 </script>

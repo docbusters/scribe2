@@ -30,9 +30,11 @@
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 
-	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
+	let { id, class: className = "", style, document, registry, mode = 'view', onchange }: ScribeProps = $props();
 
 	let loading = $state(true);
+	let rootElement = $state<HTMLElement | null>(null);
+	let isInitialized = false;
 	let dataOrder = $state<HTMLElement>();
 	let documentState = $derived<Document<C>>(mode === 'edit' ? editStore.document as Document<C> : document);
 	let sections = $derived(Object.values(documentState?.sections || {}));
@@ -85,7 +87,34 @@
 				instance.destroy();
 			}
 		};
-	})
+	});
+
+	// Notify change events to the consumer
+	$effect(() => {
+		const docSnapshot = $state.snapshot(documentState) as Document<never>;
+		
+		if (docSnapshot) {
+			if (!isInitialized) {
+				isInitialized = true;
+				return;
+			}
+			
+			// Trigger Svelte callback if provided
+			onchange?.(docSnapshot);
+			
+			// Dispatch native custom DOM event for web component integration
+			if (rootElement) {
+				const host = rootElement.closest('scribe-interpreter');
+				if (host) {
+					host.dispatchEvent(new CustomEvent('documentchange', {
+						detail: docSnapshot,
+						bubbles: true,
+						composed: true
+					}));
+				}
+			}
+		}
+	});
 
 	let title = $derived(parseStringForContentEditable(documentState.title));
 
@@ -96,7 +125,7 @@
     }
 </script>
 
-<div {id} class={`${className} scribe-document md:w-full`}>
+<div {id} bind:this={rootElement} class={`${className} scribe-document md:w-full`}>
 	{#if mode === 'edit'}
 		<Button variant="outline" onclick={() => console.log($state.snapshot(documentState))}>Print document (debugging)</Button>
 	{/if}

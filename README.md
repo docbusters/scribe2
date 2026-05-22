@@ -31,7 +31,7 @@ In order to test the library in other package via npm, a tgz file can be generat
 npm pack
 ```
 
-Now simply place the file in the new project and install it:
+The previous command already builds the lib and prepares it to be installed via npm. Now simply place the file in the new project and install it:
 
 ```bash
 npm i ../scribe2-0.0.1.tgz
