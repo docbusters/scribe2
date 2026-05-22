@@ -100,10 +100,7 @@
 				return;
 			}
 			
-			// Trigger Svelte callback if provided
-			ondocumentchange?.(docSnapshot);
-			
-			// Dispatch native custom DOM event for web component integration
+			// Dispatch native custom DOM event
 			if (rootElement) {
 				const host = rootElement.closest('scribe-interpreter');
 				if (host) {

@@ -39,7 +39,7 @@ declare global {
             document: Document;
             registry?: ComponentRegistry;
             mode?: ScribeMode;
-			ondocumentchange?: (document: Document) => void;
+			ondocumentchange?: (event: CustomEvent<Document>) => void;
         };
     }
 
