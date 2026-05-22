@@ -171,7 +171,7 @@
 	}
 
 	.scribe-document {
-		width: var(--scribe-doc-width-mobile);
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
@@ -198,12 +198,6 @@
 	.document-title {
 		outline: none;
         display: inline;
-	}
-
-	@media (width >= 48rem /* 768px */) {
-		.scribe-document {
-			width: var(--scribe-doc-width);
-		}
 	}
 
 	:global(.scribe-document h1) {

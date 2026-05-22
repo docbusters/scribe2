@@ -3,7 +3,7 @@
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.js';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
-	import { globalRegistry } from '../../stores/global-registry.svelte.js';
+	import ComponentRenderer from '../utilComponents/ComponentRenderer.svelte';
 
     let { componentData, mode, sectionId }: ScribeComponentProps<TableComponent> = $props();
 
@@ -21,10 +21,7 @@
 
         const componentValue = cellValue.value;
 
-        return {
-            component: globalRegistry.getComponent(componentValue.type),
-            data: componentValue,
-        };
+        return componentValue;
     };
 </script>
 
@@ -34,10 +31,10 @@
             {#each Array.from({ length: config.rows }) as _, rowIndex (`row-${rowIndex}`)}
                 <tr>
                     {#each Array.from({ length: config.cols }) as _, colIndex (`col-${colIndex}`)}
-                        {@const Component = getCellValue(`${rowIndex}:${colIndex}`)}
+                        {@const componentData = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
-                            {#if Component}
-                                <Component.component componentData={Component.data} {mode} {sectionId} />
+                            {#if componentData}
+                                <ComponentRenderer componentData={componentData} {sectionId} {mode} />
                             {/if}
                         </td>
                     {/each}

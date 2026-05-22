@@ -3,8 +3,8 @@
     import type { DataValue, StringValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { ParagraphSection } from '../../domain/Section.js';
-	import { globalRegistry } from '../../stores/global-registry.svelte.js';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
+	import ComponentRenderer from '../utilComponents/ComponentRenderer.svelte';
 	
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;
@@ -29,14 +29,13 @@
 
 <div class="paragraph-section">
     {#each components as component, index (`${data.id}-${component.id}-${index}`)}
-    {@const Component = globalRegistry.getComponent(component.type)}
         {#if component.mode === 'block'}
             <div class="block-component-container">
-                <Component componentData={component} sectionId={data.id} {mode} />
+                <ComponentRenderer componentData={component} sectionId={data.id} {mode} />
             </div>
         {:else}
             <div class="inline-component-container">
-                <Component componentData={component} sectionId={data.id} {mode} />
+                <ComponentRenderer componentData={component} sectionId={data.id} {mode} />
             </div>
         {/if}
     {/each}

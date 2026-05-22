@@ -3,6 +3,7 @@ import type { ComponentRegistry } from './registry/ComponentRegistry.js';
 import type { ScribeMode, ScribeProps } from './types/ScribeProps.js';
 
 import ScribeComponent from './components/Scribe.svelte';
+import ComponentRenderer from './components/utilComponents/ComponentRenderer.svelte';
 
 // COMPONENTS
 export interface ScribeConstructor {
@@ -29,6 +30,8 @@ export type { DefaultComponents } from './registry/defaultRegistry.js';
 export type { BaseComponent, InlineComponent, BlockComponent } from './domain/components/Component.js';
 export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
 
+// UTILS
+export { ComponentRenderer };
 
 declare global {
     interface HTMLElementTagNameMap {
@@ -50,6 +53,7 @@ declare global {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace JSX {
         interface IntrinsicElements {
             'scribe-interpreter': ScribeProps & {
