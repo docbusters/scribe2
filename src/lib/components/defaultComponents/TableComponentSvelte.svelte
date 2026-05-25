@@ -3,7 +3,7 @@
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.js';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
-	import ComponentRenderer from '../utilComponents/ComponentRenderer.svelte';
+	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 
     let { componentData, mode, sectionId }: ScribeComponentProps<TableComponent> = $props();
 

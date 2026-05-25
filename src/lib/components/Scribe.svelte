@@ -27,11 +27,11 @@
 	import type { Document } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
-	import ComponentToolbar from './utilComponents/ComponentToolbar.svelte';
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
+	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
-	let { id, class: className = "", style, document, registry, mode = 'view', ondocumentchange }: ScribeProps = $props();
+	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
 
 	let loading = $state(true);
 	let rootElement = $state<HTMLElement | null>(null);

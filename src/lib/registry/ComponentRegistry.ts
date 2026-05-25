@@ -3,6 +3,7 @@ import type { DataValue } from '../domain/data/DataValue.js';
 import type { Component } from 'svelte';
 import type { DefaultComponents } from './defaultRegistry.js';
 import type { ScribeMode } from '../types/ScribeProps.js';
+import type { ComponentEditOptions } from './ComponentEditOptions.ts';
 
 /** Props that should be implemented by every user-defined component */
 export interface ScribeComponentProps<T extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
@@ -20,7 +21,11 @@ export type ComponentRegistry<
         icon: string;
         component: Component<ScribeComponentProps<C>>;
         /** Contains the default configuration for the component when inserted. Id will be generated automatically */
-        empty:  Omit<C, 'id' | 'value'> & { value: C['value']['type'] };
+        empty: Omit<C, 'id' | 'value'> & { value: C['value']['type'] };
+        /** Options displayed for editing a component. If not provided, default options will be used */
+        options?: ComponentEditOptions[];
+        /** Allowed value types for this component */
+        valueTypes?: DataValue['type'][];
     };
 };
 

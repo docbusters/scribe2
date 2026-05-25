@@ -4,7 +4,7 @@
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { ParagraphSection } from '../../domain/Section.js';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
-	import ComponentRenderer from '../utilComponents/ComponentRenderer.svelte';
+	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 	
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;

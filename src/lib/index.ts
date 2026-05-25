@@ -3,7 +3,7 @@ import type { ComponentRegistry } from './registry/ComponentRegistry.js';
 import type { ScribeMode, ScribeProps } from './types/ScribeProps.js';
 
 import ScribeComponent from './components/Scribe.svelte';
-import ComponentRenderer from './components/utilComponents/ComponentRenderer.svelte';
+import ComponentRenderer from './components/component/ComponentRenderer.svelte';
 
 // COMPONENTS
 export interface ScribeConstructor {
