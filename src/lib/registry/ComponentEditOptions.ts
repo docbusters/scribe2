@@ -10,11 +10,12 @@ export interface ComponentEditOnClick {
 }
 
 export interface ComponentEditProps {
+    componentType: string;
     sectionId: string;
     componentId: string;
     disabled: boolean;
     name: string;
-    onClick?: (data: ComponentEditOnClick) => void;
+    onclick?: (data: ComponentEditOnClick) => void;
     icon?: string;
 }
 
@@ -26,7 +27,7 @@ export interface ComponentEditOptions {
     /** Props passed to the default button or custom render function */
     props?: {
         icon: string;
-        onClick: (data: ComponentEditOnClick) => void;
+        onclick: (data: ComponentEditOnClick) => void;
     };
 }
 
@@ -35,7 +36,7 @@ export const addComponentOption: ComponentEditOptions = {
     name: 'Add component',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
-        onClick: (data: ComponentEditOnClick) => {
+        onclick: (data: ComponentEditOnClick) => {
             const { event, sectionId, componentId } = data;
             const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
             toolbarStore.open(rect.left, rect.bottom, sectionId, componentId, false);
@@ -48,7 +49,7 @@ export const duplicateComponentOption: ComponentEditOptions = {
     name: 'Duplicate component',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
-        onClick: (data: ComponentEditOnClick) => {
+        onclick: (data: ComponentEditOnClick) => {
             const { sectionId, componentId } = data;
             editStore.duplicateComponent(sectionId, componentId);
         }
@@ -60,7 +61,7 @@ export const deleteComponentOption: ComponentEditOptions = {
     name: 'Delete component',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-error-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
-        onClick: (data: ComponentEditOnClick) => {
+        onclick: (data: ComponentEditOnClick) => {
             const { sectionId, componentId } = data;
             editStore.deleteComponent(sectionId, componentId);
         }
@@ -81,7 +82,7 @@ export const setValueOption: ComponentEditOptions = {
     },
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>',
-        onClick(data: ComponentEditOnClick) {
+        onclick(data: ComponentEditOnClick) {
             console.log('Set value clicked', data);
         },
     }

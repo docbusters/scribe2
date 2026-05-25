@@ -12,9 +12,10 @@
     {@const Component = globalRegistry.getComponent(componentData.type)}
 	
 	{#if mode === 'edit'}
+		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents">
 			<div class="component-editor">
-				<ComponentEditor {sectionId} componentId={componentData.id} />
+				<ComponentEditor componentType={componentData.type} {sectionId} componentId={componentData.id} {options} />
 			</div>
 			<Component {componentData} {sectionId} {mode} />
 		</div>

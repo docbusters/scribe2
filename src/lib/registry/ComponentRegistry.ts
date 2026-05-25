@@ -25,7 +25,7 @@ export type ComponentRegistry<
         /** Options displayed for editing a component. If not provided, default options will be used */
         options?: ComponentEditOptions[];
         /** Allowed value types for this component */
-        valueTypes?: DataValue['type'][];
+        valueTypes: DataValue['type'][];
     };
 };
 

@@ -2,7 +2,7 @@
 	import { Button } from "bits-ui";
 	import type { HTMLButtonAttributes } from "svelte/elements";
 
-  interface ButtonProps extends HTMLButtonAttributes {
+  export interface ButtonProps extends HTMLButtonAttributes {
     variant?: "default" | "secondary" | "ghost" | "destructive" | "outline";
     size?: "default" | "sm" | "lg" | "icon" | "icon-sm";
   }

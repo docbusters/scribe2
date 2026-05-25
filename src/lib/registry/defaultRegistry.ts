@@ -20,6 +20,7 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'inline',
             value: 'string',
         },
+        valueTypes: ['string'],
     },
     'text-input': {
         name: 'Text Input',
@@ -31,6 +32,7 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'inline',
             value: 'binding',
         },
+        valueTypes: ['binding'],
     },
     'image': {
         name: 'Image',
@@ -42,6 +44,7 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'block',
             value: 'string',
         },
+        valueTypes: ['string', 'binding'],
     },
     'latex': {
         name: 'LaTeX',
@@ -53,6 +56,7 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'block',
             value: 'string',
         },
+        valueTypes: ['string', 'binding'],
     },
     'table': {
         name: 'Table',
@@ -68,5 +72,6 @@ export const defaultRegistry: ComponentRegistry = {
                 rows: 2,
             }
         },
+        valueTypes: ['record'],
     }
 };

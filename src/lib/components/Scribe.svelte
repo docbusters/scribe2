@@ -23,6 +23,7 @@
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { dataStore } from '../stores/data-store.svelte.js';
 	import type { ScribeProps } from '../types/ScribeProps.js';
+	import { setContext } from 'svelte';
 	import Sortable from 'sortablejs';
 	import type { Document } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -32,6 +33,9 @@
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
 	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
+
+	let portalTarget = $state<HTMLElement | null>(null);
+	setContext('scribe-portal-target', () => portalTarget);
 
 	let loading = $state(true);
 	let rootElement = $state<HTMLElement | null>(null);
@@ -158,6 +162,7 @@
 		<ComponentToolbar />
 		<TextFormatToolbar />
 	{/if}
+	<div bind:this={portalTarget} class="scribe-portal-target"></div>
 </div>
 
 <style>
@@ -257,8 +262,7 @@
     :global(.scribe-dropdown-item) {
         display: flex;
         align-items: center;
-        height: 2.5rem;
-        padding: 0.1rem 0.5rem;
+        padding: 0.2rem 0.5rem;
         font-size: var(--scribe-font-size-sm);
         font-weight: var(--scribe-font-weight-medium);
         border-radius: var(--radius-button, 0.5rem);

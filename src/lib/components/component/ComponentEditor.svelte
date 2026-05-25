@@ -5,13 +5,14 @@
     import { mount, unmount } from "svelte";
 
     interface ComponentEditorProps extends HTMLAttributes<HTMLDivElement> {
+        componentType: string;
         sectionId: string;
         componentId: string;
         disabled?: boolean;
         options?: ComponentEditOptions[];
     }
 
-    let { sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, ...restProps }: ComponentEditorProps = $props();
+    let { componentType, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, ...restProps }: ComponentEditorProps = $props();
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -22,19 +23,22 @@
 
         options.forEach(option => {
             if (option.props) {
+                // If a custom render function is provided, use it to render the option
                 if (option.render) {
                     const cleanup = option.render(containerElement!, {
+                        componentType,
                         sectionId,
                         componentId,
                         disabled,
                         name: option.name,
-                        onClick: option.props.onClick,
-                        icon: option.props.icon
+                        onclick: option.props.onclick,
+                        icon: option.props.icon,
                     });
                     if (cleanup) {
                         cleanups.push(cleanup);
                     }
                 } else {
+                    // Otherwise, render a default button for the option
                     const app = mount(ComponentEditorButton, {
                         target: containerElement!,
                         props: {
@@ -42,7 +46,7 @@
                             componentId,
                             disabled,
                             name: option.name,
-                            onClick: option.props.onClick,
+                            onclick: (e) => option.props!.onclick?.({ event: e, sectionId, componentId }),
                             icon: option.props.icon
                         }
                     });
