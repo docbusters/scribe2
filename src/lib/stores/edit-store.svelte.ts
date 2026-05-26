@@ -242,6 +242,15 @@ class EditStore<C> {
     setComponentValue(sectionId: string, componentId: string, newValue: DataValue) {
         const component = this.findComponent(sectionId, componentId);
         if (!component) return false;
+
+        // Verify if the new value is supported
+        if (!globalRegistry.getComponentValueTypes(component.type).includes(newValue.type)) {
+            console.warn(`Value type ${newValue.type} is not supported for component type ${component.type}`);
+            return false;
+        }
+
+        // TODO: Verifiy the value with more detail
+
         component.value = newValue;
         console.log(`Updated component ${componentId} value:`, newValue);
         

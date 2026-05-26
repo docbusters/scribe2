@@ -15,7 +15,7 @@
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents">
 			<div class="component-editor">
-				<ComponentEditor componentType={componentData.type} {sectionId} componentId={componentData.id} {options} />
+				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} sectionId={sectionId} componentId={componentData.id} {options} />
 			</div>
 			<Component {componentData} {sectionId} {mode} />
 		</div>

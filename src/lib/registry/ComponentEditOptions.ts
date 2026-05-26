@@ -1,4 +1,5 @@
 import ComponentEditorValueSelector from "$lib/components/component/ComponentEditorValueSelector.svelte";
+import type { DataValue } from "$lib/domain/data/DataValue.js";
 import { editStore } from "$lib/stores/edit-store.svelte.js";
 import { toolbarStore } from "$lib/stores/toolbar-store.svelte.js";
 import { mount, unmount } from "svelte";
@@ -11,6 +12,7 @@ export interface ComponentEditOnClick {
 
 export interface ComponentEditProps {
     componentType: string;
+    componentValue: DataValue;
     sectionId: string;
     componentId: string;
     disabled: boolean;

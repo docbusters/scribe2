@@ -47,5 +47,5 @@ export interface ComponentValue {
 
 export interface BindingValue {
     type: "binding";
-    id: string;
+    value: string;
 }

@@ -6,7 +6,7 @@ export interface Document<C = never> {
     id: string;
     title: string;
     sections: Record<string, Section<DefaultComponents | C>>;
-    bindings: Record<BindingValue['id'], BindingsDefinition>;
+    bindings: Record<BindingValue['value'], BindingsDefinition>;
 }
 
 export type BindingsDefinition = {

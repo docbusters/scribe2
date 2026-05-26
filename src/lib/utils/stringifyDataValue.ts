@@ -12,7 +12,7 @@ export const stringifyDataValue = (value: DataValue): string => {
         case 'date':
             return value.value.toISOString();
         case 'binding':
-            return stringifyDataValue(dataStore.data[value.id]);  
+            return stringifyDataValue(dataStore.data[value.value]);  
         default:
             throw new Error('Unsupported data value type');
     }

@@ -22,7 +22,7 @@
           "type": "text-input",
           "value": {
             "type": "binding",
-            "id": "image-url"
+            "value": "image-url"
           },
           "config": {
             "placeholder": "https://example.com/image.jpg",
@@ -35,7 +35,7 @@
           "mode": "block",
           "value": {
             "type": "binding",
-            "id": "image-url"
+            "value": "image-url"
           },
           "config": {
             "emptyText": "No image URL provided. Please enter an URL in the input above.",
@@ -57,7 +57,7 @@
           "type": "text-input",
           "value": {
             "type": "binding",
-            "id": "latex-string"
+            "value": "latex-string"
           }
         },
         "latex-1": {
@@ -66,7 +66,7 @@
           "mode": "block",
           "value": {
             "type": "binding",
-            "id": "latex-string"
+            "value": "latex-string"
           }
         }
       }
@@ -120,7 +120,7 @@
                   "mode": "inline",
                   "value": {
                     "type": "binding",
-                    "id": "table-latex-binding"
+                    "value": "table-latex-binding"
                   }
                 }
               },
@@ -132,7 +132,7 @@
                   "mode": "inline",
                   "value": {
                     "type": "binding",
-                    "id": "table-latex-binding"
+                    "value": "table-latex-binding"
                   }
                 }
               }

@@ -79,7 +79,7 @@
     placeholder={config?.placeholder} 
     class="text-input" 
     type="text" 
-    bind:value={dataStore.data[bindValue.id].value} 
+    bind:value={dataStore.data[bindValue.value].value} 
 />
 
 <style>

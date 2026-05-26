@@ -24,7 +24,7 @@ export const fullExampleDocument: Document = {
                     type: 'text-input',
                     value: {
                         type: 'binding',
-                        id: 'image-url',
+                        value: 'image-url',
                     },
                     config: {
                         placeholder: 'https://example.com/image.jpg',
@@ -37,7 +37,7 @@ export const fullExampleDocument: Document = {
                     mode: 'block',
                     value: {
                         type: 'binding',
-                        id: 'image-url',
+                        value: 'image-url',
                     },
                     config: {
                         emptyText: 'No image URL provided. Please enter an URL in the input above.',
@@ -59,7 +59,7 @@ export const fullExampleDocument: Document = {
                     type: 'text-input',
                     value: {
                         type: 'binding',
-                        id: 'latex-string',
+                        value: 'latex-string',
                     }
                 },
                 'latex-1': {
@@ -68,7 +68,7 @@ export const fullExampleDocument: Document = {
                     mode: 'block',
                     value: {
                         type: 'binding',
-                        id: 'latex-string',
+                        value: 'latex-string',
                     }
                 },
             },
@@ -123,7 +123,7 @@ export const fullExampleDocument: Document = {
                                     mode: 'inline',
                                     value: {
                                         type: 'binding',
-                                        id: 'table-latex-binding',
+                                        value: 'table-latex-binding',
                                     }
                                 }
                             },
@@ -135,7 +135,7 @@ export const fullExampleDocument: Document = {
                                     mode: 'inline',
                                     value: {
                                         type: 'binding',
-                                        id: 'table-latex-binding',
+                                        value: 'table-latex-binding',
                                     }
                                 }
                             }
@@ -265,7 +265,7 @@ export const fullExampleDocument: Document = {
     },
     bindings: {
         name: { type: 'string', initialValue: 'I am a binded name!!!' },
-        'image-url': { type: 'string', initialValue: '' },
+        'image-url': { type: 'string', initialValue: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' },
         'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
         'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
     }

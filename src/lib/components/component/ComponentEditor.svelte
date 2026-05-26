@@ -3,16 +3,18 @@
 	import { defaultComponentOptions, type ComponentEditOptions } from "$lib/registry/ComponentEditOptions.js";
 	import ComponentEditorButton from "./ComponentEditorButton.svelte";
     import { mount, unmount } from "svelte";
+	import type { DataValue } from "$lib/domain/data/DataValue.js";
 
     interface ComponentEditorProps extends HTMLAttributes<HTMLDivElement> {
         componentType: string;
+        componentValue: DataValue;
         sectionId: string;
         componentId: string;
         disabled?: boolean;
         options?: ComponentEditOptions[];
     }
 
-    let { componentType, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, ...restProps }: ComponentEditorProps = $props();
+    let { componentType, componentValue, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, ...restProps }: ComponentEditorProps = $props();
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -27,6 +29,7 @@
                 if (option.render) {
                     const cleanup = option.render(containerElement!, {
                         componentType,
+                        componentValue,
                         sectionId,
                         componentId,
                         disabled,

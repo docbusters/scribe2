@@ -275,6 +275,8 @@
         background-color: var(--scribe-muted);
     }
 
+	
+
 	/* Animations */
 	@keyframes pulse {
 		0%, 100% {

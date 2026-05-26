@@ -42,7 +42,7 @@ export function generateDefaultDataValue(type: DataValue['type']): DataValue {
             });
             return {
                 type: 'binding',
-                id: bindingId,
+                value: bindingId,
             };
 
         }

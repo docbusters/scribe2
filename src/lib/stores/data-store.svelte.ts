@@ -3,7 +3,7 @@ import type { BindingsDefinition, Document } from "../domain/Document.js";
 import { getEmptyPrimitiveValue } from "../utils/getEmptyPrimitiveValue.js";
 
 class DataStore {
-    data: Record<BindingValue['id'], PrimitiveValue> = $state({});
+    data: Record<BindingValue['value'], PrimitiveValue> = $state({});
 
     initialize(bindings: Document['bindings']) {
         Object.entries(bindings).forEach(([id, binding]) => {
@@ -19,6 +19,13 @@ class DataStore {
                 : { type: binding.type, value: getEmptyPrimitiveValue(binding.type) }
         ) as PrimitiveValue;
         this.data[id] = this.data[id] = primitiveValue;
+    }
+
+    getBindingOptions() {
+        return Object.entries(this.data).map(([id]) => ({
+            value: id,
+            label: `${id} (${this.data[id].value})`
+        }));
     }
 }
 

@@ -1,42 +1,92 @@
 <script lang="ts">
 	import { type ComponentEditProps } from '$lib/registry/ComponentEditOptions.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
-	import { Dialog } from 'bits-ui';
 	import ComponentEditorButton from './ComponentEditorButton.svelte';
-	import { getContext } from 'svelte';
+	import Select from '../utilComponents/Select.svelte';
+	import TextInput from '../utilComponents/TextInput.svelte';
+	import Dialog from '../utilComponents/Dialog.svelte';
+	import Button from '../utilComponents/Button.svelte';
+	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
+	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { editStore } from '$lib/stores/edit-store.svelte.js';
 
 	let props: ComponentEditProps = $props();
 
-	const supportedValues = $derived(globalRegistry.getComponentValueTypes(props.componentType));
+	const supportedValues = $derived(
+		globalRegistry.getComponentValueTypes(props.componentType).map((valueType) => ({
+			value: valueType,
+			label: valueType
+		}))
+	);
 
-	const getPortalTarget = getContext<() => HTMLElement | null>('scribe-portal-target');
-	const portalTarget = $derived(getPortalTarget?.() || undefined);
+	let open = $state(false);
+	let valueType = $state<DataValue['type']>();
+	let value = $state<DataValue['value']>();
+	let bindingOptions = $derived(dataStore.getBindingOptions());
+
+	function handleSetValue() {
+    if (!valueType || value === undefined) return;
+
+    const parsedValue = { type: valueType, value: value } as DataValue;
+
+    switch (valueType) {
+      case 'number':
+        parsedValue.value = Number(value);
+        break;
+    }
+
+    editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);
+		open = false;
+	}
 </script>
 
+<ComponentEditorButton
+	icon={props.icon}
+	name={props.name}
+	disabled={props.disabled}
+	onclick={() => {
+		valueType = props.componentValue.type;
+		value = props.componentValue.value;
+		open = true;
+	}}
+/>
 
+<Dialog bind:open title="Set new value">
+	<Select
+		placeholder="Select value type"
+		type="single"
+		bind:value={valueType}
+		items={supportedValues}
+	/>
 
-<Dialog.Root>
-  <Dialog.Trigger>
-    {#snippet child({props: dialogTriggerProps})}
-      <ComponentEditorButton
-        icon={props.icon}
-        name={props.name}
-        disabled={props.disabled}
-        {...dialogTriggerProps}
-      />
-    {/snippet}
-  </Dialog.Trigger>
-  <Dialog.Portal to={portalTarget}>
-    <Dialog.Overlay class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80" />
-    <Dialog.Content
-      class="rounded-card-lg bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 outline-hidden fixed left-[50%] top-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] border p-5 sm:max-w-[490px] md:w-full"
-    >
-      <Dialog.Title class="flex w-full items-center justify-center text-lg font-semibold tracking-tight">Set new value</Dialog.Title>
-      <Dialog.Description class="text-foreground-alt text-sm" />
-       <div class="min-h-100 min-w-100"></div>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+	{#if valueType === 'string'}
+		<TextInput bind:value={value as string} placeholder="Value" />
+	{:else if valueType === 'number'}
+		<TextInput bind:value={value as string} placeholder="Value" type="number" />
+	{:else if valueType === 'boolean'}
+		<Select
+			placeholder="Value"
+			type="single"
+			bind:value={valueType}
+			items={[
+				{ value: 'true', label: 'True' },
+				{ value: 'false', label: 'False' }
+			]}
+		/>
+	{:else if valueType === 'binding'}
+		<Select
+			placeholder="Binding"
+			type="single"
+			bind:value={value as BindingValue['value']}
+			items={bindingOptions}
+		/>
+	{/if}
+
+	{#snippet footer()}
+		<Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+		<Button onclick={handleSetValue}>Set value</Button>
+	{/snippet}
+</Dialog>
 
 <style>
 </style>
