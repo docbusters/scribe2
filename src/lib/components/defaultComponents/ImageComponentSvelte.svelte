@@ -33,6 +33,14 @@
             styleString += 'object-position: center;';
         }
 
+        if (config?.height) {
+            styleString += `height: ${config.height};`;
+        }
+
+        if (config?.width) {
+            styleString += `width: ${config.width};`;
+        }
+
         return styleString;
     })
 </script>
@@ -70,5 +78,8 @@
         min-height: 133px;
         border-radius: var(--scribe-radius-2xl);
         padding: 0.25rem;
+        align-items: center;
+        display: flex;
+        justify-content: center;
     }
 </style>

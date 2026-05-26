@@ -257,6 +257,12 @@ class EditStore<C> {
         return true;
     }
 
+    getComponentConfig(sectionId: string, componentId: string) {
+        const component = this.findComponent(sectionId, componentId);
+        if (!component) return null;
+        return component.config;
+    }
+
     setComponentConfig(sectionId: string, componentId: string, newConfig: ComponentConfig) {
         const component = this.findComponent(sectionId, componentId);
         if (!component) return false;

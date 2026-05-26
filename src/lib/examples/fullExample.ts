@@ -42,6 +42,9 @@ export const fullExampleDocument: Document = {
                     config: {
                         emptyText: 'No image URL provided. Please enter an URL in the input above.',
                         errorText: 'The provided URL is not a valid image. Please check the URL and try again.',
+                        height: "200px",
+                        width: "300px",
+                        position: 'contain',
                     }
                 },
                 'text-latex': {
