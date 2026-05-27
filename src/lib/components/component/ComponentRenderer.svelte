@@ -10,11 +10,10 @@
 
 {#if componentData}
     {@const Component = globalRegistry.getComponent(componentData.type)}
-	
-	{#if mode === 'edit' && componentData.value.value}
+	{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
-		<div class="component-edit-contents">
-			<div class="component-editor">
+		<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
+			<div class="component-editor" contenteditable="false">
 				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} />
 			</div>
 			<Component {componentData} {sectionId} {mode} />
@@ -26,19 +25,29 @@
 
 <style>
 	.component-edit-contents {
-		display: contents;
-	}
-
-	.component-edit-contents > :global(:not(.component-editor)) {
+		position: relative;
 		transition: background-color 0.2s ease;
 	}
 
-	:hover.component-edit-contents > :global(:not(.component-editor)) {
+	.component-edit-contents.is-inline {
+		display: inline;
+	}
+	
+	.component-edit-contents.is-inline-block {
+		display: inline-block;
+	}
+
+	.component-edit-contents.is-block {
+		display: flex;
+		width: 100%;
+	}
+
+	.component-edit-contents:hover {
 		background-color: var(--scribe-selection-color) !important;
 		border-radius: var(--scribe-radius-sm);
 	}
 
-	:hover.component-edit-contents > .component-editor {
+	.component-edit-contents:hover > .component-editor {
 		opacity: 1;
 		pointer-events: auto;
 	}
@@ -59,7 +68,7 @@
 		content: '';
 		position: absolute;
 		top: -15px;
-		bottom: -10px;
+		bottom: -0.5rem;
 		right: -0.75rem;
 		left: 0;
 		z-index: -1;
@@ -71,7 +80,7 @@
 		pointer-events: none !important;
 	}
 
-	.component-edit-contents:hover:has(:global(.component-edit-contents):hover) > :global(:not(.component-editor)) {
+	.component-edit-contents:hover:has(:global(.component-edit-contents):hover) {
 		background-color: transparent !important;
 	}
 </style>
