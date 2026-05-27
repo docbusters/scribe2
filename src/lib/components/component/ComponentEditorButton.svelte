@@ -6,13 +6,14 @@
         icon?: string;
         name: string;
         disabled?: boolean;
+        isSelected: boolean;
     }
 
-    let { name, icon, ...buttonProps }: ComponentEditorButtonProps = $props();
+    let { name, icon, isSelected, ...buttonProps }: ComponentEditorButtonProps = $props();
 </script>
 
 
-<Button size="icon-sm" variant="ghost" title={name} {...buttonProps}>
+<Button size="icon-sm" variant={isSelected ? "secondary" : "ghost"} title={name} {...buttonProps}>
     {#if icon}
         {@html icon}
     {/if}

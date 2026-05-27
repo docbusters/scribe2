@@ -1,4 +1,5 @@
 import ComponentEditorValueSelector from "$lib/components/component/ComponentEditorValueSelector.svelte";
+import type { ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
 import { editStore } from "$lib/stores/edit-store.svelte.js";
 import { toolbarStore } from "$lib/stores/toolbar-store.svelte.js";
@@ -19,11 +20,14 @@ export interface ComponentEditProps {
     name: string;
     onclick?: (data: ComponentEditOnClick) => void;
     icon?: string;
+    isSelected: boolean;
 }
 
 export interface ComponentEditOptions {
     type: string;
     name: string;
+    /** Function to determine if the option is selected. If not provided, the option will not be considered selected. */
+    isSelected?: (data: { value: DataValue; config: ComponentConfig | undefined }) => boolean;
     /** Framework-agnostic render function to render custom HTML/elements. Can return a cleanup function */
     render?: (container: HTMLElement, data: ComponentEditProps) => (() => void) | void;
     /** Props passed to the default button or custom render function */

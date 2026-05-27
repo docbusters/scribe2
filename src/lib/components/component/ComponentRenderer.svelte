@@ -15,7 +15,7 @@
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents">
 			<div class="component-editor">
-				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} sectionId={sectionId} componentId={componentData.id} {options} />
+				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} />
 			</div>
 			<Component {componentData} {sectionId} {mode} />
 		</div>
@@ -48,7 +48,7 @@
 		top: -0.5rem;
 		left: 0;
 		transform: translateY(-100%);
-		z-index: 10;
+		z-index: 1;
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.3s ease;
@@ -58,8 +58,8 @@
 	.component-editor::after {
 		content: '';
 		position: absolute;
-		top: -25px;
-		bottom: -25px;
+		top: -15px;
+		bottom: -10px;
 		right: -0.75rem;
 		left: 0;
 		z-index: -1;

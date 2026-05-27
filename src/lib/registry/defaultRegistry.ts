@@ -7,6 +7,7 @@ import LatexComponentSvelte from '../components/defaultComponents/LatexComponent
 import TableComponentSvelte from '../components/defaultComponents/TableComponentSvelte.svelte';
 import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
+import type { ImageComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 
 export type DefaultComponents = TextComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent;
 
@@ -45,12 +46,17 @@ export const defaultRegistry: ComponentRegistry = {
             type: 'image',
             mode: 'block',
             value: 'string',
+            config: {
+                align: 'center',
+                position: 'contain',
+            }
         },
         options: [
             ...defaultComponentOptions,
             {
                 type: 'align-left',
                 name: 'Align Left',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'left',
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-align-start-icon lucide-text-align-start"><path d="M21 5H3"/><path d="M15 12H3"/><path d="M17 19H3"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {
@@ -64,6 +70,7 @@ export const defaultRegistry: ComponentRegistry = {
             {
                 type: 'align-center',
                 name: 'Align Center',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align !== undefined ? data.config.align === 'center' : true, // If align is not set, center is default
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-align-center-icon lucide-text-align-center"><path d="M21 5H3"/><path d="M17 12H7"/><path d="M19 19H5"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {
@@ -77,6 +84,7 @@ export const defaultRegistry: ComponentRegistry = {
             {
                 type: 'align-right',
                 name: 'Align Right',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'right',
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-align-end-icon lucide-text-align-end"><path d="M21 5H3"/><path d="M21 12H9"/><path d="M21 19H7"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {
@@ -90,6 +98,7 @@ export const defaultRegistry: ComponentRegistry = {
             {
                 type: 'contain',
                 name: 'Set image fit to contain',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position !== undefined ? data.config?.position === 'contain' : true, // If position is not set, contain is default
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-images-icon lucide-images"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16"/><path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2"/><circle cx="13" cy="7" r="1" fill="currentColor"/><rect x="8" y="2" width="14" height="14" rx="2"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {
@@ -103,6 +112,7 @@ export const defaultRegistry: ComponentRegistry = {
             {
                 type: 'cover',
                 name: 'Set image fit to cover',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'cover',
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-upscale-icon lucide-image-upscale"><path d="M16 3h5v5"/><path d="M17 21h2a2 2 0 0 0 2-2"/><path d="M21 12v3"/><path d="m21 3-5 5"/><path d="M3 7V5a2 2 0 0 1 2-2"/><path d="m5 21 4.144-4.144a1.21 1.21 0 0 1 1.712 0L13 19"/><path d="M9 3h3"/><rect x="3" y="11" width="10" height="10" rx="1"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {
@@ -116,6 +126,7 @@ export const defaultRegistry: ComponentRegistry = {
             {
                 type: 'fill',
                 name: 'Set image fit to fill',
+                isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'fill',
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fullscreen-icon lucide-fullscreen"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect width="10" height="8" x="7" y="8" rx="1"/></svg>',
                     onclick: (data: ComponentEditOnClick) => {

@@ -53,6 +53,7 @@
         opacity: 0;
         transition: opacity 200ms ease-in-out;
         user-select: none;
+        z-index: 2;
     }
 
     .text-toolbar-visible {

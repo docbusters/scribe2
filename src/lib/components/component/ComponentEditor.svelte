@@ -4,17 +4,19 @@
 	import ComponentEditorButton from "./ComponentEditorButton.svelte";
     import { mount, unmount } from "svelte";
 	import type { DataValue } from "$lib/domain/data/DataValue.js";
+	import type { ComponentConfig } from "$lib/domain/components/Component.js";
 
     interface ComponentEditorProps extends HTMLAttributes<HTMLDivElement> {
         componentType: string;
         componentValue: DataValue;
+        componentConfig?: ComponentConfig;
         sectionId: string;
         componentId: string;
         disabled?: boolean;
         options?: ComponentEditOptions[];
     }
 
-    let { componentType, componentValue, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, ...restProps }: ComponentEditorProps = $props();
+    let { componentType, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions,  ...restProps }: ComponentEditorProps = $props();
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -36,6 +38,7 @@
                         name: option.name,
                         onclick: option.props.onclick,
                         icon: option.props.icon,
+                        isSelected: option.isSelected ? option.isSelected({ value: componentValue, config: componentConfig }) : false
                     });
                     if (cleanup) {
                         cleanups.push(cleanup);
@@ -50,7 +53,8 @@
                             disabled,
                             name: option.name,
                             onclick: (e) => option.props!.onclick?.({ event: e, sectionId, componentId }),
-                            icon: option.props.icon
+                            icon: option.props.icon,
+                            isSelected: option.isSelected ? option.isSelected({ value: componentValue, config: componentConfig }) : false
                         }
                     });
                     cleanups.push(() => unmount(app));
@@ -77,7 +81,6 @@
         gap: 0.25rem;
         padding: 0.25rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
     }

@@ -24,7 +24,7 @@
         if (config?.position) {
             styleString += `object-fit: ${config.position};`;
         } else {
-            styleString += 'object-fit: cover;';
+            styleString += 'object-fit: contain;';
         }
 
         if (config?.align) {
