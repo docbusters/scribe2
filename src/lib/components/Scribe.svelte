@@ -127,7 +127,7 @@
     }
 </script>
 
-<div {id} bind:this={rootElement} class={`${className} scribe-document md:w-full`}>
+<div {id} bind:this={rootElement} class={`${className} scribe-document`}>
 	{#if mode === 'edit'}
 		<Button variant="outline" onclick={() => console.log($state.snapshot(documentState))}>Print document (debugging)</Button>
 	{/if}

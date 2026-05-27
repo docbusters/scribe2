@@ -37,7 +37,7 @@
           {#snippet child({props})}
             <Button {...props} variant="ghost" size="icon" class="scribe-dialog-close-btn" style="border-radius: 100%;">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              <span class="sr-only">Close</span>
+              <span class="close-txt">Close</span>
             </Button>
           {/snippet}
         </BitsDialog.Close>
@@ -65,6 +65,18 @@
 </BitsDialog.Root>
 
 <style>
+  .close-txt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   :global(.scribe-dialog-overlay) {
 		position: fixed;
 		inset: 0;

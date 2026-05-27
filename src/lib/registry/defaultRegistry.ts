@@ -5,7 +5,7 @@ import type { ImageComponent, LatexComponent, TableComponent, TextComponent, Tex
 import ImageComponentSvelte from '../components/defaultComponents/ImageComponentSvelte.svelte';
 import LatexComponentSvelte from '../components/defaultComponents/LatexComponentSvelte.svelte';
 import TableComponentSvelte from '../components/defaultComponents/TableComponentSvelte.svelte';
-import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.ts';
+import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
 
 export type DefaultComponents = TextComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent;

@@ -5,6 +5,6 @@
 
 </script>
 
-<div class="flex justify-center w-full py-10 border-box justify-center">
+<div class="flex w-full py-10 border-box justify-center">
 	<Scribe document={fullExampleDocument} class="max-w-[70vw]" mode="edit" />
 </div>

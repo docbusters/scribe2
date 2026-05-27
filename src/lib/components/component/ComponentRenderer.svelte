@@ -11,7 +11,7 @@
 {#if componentData}
     {@const Component = globalRegistry.getComponent(componentData.type)}
 	
-	{#if mode === 'edit'}
+	{#if mode === 'edit' && componentData.value.value}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents">
 			<div class="component-editor">
@@ -45,9 +45,9 @@
 
 	.component-editor {
 		position: absolute;
-		top: 0;
-		left: -0.25rem;
-		transform: translateX(-100%);
+		top: -0.5rem;
+		left: 0;
+		transform: translateY(-100%);
 		z-index: 10;
 		opacity: 0;
 		pointer-events: none;

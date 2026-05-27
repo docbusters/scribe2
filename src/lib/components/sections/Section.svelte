@@ -55,6 +55,7 @@
         color: var(--scribe-section-foreground);
         border-radius: var(--scribe-section-radius);
         padding: 0.75rem 1.25rem;
+        margin: 0 0.5rem;
     }
 
     .section-title-container {
@@ -63,6 +64,7 @@
 
     .section-edit {
         padding-left: 1.75rem;
+        margin-right: 3.25rem;
     }
 
     :hover.section-edit .edit-handle, :hover.section-edit .section-editor {
