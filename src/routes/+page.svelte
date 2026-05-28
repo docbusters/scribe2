@@ -12,5 +12,6 @@
     <a href={resolve("/examples/full-webcomponent", {})}>Web component example</a>
     <a href={resolve("/examples/full-webcomponent-edit", {})}>Web component edit mode example</a>
     <a href={resolve("/examples/edit-empty", {})}>Edit mode empty</a>
+    <a href={resolve("/examples/full-edit-custom-binding", {})}>Edit mode custom binding</a>
 </div>
 

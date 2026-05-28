@@ -22,8 +22,9 @@
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { dataStore } from '../stores/data-store.svelte.js';
+	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
 	import type { ScribeProps } from '../types/ScribeProps.js';
-	import { setContext } from 'svelte';
+	import { setContext, onDestroy } from 'svelte';
 	import Sortable from 'sortablejs';
 	import type { Document } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -32,7 +33,7 @@
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
-	let { id, class: className = "", style, document, registry, mode = 'view' }: ScribeProps = $props();
+	let { id, class: className = "", style, document, customBindings = {}, registry, mode = 'view' }: ScribeProps = $props();
 
 	let portalTarget = $state<HTMLElement | null>(null);
 	setContext('scribe-portal-target', () => portalTarget);
@@ -63,7 +64,13 @@
 		if (document) {
 			// Initialize the data store with the initial values from the document's components
 			dataStore.initialize(document.bindings);
+			customBindingsStore.initialize(customBindings);
 		}
+	});
+
+	// Clean up custom bindings on destroy to avoid memory leaks
+	onDestroy(() => {
+		customBindingsStore.destroy();
 	});
 
 	// Sortable initialization
@@ -96,6 +103,7 @@
 
 	// Notify change events to the consumer
 	$effect(() => {
+		// Omit customBindings since they contain functions which cannot be cloned by $state.snapshot
 		const docSnapshot = $state.snapshot(documentState) as Document<never>;
 		
 		if (docSnapshot) {

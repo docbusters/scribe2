@@ -1,5 +1,5 @@
 import type { DefaultComponents } from "../registry/defaultRegistry.js";
-import type { BindingValue, PrimitiveValue } from "./data/DataValue.ts";
+import type { BindingValue, PrimitiveValue } from "./data/DataValue.js";
 import type { Section } from "./Section.js";
 
 export interface Document<C = never> {

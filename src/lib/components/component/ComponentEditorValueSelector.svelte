@@ -49,6 +49,7 @@
 		value = props.componentValue.value;
 		open = true;
 	}}
+	isSelected={props.isSelected}
 />
 
 <Dialog bind:open title="Set new value">

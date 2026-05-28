@@ -12,5 +12,17 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     mode?: ScribeMode;
     document: Document<C>;
     registry?: ComponentRegistry<C>;
+    customBindings?: Record<string, CustomBinding>;
     ondocumentchange?: (event: CustomEvent<Document<C>>) => void;
+}
+
+export interface CustomBinding {
+    type: string;
+    name: string;
+    /** Returns the current value and provides an update function */
+    getData: (id: string, update: (newValue: DataValue) => void) => {
+        value: DataValue;
+        /** Optional cleanup function */
+        destroy?: () => void;
+    };
 }
