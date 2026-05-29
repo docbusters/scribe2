@@ -24,6 +24,7 @@ export const fullExampleDocument: Document = {
                     type: 'text-input',
                     value: {
                         type: 'binding',
+                        bindingType: 'default',
                         value: 'image-url',
                     },
                     config: {
@@ -37,6 +38,7 @@ export const fullExampleDocument: Document = {
                     mode: 'block',
                     value: {
                         type: 'binding',
+                        bindingType: 'default',
                         value: 'image-url',
                     },
                     config: {
@@ -62,6 +64,7 @@ export const fullExampleDocument: Document = {
                     type: 'text-input',
                     value: {
                         type: 'binding',
+                        bindingType: 'default',
                         value: 'latex-string',
                     }
                 },
@@ -71,6 +74,7 @@ export const fullExampleDocument: Document = {
                     mode: 'block',
                     value: {
                         type: 'binding',
+                        bindingType: 'default',
                         value: 'latex-string',
                     }
                 },
@@ -126,6 +130,7 @@ export const fullExampleDocument: Document = {
                                     mode: 'inline',
                                     value: {
                                         type: 'binding',
+                                        bindingType: 'default',
                                         value: 'table-latex-binding',
                                     }
                                 }
@@ -138,6 +143,7 @@ export const fullExampleDocument: Document = {
                                     mode: 'inline',
                                     value: {
                                         type: 'binding',
+                                        bindingType: 'default',
                                         value: 'table-latex-binding',
                                     }
                                 }
