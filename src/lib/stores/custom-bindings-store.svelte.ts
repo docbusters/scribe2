@@ -67,6 +67,24 @@ class CustomBindingsStore {
         this.cache.clear();
         this.triggers = {};
     }
+
+    getBindingsList(): { type: string; name: string }[] {
+        return Object.entries(this.definitions).map(([type, def]) => ({
+            type,
+            name: def.name || type
+        }));
+    }
+
+    getAvailableIds(type: string): { value: string; label: string }[] {
+        const def = this.definitions[type];
+        if (def && def.getAvailableIds) {
+            return def.getAvailableIds().map(item => ({
+                value: item.id,
+                label: item.label || item.id
+            }));
+        }
+        return [];
+    }
 }
 
 export const customBindingsStore = new CustomBindingsStore();

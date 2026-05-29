@@ -22,6 +22,9 @@
 	const customBinding: CustomBinding = {
 		type: 'custom-binding',
 		name: 'Custom Binding',
+		getAvailableIds: () => {
+			return Object.keys(bindingData).map(id => ({ id, label: id }));
+		},
 		getData: (id, update) => {
 			if (!bindingData[id]) {
 				throw new Error(`No binding data found for ID: ${id}`);
@@ -57,6 +60,7 @@
 	const liveClockBinding: CustomBinding = {
 		type: 'live-clock',
 		name: 'Live clock',
+		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock' }],
 		getData: (id, update) => {
 			const timer = setInterval(() => {
 				const timeString = new Date().toLocaleTimeString();

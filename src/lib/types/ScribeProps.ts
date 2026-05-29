@@ -19,6 +19,8 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
 export interface CustomBinding {
     type: string;
     name: string;
+    /** Optional function to get the available ids and their labels for the editor */
+    getAvailableIds?: () => { id: string; label?: string }[];
     /** Returns the current value and provides an update function */
     getData: (id: string, update: (newValue: DataValue) => void) => {
         value: DataValue;

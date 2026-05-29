@@ -9,33 +9,63 @@
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
 	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
+	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
 
 	let props: ComponentEditProps = $props();
 
-	const supportedValues = $derived(
-		globalRegistry.getComponentValueTypes(props.componentType).map((valueType) => ({
-			value: valueType,
-			label: valueType
-		}))
-	);
+	const supportedValues = $derived.by(() => {
+		const baseValues = globalRegistry.getComponentValueTypes(props.componentType);
+		const options = [];
+		for (const type of baseValues) {
+			// NOTE: We use stringified values in order to know the binding type
+			if (type === 'binding') {
+				options.push({ value: JSON.stringify({ type: 'binding', bindingType: 'default' }), label: 'Default Binding' });
+				const customBindings = customBindingsStore.getBindingsList();
+				for (const cb of customBindings) {
+					options.push({ value: JSON.stringify({ type: 'binding', bindingType: cb.type }), label: cb.name });
+				}
+			} else {
+				options.push({ value: JSON.stringify({ type }), label: type });
+			}
+		}
+		return options;
+	});
 
 	let open = $state(false);
-	let valueType = $state<DataValue['type']>();
+	let valueType = $state<string>();
 	let value = $state<DataValue['value']>();
-	let bindingOptions = $derived(dataStore.getBindingOptions());
+
+	let parsedValueType = $derived.by(() => {
+		if (!valueType) return null;
+		try {
+			return JSON.parse(valueType);
+		} catch {
+			return null;
+		}
+	});
+
+	let bindingOptions = $derived.by(() => {
+		if (parsedValueType?.type !== 'binding') return [];
+		const type = parsedValueType.bindingType;
+		if (type === 'default') {
+			return dataStore.getBindingOptions();
+		}
+		return customBindingsStore.getAvailableIds(type);
+	});
 
 	function handleSetValue() {
-    if (!valueType || value === undefined) return;
+		if (!parsedValueType || value === undefined) return;
 
-    const parsedValue = { type: valueType, value: value } as DataValue;
+		let parsedValue: DataValue;
 
-    switch (valueType) {
-      case 'number':
-        parsedValue.value = Number(value);
-        break;
-    }
+		if (parsedValueType.type === 'binding') {
+			parsedValue = { type: 'binding', bindingType: parsedValueType.bindingType, value: value as string } as BindingValue;
+		} else {
+			parsedValue = { type: parsedValueType.type as DataValue['type'], value: value } as DataValue;
+			if (parsedValueType.type === 'number') parsedValue.value = Number(value);
+		}
 
-    editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);
+		editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);
 		open = false;
 	}
 </script>
@@ -45,8 +75,14 @@
 	name={props.name}
 	disabled={props.disabled}
 	onclick={() => {
-		valueType = props.componentValue.type;
-		value = props.componentValue.value;
+		if (props.componentValue.type === 'binding') {
+			const bv = props.componentValue as BindingValue;
+			valueType = JSON.stringify({ type: 'binding', bindingType: bv.bindingType || 'default' });
+			value = bv.value;
+		} else {
+			valueType = JSON.stringify({ type: props.componentValue.type });
+			value = props.componentValue.value;
+		}
 		open = true;
 	}}
 	isSelected={props.isSelected}
@@ -60,25 +96,25 @@
 		items={supportedValues}
 	/>
 
-	{#if valueType === 'string'}
+	{#if parsedValueType?.type === 'string'}
 		<TextInput bind:value={value as string} placeholder="Value" />
-	{:else if valueType === 'number'}
+	{:else if parsedValueType?.type === 'number'}
 		<TextInput bind:value={value as string} placeholder="Value" type="number" />
-	{:else if valueType === 'boolean'}
+	{:else if parsedValueType?.type === 'boolean'}
 		<Select
 			placeholder="Value"
 			type="single"
-			bind:value={valueType}
+			bind:value={value as string}
 			items={[
 				{ value: 'true', label: 'True' },
 				{ value: 'false', label: 'False' }
 			]}
 		/>
-	{:else if valueType === 'binding'}
+	{:else if parsedValueType?.type === 'binding'}
 		<Select
-			placeholder="Binding"
+			placeholder="Binding ID"
 			type="single"
-			bind:value={value as BindingValue['value']}
+			bind:value={value as string}
 			items={bindingOptions}
 		/>
 	{/if}
