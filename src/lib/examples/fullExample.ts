@@ -1,4 +1,4 @@
-import type { Document } from "../domain/Document.js";
+import type { BindingsDefinition, Document } from "../domain/Document.js";
 
 export const fullExampleDocument: Document = {
     id: 'example-doc',
@@ -272,10 +272,11 @@ export const fullExampleDocument: Document = {
             ]
         }
     },
-    bindings: {
-        name: { type: 'string', initialValue: 'I am a binded name!!!' },
-        'image-url': { type: 'string', initialValue: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' },
-        'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
-        'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
-    }
 };
+
+export const fullExampleBindings: Record<string, BindingsDefinition> = {
+    name: { type: 'string', initialValue: 'I am a binded name!!!' },
+    'image-url': { type: 'string', initialValue: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' },
+    'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
+    'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
+}

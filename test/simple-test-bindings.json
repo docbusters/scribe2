@@ -1,0 +1,19 @@
+{
+  "name": {
+    "type": "string",
+    "initialValue": "I am a binded name!!!"
+  },
+  "image-url": {
+    "type": "string",
+    "initialValue": ""
+  },
+  "latex-string": {
+    "type": "string",
+    "initialValue": "\\frac{1}{n} \\sum_{i=1}^n x_i"
+  },
+  "table-latex-binding": {
+    "type": "string",
+    "initialValue": "I hate LaTeX"
+  }
+}
+

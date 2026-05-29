@@ -13,7 +13,7 @@
           "type": "text",
           "value": {
             "type": "string",
-            "value": "Hello! I am a full example document showcasing all the features of Scribe. Feel free to explore and test all the components and functionalities included in this document. Place in the following input an url to an image:"
+            "value": "Hello! I am a full example document showcasing all the features of Scribe. Feel free to explore and test all the components and functionalities included in this document. Place in the following input an url to an image: "
           }
         },
         "input-image": {
@@ -41,7 +41,10 @@
           },
           "config": {
             "emptyText": "No image URL provided. Please enter an URL in the input above.",
-            "errorText": "The provided URL is not a valid image. Please check the URL and try again."
+            "errorText": "The provided URL is not a valid image. Please check the URL and try again.",
+            "height": "200px",
+            "width": "300px",
+            "position": "contain"
           }
         },
         "text-latex": {
@@ -50,7 +53,7 @@
           "type": "text",
           "value": {
             "type": "string",
-            "value": "Place in the following input a latex expression: "
+            "value": "Place in the following input a *latex expression*: "
           }
         },
         "input-latex": {
@@ -150,6 +153,12 @@
           }
         }
       }
+    },
+    "empty-section": {
+      "id": "empty-section",
+      "title": "Empty section",
+      "type": "paragraph-section",
+      "content": {}
     },
     "section-5": {
       "id": "section-5",
@@ -257,24 +266,6 @@
           }
         }
       ]
-    }
-  },
-  "bindings": {
-    "name": {
-      "type": "string",
-      "initialValue": "I am a binded name!!!"
-    },
-    "image-url": {
-      "type": "string",
-      "initialValue": ""
-    },
-    "latex-string": {
-      "type": "string",
-      "initialValue": "\\frac{1}{n} \\sum_{i=1}^n x_i"
-    },
-    "table-latex-binding": {
-      "type": "string",
-      "initialValue": "I hate LaTeX"
     }
   }
 }

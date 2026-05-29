@@ -1,11 +1,11 @@
 import type { BindingValue, PrimitiveValue } from "../domain/data/DataValue.js";
-import type { BindingsDefinition, Document } from "../domain/Document.js";
+import type { BindingsDefinition } from "../domain/Document.js";
 import { getEmptyPrimitiveValue } from "../utils/getEmptyPrimitiveValue.js";
 
 class DataStore {
     data: Record<BindingValue['value'], PrimitiveValue> = $state({});
 
-    initialize(bindings: Document['bindings']) {
+    initialize(bindings: Record<string, BindingsDefinition>) {
         Object.entries(bindings).forEach(([id, binding]) => {
             this.addBinding(id, binding);
         });

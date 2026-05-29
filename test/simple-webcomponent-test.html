@@ -11,7 +11,7 @@
 	<body>
 		<h1>Scribe HTML test</h1>
 
-		<scribe-interpreter id="scribe"></scribe-interpreter>
+		<div id="container"></div>
 	</body>
 </html>
 
@@ -63,17 +63,14 @@
 					}
 				}
 			}
-		},
-		bindings: {
-			'image-url': { type: 'string', initialValue: '' }
 		}
 	};
 
 	document.addEventListener('DOMContentLoaded', () => {
-		const scribeElement = document.getElementById('scribe');
-
-		if (scribeElement) {
-			scribeElement.document = basicExampleDocument;
-		}
+		const scribeElement = document.createElement('scribe-interpreter');
+		scribeElement.id = 'scribe';
+		scribeElement.document = basicExampleDocument;
+		
+		document.getElementById('container').appendChild(scribeElement);
 	});
 </script>

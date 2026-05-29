@@ -11,19 +11,23 @@
 	<body>
 		<h1>Scribe with JSON test</h1>
 
-		<scribe-interpreter id="scribe" mode="edit" />
+		<div id="container"></div>
 	</body>
 </html>
 
 <script type="module">
 	import data from './simple-test.json' with { type: 'json' };
+	import bindings from './simple-test-bindings.json' with { type: 'json' };
 
-	const scribeElement = document.getElementById('scribe');
-	if (scribeElement) {
-		scribeElement.document = data;
+	const scribeElement = document.createElement('scribe-interpreter');
+	scribeElement.id = 'scribe';
+	scribeElement.mode = 'edit';
+	scribeElement.document = data;
+	scribeElement.bindings = bindings;
 
-		scribeElement.addEventListener('documentchange', (event) => {
-			console.log('Document modified:', event.detail);
-		});
-	}
+	scribeElement.addEventListener('documentchange', (event) => {
+		console.log('Document modified:', event.detail);
+	});
+
+	document.getElementById('container').appendChild(scribeElement);
 </script>

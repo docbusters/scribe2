@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$lib/styles/scribe.css';
 	import Scribe from '$lib/components/Scribe.svelte';
-	import { fullExampleDocument } from '$lib/examples/fullExample.js';
+	import { fullExampleBindings, fullExampleDocument } from '$lib/examples/fullExample.js';
 	import type { Document } from '$lib/domain/Document.js';
 	import type { DataValue } from '$lib/domain/data/DataValue.js';
 	import type { CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
@@ -153,5 +153,5 @@
 	</div>
 
 	<!-- Editor Scribe usando nuestro documento inyectado -->
-	<Scribe document={documentWithBindings} {customBindings} class="max-w-[70vw]" mode="edit" />
+	<Scribe document={documentWithBindings} bindings={fullExampleBindings} {customBindings} class="max-w-[70vw]" mode="edit" />
 </div>

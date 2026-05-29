@@ -9,6 +9,7 @@
 			mode: { type: 'String' },
 			registry: { type: 'Object' },
 			document: { type: 'Object' },
+			bindings: { type: 'Object' },
 			ondocumentchange: { type: 'Object' }
 		}
 	}}
@@ -24,7 +25,7 @@
 	import { dataStore } from '../stores/data-store.svelte.js';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
 	import type { ScribeProps } from '../types/ScribeProps.js';
-	import { setContext, onDestroy } from 'svelte';
+	import { setContext, onDestroy, untrack } from 'svelte';
 	import Sortable from 'sortablejs';
 	import type { Document } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -33,7 +34,7 @@
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
-	let { id, class: className = "", style, document, customBindings = {}, registry, mode = 'view' }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view' }: ScribeProps = $props();
 
 	let portalTarget = $state<HTMLElement | null>(null);
 	setContext('scribe-portal-target', () => portalTarget);
@@ -42,10 +43,13 @@
 	let rootElement = $state<HTMLElement | null>(null);
 	let isInitialized = false;
 	let dataOrder = $state<HTMLElement>();
+
 	let documentState = $derived<Document<C>>(mode === 'edit' ? editStore.document as Document<C> : document);
 	let sections = $derived(Object.values(documentState?.sections || {}));
 
 	$effect.pre(() => {
+		// We treat document as an initial value
+		const doc = untrack(() => document)
 		// Initialize the global registry with the default components and any custom components provided via props
 		globalRegistry.initialize({
 			...defaultRegistry,
@@ -53,17 +57,19 @@
 		} as ComponentRegistry<C>);
 			
 		// If using edit mode, initialize the data store with the document's initial bindings
-		if (mode === 'edit' && document) {
-			editStore.initialize(document);
+		if (mode === 'edit' && doc) {
+			editStore.initialize(doc, bindings || {});
 		}
 
 		loading = false;
 	});
 
 	$effect.pre(() => {
-		if (document) {
+		if (bindings) {
 			// Initialize the data store with the initial values from the document's components
-			dataStore.initialize(document.bindings);
+			dataStore.initialize(bindings);
+		}
+		if (customBindings) {
 			customBindingsStore.initialize(customBindings);
 		}
 	});

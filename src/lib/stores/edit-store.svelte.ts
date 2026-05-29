@@ -10,9 +10,11 @@ import { globalRegistry } from "./global-registry.svelte.js";
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C> {
     document = $state<Document<C>>(null!);
+    bindings = $state<Record<string, BindingsDefinition>>({});
 
-    initialize(document: Document<C>) {
+    initialize(document: Document<C>, bindings: Record<string, BindingsDefinition>) {
         this.document = document;
+        this.bindings = bindings;
     }
 
     /* * DOCUMENT MANAGEMENT * */
@@ -348,7 +350,7 @@ class EditStore<C> {
     addBinding(definition: BindingsDefinition) {
         // Add the new binding to the document
         const newId = generateRandomId("binding");
-        this.document.bindings[newId] = definition;
+        this.bindings[newId] = definition;
 
         // Also initialize the binding value in the data store
         dataStore.addBinding(newId, definition);

@@ -200,6 +200,9 @@
             case ' ': {
                 if (!event.ctrlKey) return;
 
+                // First blur the contenteditable to trigger to save the current text
+                target.blur();
+
                 const isSpaceBefore = isAtStart || /\s$/.test(textBefore);
                 const isSpaceAfter = isAtEnd || /^\s/.test(textAfter);
 

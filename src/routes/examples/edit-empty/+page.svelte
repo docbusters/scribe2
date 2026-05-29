@@ -14,10 +14,9 @@
 				content: {}
 			}
 		},
-		bindings: {}
 	}
 </script>
 
-<div class="flex justify-center w-full py-10 border-box justify-center">
+<div class="flex justify-center w-full py-10 border-box">
 	<Scribe {document} class="max-w-[70vw]" mode="edit" />
 </div>
