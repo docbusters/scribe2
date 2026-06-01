@@ -22,6 +22,11 @@ export type ComponentRegistry<
         component: Component<ScribeComponentProps<C>>;
         /** Contains the default configuration for the component when inserted. Id will be generated automatically */
         empty: Omit<C, 'id' | 'value'> & { value: C['value']['type'] };
+        /** 
+         * Initial value for the component. If not provided, a default value will be used.
+         * NOTE: Some value types such as records required this to be provided since they don't have a meaningful default value
+         */
+        initialValue?: DataValue;
         /** Options displayed for editing a component. If not provided, default options will be used */
         options?: ComponentEditOptions[];
         /** Allowed value types for this component */

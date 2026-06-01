@@ -92,6 +92,10 @@ export const fullExampleDocument: Document = {
                     },
                     config: {
                         hasSearchbar: true,
+                        hasCurrentPosBtn: true,
+                        hasGlobeBtn: true,
+                        hasZoomBtn: true,
+                        isMarkerDraggable: true,
                     }
                 },
             },

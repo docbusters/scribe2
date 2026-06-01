@@ -27,6 +27,14 @@ class GlobalRegistry {
         return comp.empty;
     }
 
+    getInitialComponentValue(type: string) {
+        const comp = this.components[type];
+        if (!comp) {
+            throw new Error(`Component of type ${type} not found in registry`);
+        }
+        return comp.initialValue;
+    }
+
     getComponentValueTypes(type: string) {
         const comp = this.components[type];
         if (!comp) {

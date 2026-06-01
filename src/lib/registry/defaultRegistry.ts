@@ -179,7 +179,20 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'block',
             value: 'record',
             config: {
+                isMarkerDraggable: true,
+                hasCurrentPosBtn: true,
+                hasGlobeBtn: true,
+                hasZoomBtn: true,
+                hasSearchbar: true,
             }
+        },
+        initialValue: {
+            type: 'record',
+            value: {
+                latitude: { type: 'number', value: 40.41680843983418},
+                longitude: { type: 'number', value: -3.7032674437111246 },
+                address: { type: 'string', value: 'Madrid, Spain' },
+            },
         },
         options: [
             ...defaultComponentOptions,
@@ -258,6 +271,21 @@ export const defaultRegistry: ComponentRegistry = {
                     }
                 },
             },
+            {
+                type: 'toggle-draggable',
+                name: 'Toggle Draggable Marker',
+                isSelected: (data: { config?: MapComponentConfig }) =>  data.config?.isMarkerDraggable === true,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.isMarkerDraggable ?? false;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, isMarkerDraggable: !current });
+                    }
+                },
+            }
         ],
         valueTypes: ['record'],
         

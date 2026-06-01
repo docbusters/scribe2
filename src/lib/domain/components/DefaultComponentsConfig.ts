@@ -37,4 +37,5 @@ export interface MapComponentConfig extends ComponentConfig {
     hasGlobeBtn?: boolean;
     hasZoomBtn?: boolean;
     hasCurrentPosBtn?: boolean;
+    isMarkerDraggable?: boolean;
 }

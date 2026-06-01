@@ -310,9 +310,10 @@ class EditStore<C> {
         // Generate a new id and build the component
         const newId = generateRandomId(componentType);
         const emptyComponent = globalRegistry.getEmptyComponent(componentType);
+        const initialValue = globalRegistry.getInitialComponentValue(componentType);
 
         // Generate a default value based on the value type
-        const value = generateDefaultDataValue(emptyComponent.value);
+        const value = generateDefaultDataValue(emptyComponent.value, initialValue);
 
         const newComponent = {
             ...emptyComponent,

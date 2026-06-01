@@ -10,17 +10,14 @@
     const value = $derived.by(() => {
         const { latitude, longitude, address } = componentData.value.value;
 
-        if (isNaN(latitude.value as number) || isNaN(longitude.value as number)) {
-            throw new Error('Latitude and Longitude must be valid numbers');
-        }
-        if (typeof address.value !== 'string' || address.value.trim() === '') {
-            throw new Error('Address must be a non-empty string');
-        }
+        const lat = isNaN(latitude.value as number) ? 0 : latitude.value as number;
+        const lng = isNaN(longitude.value as number) ? 0 : longitude.value as number;
+        const addr = (typeof address.value !== 'string') ? '' : address.value as string;
 
         return {
-            lat: latitude.value as number,
-            lng: longitude.value as number,
-            address: address.value as string,
+            lat,
+            lng,
+            address: addr,
         }
     });
     const config = $derived(componentData.config);
@@ -48,9 +45,9 @@
         hasCurrentPosBtn={config?.hasCurrentPosBtn}
         hasGlobeBtn={config?.hasGlobeBtn}
         hasZoomBtn={config?.hasZoomBtn}
+        isMarkerDraggable={config?.isMarkerDraggable}
         location={value}
         onLocationSelect={onLocationChange}
-        isMarkerDraggable
     />
 </div>
 

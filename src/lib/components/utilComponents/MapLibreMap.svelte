@@ -36,14 +36,14 @@
 	}
 
 	let {
-		isMarkerDraggable = true,
+		isMarkerDraggable = false,
 		hasSearchbar = false,
 		class: className,
 		location = $bindable(),
 		markerColor = '#277ee8',
-		hasGlobeBtn = true,
-		hasZoomBtn = true,
-		hasCurrentPosBtn = true,
+		hasGlobeBtn = false,
+		hasZoomBtn = false,
+		hasCurrentPosBtn = false,
 		isLoading = $bindable(false),
 		initialZoom = 14,
 		initialPosition = { lat: 38.02383085987818, lng: -1.173557484002349 },

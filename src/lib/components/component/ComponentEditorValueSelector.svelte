@@ -3,15 +3,15 @@
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import ComponentEditorButton from './ComponentEditorButton.svelte';
 	import Select from '../utilComponents/Select.svelte';
-	import TextInput from '../utilComponents/TextInput.svelte';
 	import Dialog from '../utilComponents/Dialog.svelte';
 	import Button from '../utilComponents/Button.svelte';
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
+	import ComponentEditorValue from './ComponentEditorValue.svelte';
 
 	let props: ComponentEditProps = $props();
+
 
 	const supportedValues = $derived.by(() => {
 		const baseValues = globalRegistry.getComponentValueTypes(props.componentType);
@@ -38,19 +38,10 @@
 	let parsedValueType = $derived.by(() => {
 		if (!valueType) return null;
 		try {
-			return JSON.parse(valueType);
+			return JSON.parse(valueType) as { type: DataValue['type']; bindingType?: string };
 		} catch {
 			return null;
 		}
-	});
-
-	let bindingOptions = $derived.by(() => {
-		if (parsedValueType?.type !== 'binding') return [];
-		const type = parsedValueType.bindingType;
-		if (type === 'default') {
-			return dataStore.getBindingOptions();
-		}
-		return customBindingsStore.getAvailableIds(type);
 	});
 
 	function handleSetValue() {
@@ -81,7 +72,8 @@
 			value = bv.value;
 		} else {
 			valueType = JSON.stringify({ type: props.componentValue.type });
-			value = props.componentValue.value;
+			// We must deep clone the value in order to avoid mofifying the original data while editing
+			value = $state.snapshot(props.componentValue.value);
 		}
 		open = true;
 	}}
@@ -96,28 +88,14 @@
 		items={supportedValues}
 	/>
 
-	{#if parsedValueType?.type === 'string'}
-		<TextInput bind:value={value as string} placeholder="Value" />
-	{:else if parsedValueType?.type === 'number'}
-		<TextInput bind:value={value as string} placeholder="Value" type="number" />
-	{:else if parsedValueType?.type === 'boolean'}
-		<Select
-			placeholder="Value"
-			type="single"
-			bind:value={value as string}
-			items={[
-				{ value: 'true', label: 'True' },
-				{ value: 'false', label: 'False' }
-			]}
-		/>
-	{:else if parsedValueType?.type === 'binding'}
-		<Select
-			placeholder="Binding ID"
-			type="single"
-			bind:value={value as string}
-			items={bindingOptions}
+	{#if parsedValueType}
+		<ComponentEditorValue
+			{parsedValueType}
+			bind:value={value}
+			componentType={props.componentType}
 		/>
 	{/if}
+		
 
 	{#snippet footer()}
 		<Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>

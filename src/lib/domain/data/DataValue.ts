@@ -35,7 +35,7 @@ export interface ArrayValue<T> {
     value: T[];
 }
 
-export interface RecordValue<T extends string, K> {
+export interface RecordValue<T extends string, K extends DataValue> {
     type: "record";
     value: Record<T, K>;
 }

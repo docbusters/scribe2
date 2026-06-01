@@ -2,38 +2,45 @@ import type { DataValue } from "../domain/data/DataValue.js";
 import { editStore } from "../stores/edit-store.svelte.js";
 import { generateRandomId } from "./generateRandomId.js";
 
-export function generateDefaultDataValue(type: DataValue['type']): DataValue {
+/**
+ * Generates a default date value given a type. If specified, it will use the initialValue to generate the default value, but if the type of the initialValue does not match the specified type, it will throw an error.
+ */
+export function generateDefaultDataValue(type: DataValue['type'], initialValue?: DataValue): DataValue {
+    if (initialValue && initialValue.type !== type) {
+        throw new Error(`Initial value type (${initialValue.type}) does not match the specified type (${type})`);
+    }
     switch (type) {
         case 'string':
             return {
                 type: 'string',
-                value: '',
+                value: initialValue?.value as string ?? '',
             };
         case 'number':
             return {
                 type: 'number',
-                value: 0,
+                value: initialValue?.value as number ?? 0,
             };
         case 'boolean':
             return {
                 type: 'boolean',
-                value: false,
+                value: initialValue?.value as boolean ?? false,
             };
         case 'date':
             return {
                 type: 'date',
-                value: new Date(),
+                value: initialValue?.value as Date ?? new Date(),
             };
         case 'array':
             return {
                 type: 'array',
-                value: [],
+                value: initialValue?.value as DataValue[] ?? [],
             };
-        case 'record':
+        case 'record': {
             return {
                 type: 'record',
-                value: {},
+                value: initialValue?.value as Record<string, DataValue> ?? {},
             };
+        }
         case 'binding': {
             // In this case we need to add a new binding
             const bindingId = editStore.addBinding({
