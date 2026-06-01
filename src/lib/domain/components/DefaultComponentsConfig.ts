@@ -26,5 +26,15 @@ export interface TableComponentConfig extends ComponentConfig {
     cols: number;
     /** Total number of rows */
     rows: number;
-    
+}
+
+export interface MapComponentConfig extends ComponentConfig {
+    initialZoom?: number;
+    initialPosition?: { lat: number; lng: number };
+    markerColor?: string;
+    readonly?: boolean;
+    hasSearchbar?: boolean;
+    hasGlobeBtn?: boolean;
+    hasZoomBtn?: boolean;
+    hasCurrentPosBtn?: boolean;
 }

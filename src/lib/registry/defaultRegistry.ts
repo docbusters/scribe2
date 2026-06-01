@@ -1,15 +1,16 @@
 import type { ComponentRegistry } from './ComponentRegistry.js';
-import TextComponentSvelte from '../components/defaultComponents/TextComponentSvelte.svelte';
-import TextInputComponentSvelte from '../components/defaultComponents/TextInputComponentSvelte.svelte';
-import type { ImageComponent, LatexComponent, TableComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
-import ImageComponentSvelte from '../components/defaultComponents/ImageComponentSvelte.svelte';
-import LatexComponentSvelte from '../components/defaultComponents/LatexComponentSvelte.svelte';
-import TableComponentSvelte from '../components/defaultComponents/TableComponentSvelte.svelte';
+import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
+import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
+import type { ImageComponent, LatexComponent, MapComponent, TableComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
+import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
+import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
+import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
 import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
-import type { ImageComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import type { ImageComponentConfig, MapComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 
-export type DefaultComponents = TextComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent;
+export type DefaultComponents = TextComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent;
 
 /** Contains default component implementations */
 export const defaultRegistry: ComponentRegistry = {
@@ -17,7 +18,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Text',
         description: 'As simple as it gets',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-case-sensitive-icon lucide-case-sensitive"><path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16"/><path d="M22 9v7"/><path d="M3.304 13h6.392"/><circle cx="18.5" cy="12.5" r="3.5"/></svg>',
-        component: TextComponentSvelte,
+        component: TextComponentScribe,
         empty: {
             type: 'text',
             mode: 'inline',
@@ -29,7 +30,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Text Input',
         description: 'Used to input text',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-cursor-input-icon lucide-text-cursor-input"><path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"/><path d="M9 6v12"/></svg>',
-        component: TextInputComponentSvelte,
+        component: TextInputComponentScribe,
         empty: {
             type: 'text-input',
             mode: 'inline',
@@ -41,7 +42,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Image',
         description: 'Display online images',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-icon lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
-        component: ImageComponentSvelte,
+        component: ImageComponentScribe,
         empty: {
             type: 'image',
             mode: 'block',
@@ -144,7 +145,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'LaTeX',
         description: 'Render LaTeX formulas',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sigma-icon lucide-sigma"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></svg>',
-        component: LatexComponentSvelte,
+        component: LatexComponentScribe,
         empty: {
             type: 'latex',
             mode: 'block',
@@ -156,7 +157,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Table',
         description: 'Create tables to organize your content',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table2-icon lucide-table-2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>',
-        component: TableComponentSvelte,
+        component: TableComponentScribe,
         empty: {
             type: 'table',
             mode: 'block',
@@ -167,5 +168,98 @@ export const defaultRegistry: ComponentRegistry = {
             }
         },
         valueTypes: ['record'],
+    },
+    'map': {
+        name: 'Map',
+        description: 'Create interactive maps',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-icon lucide-map"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>',
+        component: MapComponentScribe,
+        empty: {
+            type: 'map',
+            mode: 'block',
+            value: 'record',
+            config: {
+            }
+        },
+        options: [
+            ...defaultComponentOptions,
+            {
+                type: 'toggle-readonly',
+                name: 'Toggle Read-only',
+                isSelected: (data: { config?: MapComponentConfig }) => data.config?.readonly === true,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.readonly ?? false;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, readonly: !current });
+                    }
+                },
+            },
+            {
+                type: 'toggle-searchbar',
+                name: 'Toggle Searchbar',
+                isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasSearchbar === true,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.hasSearchbar ?? false;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, hasSearchbar: !current });
+                    }
+                },
+            },
+            {
+                type: 'toggle-globe',
+                name: 'Toggle Globe Button',
+                isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasGlobeBtn !== false,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.hasGlobeBtn ?? true;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, hasGlobeBtn: !current });
+                    }
+                },
+            },
+            {
+                type: 'toggle-zoom',
+                name: 'Toggle Zoom Buttons',
+                isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasZoomBtn !== false,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in-icon lucide-zoom-in"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.hasZoomBtn ?? true;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, hasZoomBtn: !current });
+                    }
+                },
+            },
+            {
+                type: 'toggle-current-pos',
+                name: 'Toggle Current Position Button',
+                isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasCurrentPosBtn !== false,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-locate-fixed-icon lucide-locate-fixed"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
+                        if (!config) return;
+                        const current = config.hasCurrentPosBtn ?? true;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, hasCurrentPosBtn: !current });
+                    }
+                },
+            },
+        ],
+        valueTypes: ['record'],
+        
     }
 };

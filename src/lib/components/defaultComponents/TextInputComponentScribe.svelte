@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TextInputComponent } from '../../domain/components/DefaultComponents.js';
-	import { dataStore } from '../../stores/data-store.svelte.js';
-    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.js';
+	import type { TextInputComponent } from '../../domain/components/DefaultComponents.ts';
+	import { dataStore } from '../../stores/data-store.svelte.ts';
+    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.ts';
 
     let { componentData }: ScribeComponentProps<TextInputComponent> = $props();
 

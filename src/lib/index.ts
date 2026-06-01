@@ -1,9 +1,11 @@
 import type { BindingsDefinition, Document } from './domain/Document.js';
-import type { ComponentRegistry } from './registry/ComponentRegistry.js';
+
 import type { CustomBinding, ScribeMode, ScribeProps } from './types/ScribeProps.js';
 
 import ScribeComponent from './components/Scribe.svelte';
-import ComponentRenderer from './components/component/ComponentRenderer.svelte';
+import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
+
+import type { Component } from 'svelte';
 
 // COMPONENTS
 export interface ScribeConstructor {
@@ -22,16 +24,36 @@ export type { Document, BindingsDefinition } from './domain/Document.js';
 export type { Section, ParagraphSection, GridSection, GridSectionContent } from './domain/Section.js';
 
 // DATA VALUES
-export type { DataValue, PrimitiveValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
+import type { DataValue, PrimitiveValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
+export type { DataValue, PrimitiveValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
 
 // COMPONENTS
-export type { ComponentRegistry, ScribeComponentProps } from './registry/ComponentRegistry.js';
-export type { DefaultComponents } from './registry/defaultRegistry.js';
-export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig } from './domain/components/Component.js';
-export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
+import type { ComponentRegistry, ScribeComponentProps } from './registry/ComponentRegistry.js';
+export type { ComponentRegistry, ScribeComponentProps };
+
+import type { DefaultComponents } from './registry/defaultRegistry.js';
+export type { DefaultComponents };
+
+import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig } from './domain/components/Component.js';
+export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig };
+
+import type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
+export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex };
+
+import TextComponentSvelte from './components/defaultComponents/TextComponentScribe.svelte';
+import TextInputComponentSvelte from './components/defaultComponents/TextInputComponentScribe.svelte';
+import ImageComponentSvelte from './components/defaultComponents/ImageComponentScribe.svelte';
+import LatexComponentSvelte from './components/defaultComponents/LatexComponentScribe.svelte';
+import TableComponentSvelte from './components/defaultComponents/TableComponentScribe.svelte';
+
+export const TextComponentScribe = TextComponentSvelte as Component<ScribeComponentProps<TextComponent>>;
+export const TextInputComponentScribe = TextInputComponentSvelte as Component<ScribeComponentProps<TextInputComponent>>;
+export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComponentProps<ImageComponent>>;
+export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
+export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
 // UTILS
-export { ComponentRenderer };
+export const ComponentRenderer = ComponentRendererSvelte as Component<ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>>;
 
 declare global {
     interface HTMLElementTagNameMap {

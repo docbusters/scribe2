@@ -78,6 +78,22 @@ export const fullExampleDocument: Document = {
                         value: 'latex-string',
                     }
                 },
+                'map-1': {
+                    id: 'map-1',
+                    type: 'map',
+                    mode: 'block',
+                    value: {
+                        type: 'record',
+                        value: {
+                            latitude: { type: 'number', value: 40.41680843983418},
+                            longitude: { type: 'number', value: -3.7032674437111246 },
+                            address: { type: 'string', value: 'Madrid, Spain' },
+                        }
+                    },
+                    config: {
+                        hasSearchbar: true,
+                    }
+                },
             },
         },
         'section-4': {

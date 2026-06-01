@@ -11,6 +11,8 @@ class DataStore {
         });
     }
 
+    // BINDINGS
+
     addBinding(id: string, binding: BindingsDefinition) {
         // If no initial value is provided, use an empty value based on the type
         const primitiveValue = (

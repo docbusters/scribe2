@@ -1,6 +1,6 @@
-import type { BindingValue, ComponentValue, RecordValue, StringValue } from "../data/DataValue.ts";
+import type { BindingValue, ComponentValue, NumberValue, RecordValue, StringValue } from "../data/DataValue.ts";
 import type { BlockComponent, InlineComponent } from "./Component.ts";
-import type { ImageComponentConfig, LatexComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
+import type { ImageComponentConfig, LatexComponentConfig, MapComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
 
 /** Shows a line of text accepting a string value */
 export type TextComponent = InlineComponent<'text', StringValue>;
@@ -17,3 +17,7 @@ export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue,
 /** Renders a table */
 export type TableComponent = BlockComponent<'table', RecordValue<TableCellIndex, ComponentValue>, TableComponentConfig>;
 export type TableCellIndex = `${number}:${number}`;
+
+/** Renders an interactive map */
+export type MapComponent = BlockComponent<'map', RecordValue<'latitude' | 'longitude' | 'address', NumberValue | StringValue>, MapComponentConfig>;
+

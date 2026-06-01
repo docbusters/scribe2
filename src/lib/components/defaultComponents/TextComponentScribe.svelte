@@ -1,14 +1,14 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TextComponent } from '../../domain/components/DefaultComponents.js';
-	import type { StringValue } from '../../domain/data/DataValue.js';
-	import { editStore } from '../../stores/edit-store.svelte.js';
-	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
-	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.js';
-    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.js';
-	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.js';
-	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.js';
-	import { getSelection } from '../../utils/selection.js';
+	import type { TextComponent } from '../../domain/components/DefaultComponents.ts';
+	import type { StringValue } from '../../domain/data/DataValue.ts';
+	import { editStore } from '../../stores/edit-store.svelte.ts';
+	import { toolbarStore } from '../../stores/toolbar-store.svelte.ts';
+	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
+    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.ts';
+	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
+	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
+	import { getSelection } from '../../utils/selection.ts';
 
 
     let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();

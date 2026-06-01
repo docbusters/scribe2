@@ -1,7 +1,7 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-unused-vars */
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.js';
+	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 
