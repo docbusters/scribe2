@@ -75,13 +75,18 @@ class CustomBindingsStore {
         }));
     }
 
-    getAvailableIds(type: string): { value: string; label: string }[] {
+    getAvailableIds(type: string, supportedTypes?: string[]): { value: string; label: string; disabled?: boolean }[] {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {
-            return def.getAvailableIds().map(item => ({
-                value: item.id,
-                label: item.label || item.id
-            }));
+            const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];
+            return def.getAvailableIds().map(item => {
+                const disabled = item.type && allowedTypes.length > 0 ? !allowedTypes.includes(item.type) : false;
+                return {
+                    value: item.id,
+                    label: item.label || item.id,
+                    disabled
+                };
+            });
         }
         return [];
     }

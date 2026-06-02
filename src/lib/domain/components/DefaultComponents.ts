@@ -19,5 +19,5 @@ export type TableComponent = BlockComponent<'table', RecordValue<TableCellIndex,
 export type TableCellIndex = `${number}:${number}`;
 
 /** Renders an interactive map */
-export type MapComponent = BlockComponent<'map', RecordValue<'latitude' | 'longitude' | 'address', NumberValue | StringValue>, MapComponentConfig>;
+export type MapComponent = BlockComponent<'map', RecordValue<'latitude' | 'longitude' | 'address', NumberValue | StringValue> | BindingValue, MapComponentConfig>;
 

@@ -287,7 +287,7 @@ export const defaultRegistry: ComponentRegistry = {
                 },
             }
         ],
-        valueTypes: ['record'],
+        valueTypes: ['record', 'binding'],
         
     }
 };

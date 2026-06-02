@@ -26,6 +26,7 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'image-url',
+                        valueType: 'string',
                     },
                     config: {
                         placeholder: 'https://example.com/image.jpg',
@@ -40,6 +41,7 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'image-url',
+                        valueType: 'string',
                     },
                     config: {
                         emptyText: 'No image URL provided. Please enter an URL in the input above.',
@@ -66,6 +68,7 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'latex-string',
+                        valueType: 'string',
                     }
                 },
                 'latex-1': {
@@ -76,6 +79,7 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'latex-string',
+                        valueType: 'string',
                     }
                 },
                 'map-1': {
@@ -152,6 +156,7 @@ export const fullExampleDocument: Document = {
                                         type: 'binding',
                                         bindingType: 'default',
                                         value: 'table-latex-binding',
+                                        valueType: 'string',
                                     }
                                 }
                             },
@@ -165,6 +170,7 @@ export const fullExampleDocument: Document = {
                                         type: 'binding',
                                         bindingType: 'default',
                                         value: 'table-latex-binding',
+                                        valueType: 'string',
                                     }
                                 }
                             }

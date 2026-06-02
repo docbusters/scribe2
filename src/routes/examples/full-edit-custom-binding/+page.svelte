@@ -23,7 +23,7 @@
 		type: 'custom-binding',
 		name: 'Custom Binding',
 		getAvailableIds: () => {
-			return Object.keys(bindingData).map(id => ({ id, label: id }));
+			return Object.entries(bindingData).map(([id, value]) => ({ id, label: id, type: value.type }));
 		},
 		getData: (id, update) => {
 			if (!bindingData[id]) {
@@ -60,7 +60,7 @@
 	const liveClockBinding: CustomBinding = {
 		type: 'live-clock',
 		name: 'Live clock',
-		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock' }],
+		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],
 		getData: (id, update) => {
 			const timer = setInterval(() => {
 				const timeString = new Date().toLocaleTimeString();
@@ -90,7 +90,8 @@
 						value: {
 							type: 'binding',
 							bindingType: 'custom-binding',
-							value: 'example-image-binding'
+							value: 'example-image-binding',
+							valueType: 'string',
 						}
 					},
 					"latex-bind": {
@@ -100,7 +101,8 @@
 						value: {
 							type: 'binding',
 							bindingType: 'custom-binding',
-							value: 'example-binding'
+							value: 'example-binding',
+							valueType: 'string',
 						}
 					}
 				}
@@ -117,7 +119,8 @@
 						value: {
 							type: 'binding',
 							bindingType: 'live-clock',
-							value: 'not-used' // In this case, the value can be ignored since the live clock binding doesn't use it
+							value: 'not-used', // In this case, the value can be ignored since the live clock binding doesn't use it
+							valueType: 'string'
 						}
 					}
 				}

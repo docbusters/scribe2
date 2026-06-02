@@ -23,7 +23,8 @@
           "value": {
             "type": "binding",
             "bindingType": "default",
-            "value": "image-url"
+            "value": "image-url",
+            "valueType": "string"
           },
           "config": {
             "placeholder": "https://example.com/image.jpg",
@@ -37,7 +38,8 @@
           "value": {
             "type": "binding",
             "bindingType": "default",
-            "value": "image-url"
+            "value": "image-url",
+            "valueType": "string"
           },
           "config": {
             "emptyText": "No image URL provided. Please enter an URL in the input above.",
@@ -63,7 +65,8 @@
           "value": {
             "type": "binding",
             "bindingType": "default",
-            "value": "latex-string"
+            "value": "latex-string",
+            "valueType": "string"
           }
         },
         "latex-1": {
@@ -73,7 +76,37 @@
           "value": {
             "type": "binding",
             "bindingType": "default",
-            "value": "latex-string"
+            "value": "latex-string",
+            "valueType": "string"
+          }
+        },
+        "map-1": {
+          "id": "map-1",
+          "type": "map",
+          "mode": "block",
+          "value": {
+            "type": "record",
+            "value": {
+              "latitude": {
+                "type": "number",
+                "value": 40.41680843983418
+              },
+              "longitude": {
+                "type": "number",
+                "value": -3.7032674437111246
+              },
+              "address": {
+                "type": "string",
+                "value": "Madrid, Spain"
+              }
+            }
+          },
+          "config": {
+            "hasSearchbar": true,
+            "hasCurrentPosBtn": true,
+            "hasGlobeBtn": true,
+            "hasZoomBtn": true,
+            "isMarkerDraggable": true
           }
         }
       }
@@ -101,49 +134,6 @@
                     "value": "I am normal text"
                   }
                 }
-              },
-              "1:1": {
-                "type": "component",
-                "value": {
-                  "id": "image-table",
-                  "type": "image",
-                  "mode": "block",
-                  "value": {
-                    "type": "string",
-                    "value": "https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg"
-                  },
-                  "config": {
-                    "height": "150px",
-                    "position": "contain",
-                    "align": "center"
-                  }
-                }
-              },
-              "0:2": {
-                "type": "component",
-                "value": {
-                  "type": "text-input",
-                  "id": "input-table-1",
-                  "mode": "inline",
-                  "value": {
-                    "type": "binding",
-                    "bindingType": "default",
-                    "value": "table-latex-binding"
-                  }
-                }
-              },
-              "1:2": {
-                "type": "component",
-                "value": {
-                  "type": "latex",
-                  "id": "table-latex",
-                  "mode": "inline",
-                  "value": {
-                    "type": "binding",
-                    "bindingType": "default",
-                    "value": "table-latex-binding"
-                  }
-                }
               }
             }
           },
@@ -159,113 +149,6 @@
       "title": "Empty section",
       "type": "paragraph-section",
       "content": {}
-    },
-    "section-5": {
-      "id": "section-5",
-      "title": "Grid section",
-      "type": "grid-section",
-      "columns": 2,
-      "rows": 2,
-      "gapX": 40,
-      "gapY": 20,
-      "content": [
-        {
-          "row": 1,
-          "column": 1,
-          "section": {
-            "id": "section-5-1",
-            "title": "Nested section 1",
-            "type": "paragraph-section",
-            "content": {
-              "text-4": {
-                "id": "text-4",
-                "mode": "inline",
-                "type": "text",
-                "value": {
-                  "type": "string",
-                  "value": "This is a nested section inside the grid."
-                }
-              }
-            }
-          }
-        },
-        {
-          "row": 2,
-          "column": 2,
-          "section": {
-            "id": "section-5-2",
-            "title": "Nested section 2",
-            "type": "paragraph-section",
-            "content": {
-              "text-5": {
-                "id": "text-5",
-                "mode": "inline",
-                "type": "text",
-                "value": {
-                  "type": "string",
-                  "value": "This is another nested section inside the grid."
-                }
-              }
-            }
-          }
-        },
-        {
-          "row": 1,
-          "column": 2,
-          "section": {
-            "id": "section-5-3",
-            "title": "I am a grid inside a grid (sectionception)",
-            "type": "grid-section",
-            "columns": 2,
-            "rows": 2,
-            "gapX": 20,
-            "gapY": 20,
-            "content": [
-              {
-                "row": 1,
-                "column": 1,
-                "colspan": 2,
-                "section": {
-                  "id": "section-5-3",
-                  "title": "Nested nested section 1",
-                  "type": "paragraph-section",
-                  "content": {
-                    "text-6": {
-                      "id": "text-6",
-                      "mode": "inline",
-                      "type": "text",
-                      "value": {
-                        "type": "string",
-                        "value": "This is a nested section inside the nested grid. I occupy 2 columns!"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "row": 2,
-                "column": 2,
-                "section": {
-                  "id": "section-5-4",
-                  "title": "Nested nested section 2",
-                  "type": "paragraph-section",
-                  "content": {
-                    "text-7": {
-                      "id": "text-7",
-                      "mode": "inline",
-                      "type": "text",
-                      "value": {
-                        "type": "string",
-                        "value": "This is another nested section inside the nested grid."
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
     }
   }
 }

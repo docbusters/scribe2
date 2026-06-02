@@ -23,11 +23,17 @@ class DataStore {
         this.data[id] = this.data[id] = primitiveValue;
     }
 
-    getBindingOptions() {
-        return Object.entries(this.data).map(([id]) => ({
-            value: id,
-            label: `${id} (${this.data[id].value})`
-        }));
+    getBindingOptions(supportedTypes?: string[]) {
+        const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];
+        return Object.entries(this.data).map(([id]) => {
+            const type = this.data[id].type;
+            const disabled = allowedTypes.length > 0 ? !allowedTypes.includes(type) : false;
+            return {
+                value: id,
+                label: `${id} (${this.data[id].value})`,
+                disabled
+            };
+        });
     }
 }
 

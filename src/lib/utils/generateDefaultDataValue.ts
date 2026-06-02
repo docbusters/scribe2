@@ -51,6 +51,7 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
                 type: 'binding',
                 bindingType: 'default',
                 value: bindingId,
+                valueType: 'string',
             };
 
         }

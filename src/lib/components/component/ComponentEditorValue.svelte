@@ -30,7 +30,7 @@
 						const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined };
 						let newDataValue: DataValue;
 						if (valType.type === 'binding') {
-							newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string } as BindingValue;
+							newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string, valueType: initialVal.type } as BindingValue;
 						} else {
 							newDataValue = { type: valType.type as DataValue['type'], value: initialVal.value } as DataValue;
 						}
@@ -44,10 +44,11 @@
 	let bindingOptions = $derived.by(() => {
 		if (parsedValueType?.type !== 'binding') return [];
 		const type = parsedValueType.bindingType;
+		const supportedTypes = globalRegistry.getComponentValueTypes(componentType);
 		if (type === 'default' || !type) {
-			return dataStore.getBindingOptions();
+			return dataStore.getBindingOptions(supportedTypes);
 		}
-		return customBindingsStore.getAvailableIds(type);
+		return customBindingsStore.getAvailableIds(type, supportedTypes);
 	});
 </script>
 

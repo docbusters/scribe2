@@ -48,5 +48,7 @@ export interface ComponentValue {
 export interface BindingValue {
     type: "binding";
     bindingType: "default" | string;
+    /** The id of the bound value */
     value: string;
+    valueType: DataValue['type'];
 }
