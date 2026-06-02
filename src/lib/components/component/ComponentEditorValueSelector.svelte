@@ -50,10 +50,10 @@
 		let parsedValue: DataValue;
 
 		if (parsedValueType.type === 'binding') {
-			parsedValue = { type: 'binding', bindingType: parsedValueType.bindingType, value: value as string } as BindingValue;
+			parsedValue = { type: 'binding', bindingType: parsedValueType.bindingType, value: $state.snapshot(value) as string } as BindingValue;
 		} else {
-			parsedValue = { type: parsedValueType.type as DataValue['type'], value: value } as DataValue;
-			if (parsedValueType.type === 'number') parsedValue.value = Number(value);
+			parsedValue = { type: parsedValueType.type as DataValue['type'], value: $state.snapshot(value) } as DataValue;
+			if (parsedValueType.type === 'number') parsedValue.value = Number($state.snapshot(value));
 		}
 
 		editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);
