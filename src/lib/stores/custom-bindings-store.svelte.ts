@@ -75,7 +75,7 @@ class CustomBindingsStore {
         }));
     }
 
-    getAvailableIds(type: string, supportedTypes?: string[]): { value: string; label: string; disabled?: boolean }[] {
+    getAvailableIds(type: string, supportedTypes?: string[]): { value: string; label: string; disabled?: boolean; type: string }[] {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {
             const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];
@@ -84,7 +84,8 @@ class CustomBindingsStore {
                 return {
                     value: item.id,
                     label: item.label || item.id,
-                    disabled
+                    disabled,
+                    type: item.type
                 };
             });
         }

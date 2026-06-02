@@ -31,7 +31,8 @@ class DataStore {
             return {
                 value: id,
                 label: `${id} (${this.data[id].value})`,
-                disabled
+                disabled,
+                type
             };
         });
     }

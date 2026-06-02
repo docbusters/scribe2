@@ -8,6 +8,7 @@
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
+	import { dataStore } from '$lib/stores/data-store.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
 
 	let props: ComponentEditProps = $props();
@@ -50,10 +51,33 @@
 		let parsedValue: DataValue;
 
 		if (parsedValueType.type === 'binding') {
-			parsedValue = { type: 'binding', bindingType: parsedValueType.bindingType, value: $state.snapshot(value) as string, valueType: parsedValueType.type } as BindingValue;
+			let bindingValueType: string;
+
+			if (parsedValueType.bindingType === 'default' || !parsedValueType.bindingType) {
+				// If it is a native binding obtain data from the store
+				const bindingData = dataStore.data[$state.snapshot(value) as string];
+				bindingValueType = bindingData.type;
+			} else {
+				// If it is a custom binding obtain the specific binding in order to extract the value type
+				const customBindings = customBindingsStore.getAvailableIds(parsedValueType.bindingType);
+				const selectedBinding = customBindings.find(b => b.value === $state.snapshot(value));
+				if (!selectedBinding) {
+					throw new Error(`Custom binding with id ${value} for type ${parsedValueType.bindingType} not found.`);
+				}
+				bindingValueType = selectedBinding.type;
+			}
+
+			parsedValue = { 
+				type: 'binding', 
+				bindingType: parsedValueType.bindingType, 
+				value: $state.snapshot(value) as string, 
+				valueType: bindingValueType 
+			} as BindingValue;
 		} else {
 			parsedValue = { type: parsedValueType.type as DataValue['type'], value: $state.snapshot(value) } as DataValue;
-			if (parsedValueType.type === 'number') parsedValue.value = Number($state.snapshot(value));
+			if (parsedValueType.type === 'number') {
+				parsedValue.value = Number($state.snapshot(value));
+			} 
 		}
 
 		editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);

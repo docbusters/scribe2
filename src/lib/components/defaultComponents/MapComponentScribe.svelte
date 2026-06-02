@@ -5,25 +5,50 @@
 	import MapLibreMap from '../utilComponents/MapLibreMap.svelte';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { untrack } from 'svelte';
+	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
+	import type { DataValue } from '$lib/domain/data/DataValue.js';
 
     let { componentData, sectionId }: ScribeComponentProps<MapComponent> = $props();
 
     const value = $derived.by(() => {
-        if (componentData.value.type !== 'record') {
-            throw new Error('Invalid component data type for MapComponent');
+        if (componentData.value.type === 'record') {
+            const { latitude, longitude, address } = componentData.value.value;
+
+            const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
+            const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
+            const addr = address && typeof address.value === 'string' ? address.value as string : '';
+
+            return {
+                lat,
+                lng,
+                address: addr,
+            }
+        } else if (componentData.value.type === 'binding' && componentData.value.valueType === 'record') {
+            // NOTE: When handling bindings we need to verify that it is binded to a record with the correct structure
+            let resolvedValue: DataValue | undefined;
+            if (componentData.value.bindingType === undefined || componentData.value.bindingType === 'default') {
+                resolvedValue = dataStore.data[componentData.value.value];
+            } else {
+                resolvedValue = customBindingsStore.getValue(componentData.value.bindingType, componentData.value.value);
+            }
+
+            if (resolvedValue && resolvedValue.type === 'record') {
+                const { latitude, longitude, address } = resolvedValue.value as Record<string, DataValue>;
+
+                const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
+                const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
+                const addr = address && typeof address.value === 'string' ? address.value as string : '';
+
+                return {
+                    lat,
+                    lng,
+                    address: addr,
+                };
+            }
         }
         
-        const { latitude, longitude, address } = componentData.value.value;
-
-        const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
-        const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
-        const addr = address && typeof address.value === 'string' ? address.value as string : '';
-
-        return {
-            lat,
-            lng,
-            address: addr,
-        }
+        throw new Error(`Invalid component data type for MapComponent: ${componentData.value.type}`);
     });
     const config = $derived(componentData.config);
 
