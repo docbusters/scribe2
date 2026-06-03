@@ -3,52 +3,26 @@
 	import type { MapComponent } from '../../domain/components/DefaultComponents.ts';
 	import { fade } from 'svelte/transition';
 	import MapLibreMap from '../utilComponents/MapLibreMap.svelte';
-	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { untrack } from 'svelte';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
-	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
-	import type { DataValue } from '$lib/domain/data/DataValue.js';
 
-    let { componentData, sectionId }: ScribeComponentProps<MapComponent> = $props();
+    let { componentData, resolvedValue, updateComponentValue }: ScribeComponentProps<MapComponent> = $props();
 
     const value = $derived.by(() => {
-        if (componentData.value.type === 'record') {
-            const { latitude, longitude, address } = componentData.value.value;
-
-            const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
-            const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
-            const addr = address && typeof address.value === 'string' ? address.value as string : '';
-
-            return {
-                lat,
-                lng,
-                address: addr,
-            }
-        } else if (componentData.value.type === 'binding' && componentData.value.valueType === 'record') {
-            // NOTE: When handling bindings we need to verify that it is binded to a record with the correct structure
-            let resolvedValue: DataValue | undefined;
-            if (componentData.value.bindingType === undefined || componentData.value.bindingType === 'default') {
-                resolvedValue = dataStore.data[componentData.value.value];
-            } else {
-                resolvedValue = customBindingsStore.getValue(componentData.value.bindingType, componentData.value.value);
-            }
-
-            if (resolvedValue && resolvedValue.type === 'record') {
-                const { latitude, longitude, address } = resolvedValue.value as Record<string, DataValue>;
-
-                const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
-                const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
-                const addr = address && typeof address.value === 'string' ? address.value as string : '';
-
-                return {
-                    lat,
-                    lng,
-                    address: addr,
-                };
-            }
+        // Verify it contains the correct arttributes
+        if (resolvedValue.type !== 'record' || !resolvedValue.value.latitude || !resolvedValue.value.longitude || !resolvedValue.value.address) {
+            throw new Error(`Invalid value for MapComponent: ${$state.snapshot(resolvedValue)}`);
         }
-        
-        throw new Error(`Invalid component data type for MapComponent: ${componentData.value.type}`);
+        const { latitude, longitude, address } = resolvedValue.value;
+
+        const lat = latitude && !isNaN(latitude.value as number) ? latitude.value as number : 0;
+        const lng = longitude && !isNaN(longitude.value as number) ? longitude.value as number : 0;
+        const addr = address && typeof address.value === 'string' ? address.value as string : '';
+
+        return {
+            lat,
+            lng,
+            address: addr,
+        };
     });
     const config = $derived(componentData.config);
 
@@ -78,7 +52,7 @@
         // Sets the same value so that it doesn't trigger a re-render of the map
         lastInternalValue = JSON.stringify(newValue);
 
-        editStore.setComponentValue(sectionId, componentData.id, {
+        updateComponentValue({
             type: 'record',
             value: {
                 latitude: { type: 'number', value: newLocation.lat },

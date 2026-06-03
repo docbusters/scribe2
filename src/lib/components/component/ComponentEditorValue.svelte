@@ -2,7 +2,7 @@
 	import Select from '../utilComponents/Select.svelte';
 	import TextInput from '../utilComponents/TextInput.svelte';
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { bindingStore } from '$lib/stores/binding-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
@@ -44,9 +44,9 @@
 	let bindingOptions = $derived.by(() => {
 		if (parsedValueType?.type !== 'binding') return [];
 		const type = parsedValueType.bindingType;
-		const supportedTypes = globalRegistry.getComponentValueTypes(componentType);
+		const supportedTypes = globalRegistry.getComponentSupportedBindingValueTypes(componentType);
 		if (type === 'default' || !type) {
-			return dataStore.getBindingOptions(supportedTypes);
+			return bindingStore.getBindingOptions(supportedTypes);
 		}
 		return customBindingsStore.getAvailableIds(type, supportedTypes);
 	});

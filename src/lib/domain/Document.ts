@@ -1,5 +1,5 @@
 import type { DefaultComponents } from "../registry/defaultRegistry.js";
-import type { PrimitiveValue } from "./data/DataValue.js";
+import type { CollectionValue, PrimitiveValue } from "./data/DataValue.js";
 import type { Section } from "./Section.js";
 
 export interface Document<C = never> {
@@ -9,8 +9,8 @@ export interface Document<C = never> {
 }
 
 export type BindingsDefinition = {
-    [K in PrimitiveValue['type']]: {
+    [K in PrimitiveValue['type'] | CollectionValue['type']]: {
         type: K;
-        initialValue?: Extract<PrimitiveValue, { type: K }>['value'];
+        initialValue?: Extract<PrimitiveValue | CollectionValue, { type: K }>['value'];
     }
-}[PrimitiveValue['type']];
+}[PrimitiveValue['type'] | CollectionValue['type']];

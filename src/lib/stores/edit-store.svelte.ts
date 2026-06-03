@@ -1,10 +1,10 @@
 import type { BaseComponent, ComponentConfig } from "../domain/components/Component.js";
-import type { DataValue } from "../domain/data/DataValue.js";
+import type { CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 import type { ParagraphSection, Section } from "../domain/Section.js";
 import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
 import { generateRandomId } from "../utils/generateRandomId.js";
-import { dataStore } from "./data-store.svelte.js";
+import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
@@ -18,6 +18,7 @@ class EditStore<C> {
     }
 
     /* * DOCUMENT MANAGEMENT * */
+
     setDocumentTitle(newTitle: string) {
         if (!this.document) {
             console.warn("No document found for setting title");
@@ -26,6 +27,7 @@ class EditStore<C> {
         this.document.title = newTitle;
         return true;
     }
+
 
     /* * SECTION MANAGEMENT * */
 
@@ -136,6 +138,7 @@ class EditStore<C> {
         };
         return true;
     }
+
 
     /* * COMPONENT MANAGEMENT * */
 
@@ -347,16 +350,33 @@ class EditStore<C> {
         }
     }
 
+
     /* * BINDINGS MANAGEMENT * */
+
     addBinding(definition: BindingsDefinition) {
         // Add the new binding to the document
         const newId = generateRandomId("binding");
         this.bindings[newId] = definition;
 
         // Also initialize the binding value in the data store
-        dataStore.addBinding(newId, definition);
+        bindingStore.addBinding(newId, definition);
 
         return newId;
+    }
+
+    setBindingInitialValue(bindingId: string, initialValue: PrimitiveValue | CollectionValue) {
+        if (!this.bindings[bindingId]) {
+            console.warn(`Binding with id ${bindingId} does not exist.`);
+            return false;
+        }
+
+        if (this.bindings[bindingId].type !== initialValue.type) {
+            console.warn(`Initial value type ${initialValue.type} does not match binding type ${this.bindings[bindingId].type}.`);
+            return false;
+        }
+
+        this.bindings[bindingId].initialValue = initialValue.value;
+        return true;
     }
 }
 

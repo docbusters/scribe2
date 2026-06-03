@@ -1,11 +1,10 @@
 import type { CustomBinding } from '$lib/types/ScribeProps.js';
-import type { DataValue } from '../domain/data/DataValue.js';
+import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 
 interface CustomBindingInstance {
-    value: DataValue;
+    value: PrimitiveValue | CollectionValue;
     destroy?: () => void;
 }
-
 
 class CustomBindingsStore {
     definitions: Record<string, CustomBinding> = {};
@@ -21,7 +20,7 @@ class CustomBindingsStore {
     }
 
     /** Obtains a reactive value for a given binding type and ID */
-    getValue(bindingType: string, id: string): DataValue {
+    getValue(bindingType: string, id: string): PrimitiveValue | CollectionValue {
         const key = `${bindingType}:${id}`;
         
         // Read trigger to make Svelte subscribe to changes
@@ -75,7 +74,7 @@ class CustomBindingsStore {
         }));
     }
 
-    getAvailableIds(type: string, supportedTypes?: string[]): { value: string; label: string; disabled?: boolean; type: string }[] {
+    getAvailableIds(type: string, supportedTypes?: Omit<DataValue['type'], 'binding'>[]): { value: string; label: string; disabled?: boolean; type: string }[] {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {
             const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];

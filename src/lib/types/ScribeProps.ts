@@ -1,5 +1,5 @@
 import type { BaseComponent } from "../domain/components/Component.js";
-import type { DataValue } from "../domain/data/DataValue.js";
+import type { CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.js";
 import type { Document, BindingsDefinition } from "../domain/Document.js";
 import type { ComponentRegistry } from "../registry/ComponentRegistry.js";
 
@@ -24,8 +24,8 @@ export interface CustomBinding {
     /** Returns the available ids and their labels for the editor */
     getAvailableIds: () => { id: string; label: string; type: string }[];
     /** Returns the current value and provides an update function */
-    getData: (id: string, update: (newValue: DataValue) => void) => {
-        value: DataValue;
+    getData: (id: string, update: (newValue: PrimitiveValue | CollectionValue) => void) => {
+        value: PrimitiveValue | CollectionValue;
         /** Optional cleanup function */
         destroy?: () => void;
     };

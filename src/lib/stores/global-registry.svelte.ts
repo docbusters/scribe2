@@ -43,6 +43,14 @@ class GlobalRegistry {
         return comp.valueTypes;
     }
 
+    getComponentSupportedBindingValueTypes(type: string) {
+        const comp = this.components[type];
+        if (!comp) {
+            throw new Error(`Component of type ${type} not found in registry`);
+        }
+        return comp.supportedBindingValueTypes || [];
+    }
+
     getComponentOptions(type: string) {
         const comp = this.components[type];
         if (!comp) {

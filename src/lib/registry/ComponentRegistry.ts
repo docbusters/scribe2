@@ -1,5 +1,5 @@
 import type { BaseComponent, ComponentConfig } from '../domain/components/Component.js';
-import type { DataValue } from '../domain/data/DataValue.js';
+import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 import type { Component } from 'svelte';
 import type { DefaultComponents } from './defaultRegistry.js';
 import type { ScribeMode } from '../types/ScribeProps.js';
@@ -10,6 +10,10 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     componentData: T;
     sectionId: string;
     mode: ScribeMode;
+    /** Component value with bindings resolved */
+    resolvedValue: PrimitiveValue | CollectionValue;
+    /** Updates the component value handling binding updates */
+    updateComponentValue: (newValue: DataValue) => void;
 }
 
 export type ComponentRegistry<
@@ -31,6 +35,8 @@ export type ComponentRegistry<
         options?: ComponentEditOptions[];
         /** Allowed value types for this component */
         valueTypes: DataValue['type'][];
+        /** Supported value types for bindings. Only needs to be specified if the component supports bindings */
+        supportedBindingValueTypes?: Omit<DataValue['type'], 'binding'>[];
     };
 };
 

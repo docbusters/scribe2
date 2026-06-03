@@ -37,6 +37,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'binding',
         },
         valueTypes: ['binding'],
+        supportedBindingValueTypes: ['string'],
     },
     'image': {
         name: 'Image',
@@ -140,6 +141,7 @@ export const defaultRegistry: ComponentRegistry = {
             },
         ],
         valueTypes: ['string', 'binding'],
+        supportedBindingValueTypes: ['string'],
     },
     'latex': {
         name: 'LaTeX',
@@ -152,6 +154,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'string',
         },
         valueTypes: ['string', 'binding'],
+        supportedBindingValueTypes: ['string'],
     },
     'table': {
         name: 'Table',
@@ -288,6 +291,7 @@ export const defaultRegistry: ComponentRegistry = {
             }
         ],
         valueTypes: ['record', 'binding'],
+        supportedBindingValueTypes: ['record'],
         
     }
 };

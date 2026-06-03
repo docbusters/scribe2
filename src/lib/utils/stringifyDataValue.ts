@@ -1,7 +1,8 @@
 import type { DataValue } from "../domain/data/DataValue.js";
-import { dataStore } from "../stores/data-store.svelte.js";
+import { bindingStore } from "../stores/binding-store.svelte.js";
 import { customBindingsStore } from "../stores/custom-bindings-store.svelte.js";
 
+/** @deprecated Use the resolved value directly instead */
 export const stringifyDataValue = (value: DataValue): string => {
     switch (value.type) {
         case 'string':
@@ -15,7 +16,7 @@ export const stringifyDataValue = (value: DataValue): string => {
         case 'binding': {
             // Check if it is a default document binding
             if (value.bindingType === undefined || value.bindingType === 'default') {
-                return stringifyDataValue(dataStore.data[value.value]); 
+                return stringifyDataValue(bindingStore.data[value.value]); 
             }
             
             // Resolve the custom binding

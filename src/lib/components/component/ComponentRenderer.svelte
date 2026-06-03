@@ -1,11 +1,57 @@
 <script lang="ts">
-	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
-	import type { DataValue } from "$lib/domain/data/DataValue.js";
-	import type { ScribeComponentProps } from "$lib/registry/ComponentRegistry.js";
+	import type { CollectionValue, DataValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
+	import { bindingStore } from "$lib/stores/binding-store.svelte.js";
+	import { editStore } from "$lib/stores/edit-store.svelte.js";
 	import { globalRegistry } from "$lib/stores/global-registry.svelte.js";
+	import type { ComponentRendererProps } from "$lib/types/CustomRendererProps.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 
-    let { mode, componentData, sectionId }: ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>> = $props();
+    let { mode, componentData, sectionId }: ComponentRendererProps = $props();
+
+	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
+	let componentValue = $derived(componentData.value);
+	const resolvedValue = $derived.by(() => {
+		const { types, bindingTypes } = componentSupportedTypes;
+
+		if (!types.includes(componentValue.type)) {
+			throw new Error(`Unsupported component value type: ${componentValue.type}`);
+		}
+
+		if (componentValue.type === 'binding') {
+			const bindingValue = bindingStore.getBindingValue(componentValue.value, componentValue.bindingType);
+
+			if (!bindingTypes.includes(bindingValue.type)) {
+				throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
+			}
+
+			return bindingValue;
+		}
+
+		return componentValue;
+	})
+
+	function updateComponentValue(newValue: DataValue) {
+		const { types, bindingTypes } = componentSupportedTypes;
+
+		if (componentValue.type === 'binding') {
+			// Bindings can be updated in any mode
+			if (!bindingTypes.includes(newValue.type)) {
+				throw new Error(`Updated value type ${newValue.type} is not supported by component's binding`);
+			}
+
+			bindingStore.updateBindingValue(mode, componentValue.value, componentValue.bindingType, newValue as PrimitiveValue | CollectionValue);
+		} else {
+			// Other data values can only be updated in edit mode
+			if (mode !== 'edit') {
+				throw new Error(`Value ${newValue.type} cannot be updated in mode ${mode}`);
+			}
+			if (!types.includes(newValue.type)) {
+				throw new Error(`Updated value type ${newValue.type} is not supported by component`);
+			}
+			
+			editStore.setComponentValue(sectionId, componentData.id, newValue);
+		}
+	}
 </script>
 
 {#if componentData}
@@ -16,10 +62,10 @@
 			<div class="component-editor" contenteditable="false">
 				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} />
 			</div>
-			<Component {componentData} {sectionId} {mode} />
+			<Component {componentData} {sectionId} {mode} {resolvedValue} {updateComponentValue} />
 		</div>
 	{:else}
-    	<Component {componentData} {sectionId} {mode} />
+    	<Component {componentData} {sectionId} {mode} {resolvedValue} {updateComponentValue} />
 	{/if}
 {/if}
 

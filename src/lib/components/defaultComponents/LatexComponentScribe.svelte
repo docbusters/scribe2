@@ -2,15 +2,14 @@
     /* eslint-disable svelte/no-at-html-tags */ // There is no risk of XSS since katex handles the rendering
     import katex from 'katex';
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import { stringifyDataValue } from '../../utils/stringifyDataValue.ts';
 	import type { LatexComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { fade } from 'svelte/transition';
 
-    let { componentData }: ScribeComponentProps<LatexComponent> = $props();
+    let { componentData, resolvedValue }: ScribeComponentProps<LatexComponent> = $props();
 
 
-    const value = $derived(stringifyDataValue(componentData.value));
+    const value = $derived(resolvedValue.value as string);
     const config = $derived(componentData.config);
 
     function renderFormula(latex: string) {

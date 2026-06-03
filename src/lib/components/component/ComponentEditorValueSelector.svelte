@@ -8,7 +8,7 @@
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
-	import { dataStore } from '$lib/stores/data-store.svelte.js';
+	import { bindingStore } from '$lib/stores/binding-store.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
 
 	let props: ComponentEditProps = $props();
@@ -55,7 +55,7 @@
 
 			if (parsedValueType.bindingType === 'default' || !parsedValueType.bindingType) {
 				// If it is a native binding obtain data from the store
-				const bindingData = dataStore.data[$state.snapshot(value) as string];
+				const bindingData = bindingStore.data[$state.snapshot(value) as string];
 				bindingValueType = bindingData.type;
 			} else {
 				// If it is a custom binding obtain the specific binding in order to extract the value type

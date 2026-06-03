@@ -1,13 +1,12 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextInputComponent } from '../../domain/components/DefaultComponents.ts';
-	import { dataStore } from '../../stores/data-store.svelte.ts';
     import { navigateToAdjacentComponent } from '../../utils/focusNavigation.ts';
 
-    let { componentData }: ScribeComponentProps<TextInputComponent> = $props();
+    let { componentData, resolvedValue, updateComponentValue }: ScribeComponentProps<TextInputComponent> = $props();
 
-    const bindValue = $derived(componentData.value)
-    const config = $derived(componentData.config)
+    let inputValue = $derived(resolvedValue.value as string);
+    const config = $derived(componentData.config);
 
     let inputElement: HTMLInputElement | null = $state(null);
 
@@ -67,6 +66,14 @@
             inputElement!.removeEventListener('scribe-focus-end', onFocusEnd);
         };
     });
+
+    const oninput = () => {
+        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) });
+    };
+
+    const onblur = () => {
+        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) });
+    }
 </script>
 
 <input 
@@ -78,8 +85,10 @@
     {style} 
     placeholder={config?.placeholder} 
     class="text-input" 
-    type="text" 
-    bind:value={dataStore.data[bindValue.value].value} 
+    type="text"
+    {oninput}
+    {onblur}
+    bind:value={inputValue} 
 />
 
 <style>

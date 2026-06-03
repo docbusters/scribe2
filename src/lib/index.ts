@@ -1,10 +1,8 @@
 import type { BindingsDefinition, Document } from './domain/Document.js';
-
 import type { CustomBinding, ScribeMode, ScribeProps } from './types/ScribeProps.js';
-
 import ScribeComponent from './components/Scribe.svelte';
 import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
-
+import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
 import type { Component } from 'svelte';
 
 // COMPONENTS
@@ -24,8 +22,8 @@ export type { Document, BindingsDefinition } from './domain/Document.js';
 export type { Section, ParagraphSection, GridSection, GridSectionContent } from './domain/Section.js';
 
 // DATA VALUES
-import type { DataValue, PrimitiveValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
-export type { DataValue, PrimitiveValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
+import type { DataValue, PrimitiveValue, CollectionValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
+export type { DataValue, PrimitiveValue, CollectionValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
 
 // COMPONENTS
 import type { ComponentRegistry, ScribeComponentProps } from './registry/ComponentRegistry.js';
@@ -37,8 +35,8 @@ export type { DefaultComponents };
 import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig } from './domain/components/Component.js';
 export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig };
 
-import type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
-export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, TableCellIndex };
+import type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
+export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
 
 import TextComponentSvelte from './components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentSvelte from './components/defaultComponents/TextInputComponentScribe.svelte';
@@ -53,7 +51,7 @@ export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComp
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
 // UTILS
-export const ComponentRenderer = ComponentRendererSvelte as Component<ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>>;
+export const ComponentRenderer = ComponentRendererSvelte as Component<ComponentRendererProps>;
 
 declare global {
     interface HTMLElementTagNameMap {

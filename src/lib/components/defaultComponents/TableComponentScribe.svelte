@@ -4,10 +4,11 @@
 	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
+	import type { ComponentValue, RecordValue } from '$lib/domain/data/DataValue.js';
 
-    let { componentData, mode, sectionId }: ScribeComponentProps<TableComponent> = $props();
+    let { componentData, mode, sectionId, resolvedValue }: ScribeComponentProps<TableComponent> = $props();
 
-    const recordValue = $derived(componentData.value);
+    const recordValue = $derived(resolvedValue as RecordValue<TableCellIndex, ComponentValue>);
     const config = $derived(componentData.config);
 
     const getCellValue = (cell: TableCellIndex) => {
@@ -34,7 +35,7 @@
                         {@const componentData = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
                             {#if componentData}
-                                <ComponentRenderer componentData={componentData} {sectionId} {mode} />
+                                <ComponentRenderer {componentData} {sectionId} {mode}   />
                             {/if}
                         </td>
                     {/each}

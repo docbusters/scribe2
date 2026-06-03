@@ -1,20 +1,19 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import { stringifyDataValue } from '../../utils/stringifyDataValue.ts';
 	import type { ImageComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { fade } from 'svelte/transition';
 
-    let { componentData }: ScribeComponentProps<ImageComponent> = $props();
+    let { componentData, resolvedValue }: ScribeComponentProps<ImageComponent> = $props();
 
     let errorLoadingImage = $state(false);
 
-    const value = $derived(stringifyDataValue(componentData.value));
+    const src = $derived(resolvedValue.value as string);
     const config = $derived(componentData.config);
 
     $effect(() => {
         // We interact with value so that error state is reset when it changes
-        void value; 
+        void resolvedValue; 
         errorLoadingImage = false;
     });
 
@@ -45,10 +44,10 @@
     })
 </script>
 
-{#key value}
+{#key resolvedValue}
     <div class="image-container" in:fade>
-        {#if value && !errorLoadingImage}
-            <img style={style} height={config?.height} width={config?.width} onerror={() => errorLoadingImage = true} id={componentData.id} src={value} alt={componentData.id} />   
+        {#if resolvedValue && !errorLoadingImage}
+            <img style={style} height={config?.height} width={config?.width} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
         {:else if errorLoadingImage}
             <EmptyContent
                 style="padding: 2rem;"

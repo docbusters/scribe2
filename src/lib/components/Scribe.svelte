@@ -22,7 +22,7 @@
 	import { defaultRegistry } from '../registry/defaultRegistry.js';
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
-	import { dataStore } from '../stores/data-store.svelte.js';
+	import { bindingStore } from '../stores/binding-store.svelte.ts';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
 	import type { ScribeProps } from '../types/ScribeProps.js';
 	import { setContext, onDestroy, untrack } from 'svelte';
@@ -67,7 +67,7 @@
 	$effect.pre(() => {
 		if (bindings) {
 			// Initialize the data store with the initial values from the document's components
-			dataStore.initialize(bindings);
+			bindingStore.initialize(bindings);
 		}
 		if (customBindings) {
 			customBindingsStore.initialize(customBindings);
