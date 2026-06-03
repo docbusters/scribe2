@@ -1,4 +1,4 @@
-import type { ScribeMode } from "$lib/types/ScribeProps.js";
+import type { BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode } from "$lib/types/ScribeProps.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import type { BindingValue, CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.ts";
 import type { BindingsDefinition } from "../domain/Document.ts";
@@ -7,6 +7,18 @@ import { editStore } from "./edit-store.svelte.js";
 
 class BindingStore {
     data: Record<BindingValue['value'], CollectionValue | PrimitiveValue> = $state({});
+    private listeners: Set<(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void> = new Set();
+
+    subscribeToChanges(listener: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void) {
+        this.listeners.add(listener);
+        return () => {
+            this.listeners.delete(listener);
+        };
+    }
+
+    private emitChange(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) {
+        this.listeners.forEach(listener => listener(event));
+    }
 
     initialize(bindings: Record<string, BindingsDefinition>) {
         Object.entries(bindings).forEach(([id, binding]) => {
@@ -61,15 +73,30 @@ class BindingStore {
         const isDefaultBinding = bindingType === "default";
         const isEditMode = mode === "edit";
 
-        console.log(`Updating binding ${bindingId} with value`, newValue, `in mode ${mode} and binding type ${bindingType}`);
-
         if (!isDefaultBinding) {
-            // TODO: Update custom bindings
+            this.emitChange(new CustomEvent<CustomBindingValueUpdate>('value_update', {
+                detail: {
+                    type: 'value_update',
+                    id: bindingId,
+                    value: newValue
+                }
+            }));
             return;
         }
         
         if (isEditMode) {
             editStore.setBindingInitialValue(bindingId, newValue);
+            // Notify about the updated initial value so that the editor can update the options label
+            this.emitChange(new CustomEvent<BindingDefinitionUpdate>('binding_update', {
+                detail: {
+                    type: 'binding_update',
+                    id: bindingId,
+                    definition: {
+                        type: newValue.type,
+                        initialValue: newValue.value
+                    } as BindingsDefinition
+                }
+            }));
         }
 
         this.setBindingValue(bindingId, newValue);

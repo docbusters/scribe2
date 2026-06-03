@@ -16,6 +16,7 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     registry?: ComponentRegistry<C>;
     customBindings?: Record<string, CustomBinding>;
     ondocumentchange?: (event: CustomEvent<Document<C>>) => void;
+    onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
 }
 
 export interface CustomBinding {
@@ -29,4 +30,18 @@ export interface CustomBinding {
         /** Optional cleanup function */
         destroy?: () => void;
     };
+}
+
+/** A binding definition has been updated, most likely its initial value */
+export interface BindingDefinitionUpdate {
+    type: 'binding_update';
+    id: string;
+    definition: BindingsDefinition;
+} 
+
+/** A custom binding value has been updated */
+export interface CustomBindingValueUpdate {
+    type: 'value_update';
+    id: string;
+    value: PrimitiveValue | CollectionValue;
 }

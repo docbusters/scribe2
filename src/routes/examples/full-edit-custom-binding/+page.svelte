@@ -3,13 +3,13 @@
 	import Scribe from '$lib/components/Scribe.svelte';
 	import { fullExampleBindings, fullExampleDocument } from '$lib/examples/fullExample.js';
 	import type { Document } from '$lib/domain/Document.js';
-	import type { DataValue } from '$lib/domain/data/DataValue.js';
-	import type { CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
+	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
+	import type { BindingDefinitionUpdate, CustomBinding, CustomBindingValueUpdate, ScribeProps } from '$lib/types/ScribeProps.js';
 
 
 	// BASIC CUSTOM BINDING EXAMPLE
 
-	const bindingData = $state<Record<string, DataValue>>({
+	const bindingData = $state<Record<string, PrimitiveValue | CollectionValue>>({
 		'example-binding': { type: 'string', value: 'This is an example binding value.' },
 		'example-image-binding': { type: 'string', value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' }
 	});
@@ -17,7 +17,7 @@
 	// Stores the update callbacks for each binding ID
 	// IMPORTANT: Use a regular Map, not SvelteMap, because the app is deriving the value
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const updaters = new Map<string, Set<(val: DataValue) => void>>();
+	const updaters = new Map<string, Set<(val: PrimitiveValue | CollectionValue) => void>>();
 
 	const customBinding: CustomBinding = {
 		type: 'custom-binding',
@@ -133,6 +133,15 @@
 		'custom-binding': customBinding,
 		'live-clock': liveClockBinding,
 	}
+
+	function handleBindingChange(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) {
+		const { type, id } = event.detail;
+
+		if (type === 'value_update') {
+			const { value } = event.detail;
+			bindingData[id] = value; // Update the binding data, which will trigger the updaters
+		}
+	}
 </script>
 
 <div class="flex flex-col items-center w-full py-10 border-box gap-8">
@@ -156,5 +165,5 @@
 	</div>
 
 	<!-- Editor Scribe usando nuestro documento inyectado -->
-	<Scribe document={documentWithBindings} bindings={fullExampleBindings} {customBindings} class="max-w-[70vw]" mode="edit" />
+	<Scribe document={documentWithBindings} bindings={fullExampleBindings} {customBindings} onbindingchange={handleBindingChange} class="max-w-[70vw]" mode="edit" />
 </div>

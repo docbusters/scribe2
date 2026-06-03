@@ -10,7 +10,8 @@
 			registry: { type: 'Object' },
 			document: { type: 'Object' },
 			bindings: { type: 'Object' },
-			ondocumentchange: { type: 'Object' }
+			ondocumentchange: { type: 'Object' },
+			onbindingchange: { type: 'Object' }
 		}
 	}}
 />
@@ -34,7 +35,7 @@
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
-	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view' }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange }: ScribeProps = $props();
 
 	let portalTarget = $state<HTMLElement | null>(null);
 	setContext('scribe-portal-target', () => portalTarget);
@@ -72,6 +73,28 @@
 		if (customBindings) {
 			customBindingsStore.initialize(customBindings);
 		}
+	});
+
+	// Subscribe to binding changes
+	$effect(() => {
+		const unsubscribe = bindingStore.subscribeToChanges((event) => {
+			const bindingChangeEvent = new CustomEvent('bindingchange', {
+				detail: event.detail,
+				bubbles: true,
+				composed: true
+			});
+
+			onbindingchange?.(bindingChangeEvent);
+			
+			const host = rootElement ? (rootElement.closest('scribe-interpreter') || rootElement) : null;
+			if (host) {
+				host.dispatchEvent(bindingChangeEvent);
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
 	});
 
 	// Clean up custom bindings on destroy to avoid memory leaks
@@ -117,17 +140,21 @@
 				isInitialized = true;
 				return;
 			}
-			
+
+			const documentChangeEvent = new CustomEvent('documentchange', {
+				detail: docSnapshot,
+				bubbles: true,
+				composed: true
+			});
+
+			if (ondocumentchange) {
+				ondocumentchange(documentChangeEvent);
+			}
+
 			// Dispatch native custom DOM event
-			if (rootElement) {
-				const host = rootElement.closest('scribe-interpreter');
-				if (host) {
-					host.dispatchEvent(new CustomEvent('documentchange', {
-						detail: docSnapshot,
-						bubbles: true,
-						composed: true
-					}));
-				}
+			const host = rootElement ? (rootElement.closest('scribe-interpreter') || rootElement) : null;
+			if (host) {
+				host.dispatchEvent(documentChangeEvent);
 			}
 		}
 	});

@@ -1,5 +1,5 @@
 import type { BindingsDefinition, Document } from './domain/Document.js';
-import type { CustomBinding, ScribeMode, ScribeProps } from './types/ScribeProps.js';
+import type { CustomBinding, ScribeMode, ScribeProps, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
@@ -15,7 +15,7 @@ export const Scribe = ScribeComponent as unknown as ScribeConstructor;
 export { defaultRegistry } from './registry/defaultRegistry.js';
 
 // TYPES
-export type { ScribeProps, CustomBinding, ScribeMode } from './types/ScribeProps.js';
+export type { ScribeProps, CustomBinding, ScribeMode, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
 
 // DOCUMENT STRUCTURE
 export type { Document, BindingsDefinition } from './domain/Document.js';
@@ -65,6 +65,7 @@ declare global {
             bindings?: Record<string, BindingsDefinition>;
             customBindings?: Record<string, CustomBinding>;
 			ondocumentchange?: (event: CustomEvent<Document>) => void;
+            onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
         };
     }
 
