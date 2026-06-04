@@ -33,6 +33,17 @@ export const fullExampleDocument: Document = {
                         expandWithContent: true,
                     }
                 },
+                'text-bind': {
+                    id: 'text-bind',
+                    mode: 'inline',
+                    type: 'text-binding',
+                    value: {
+                        type: 'binding',
+                        bindingType: 'default',
+                        value: 'image-url',
+                        valueType: 'string',
+                    },
+                },
                 'image-1': {
                     id: 'image-1',
                     type: 'image',

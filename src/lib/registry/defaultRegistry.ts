@@ -1,19 +1,33 @@
 import type { ComponentRegistry } from './ComponentRegistry.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
-import type { ImageComponent, LatexComponent, MapComponent, TableComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
+import type { ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
 import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
-import type { ImageComponentConfig, MapComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
+import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
 
-export type DefaultComponents = TextComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent;
+export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent;
 
 /** Contains default component implementations */
 export const defaultRegistry: ComponentRegistry = {
+    'text-binding': {
+        name: 'Text Binding',
+        description: 'Text that can be binded',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text-icon lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>',
+        component: TextBindingComponentScribe,
+        empty: {
+            type: 'text-binding',
+            mode: 'inline',
+            value: 'binding',
+        },
+        valueTypes: ['binding'],
+        supportedBindingValueTypes: ['string'],
+    },
     'text': {
         name: 'Text',
         description: 'As simple as it gets',
@@ -38,6 +52,23 @@ export const defaultRegistry: ComponentRegistry = {
         },
         valueTypes: ['binding'],
         supportedBindingValueTypes: ['string'],
+        options: [
+            ...defaultComponentOptions,
+            {
+                type: 'expand-content',
+                name: 'Expand with content',
+                isSelected: (data: { config?: TextInputComponentConfig }) => data.config?.expandWithContent === true,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand-icon lucide-expand"><path d="m15 15 6 6"/><path d="m15 9 6-6"/><path d="M21 16v5h-5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="m3 21 6-6"/><path d="M3 8V3h5"/><path d="M9 9 3 3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        const current = config?.expandWithContent ?? false;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, expandWithContent: !current });
+                    }
+                },
+            },
+        ],
     },
     'image': {
         name: 'Image',
@@ -64,7 +95,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, align: 'left' });
                     }
                 },
@@ -78,7 +108,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, align: 'center' });
                     }
                 },
@@ -92,7 +121,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, align: 'right' });
                     }
                 },
@@ -106,7 +134,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, position: 'contain' });
                     }
                 },
@@ -120,7 +147,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, position: 'cover' });
                     }
                 },
@@ -134,7 +160,6 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId);
-                        if (!config) return;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, position: 'fill' });
                     }
                 },
@@ -208,8 +233,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.readonly ?? false;
+                        const current = config?.readonly ?? false;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, readonly: !current });
                     }
                 },
@@ -223,8 +247,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.hasSearchbar ?? false;
+                        const current = config?.hasSearchbar ?? false;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, hasSearchbar: !current });
                     }
                 },
@@ -238,8 +261,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.hasGlobeBtn ?? true;
+                        const current = config?.hasGlobeBtn ?? true;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, hasGlobeBtn: !current });
                     }
                 },
@@ -253,8 +275,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.hasZoomBtn ?? true;
+                        const current = config?.hasZoomBtn ?? true;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, hasZoomBtn: !current });
                     }
                 },
@@ -268,8 +289,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.hasCurrentPosBtn ?? true;
+                        const current = config?.hasCurrentPosBtn ?? true;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, hasCurrentPosBtn: !current });
                     }
                 },
@@ -283,8 +303,7 @@ export const defaultRegistry: ComponentRegistry = {
                     onclick: (data: ComponentEditOnClick) => {
                         const { sectionId, componentId } = data;
                         const config = editStore.getComponentConfig(sectionId, componentId) as MapComponentConfig;
-                        if (!config) return;
-                        const current = config.isMarkerDraggable ?? false;
+                        const current = config?.isMarkerDraggable ?? false;
                         editStore.setComponentConfig(sectionId, componentId, { ...config, isMarkerDraggable: !current });
                     }
                 },

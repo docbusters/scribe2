@@ -5,6 +5,9 @@ import type { ImageComponentConfig, LatexComponentConfig, MapComponentConfig, Ta
 /** Shows a line of text accepting a string value */
 export type TextComponent = InlineComponent<'text', StringValue>;
 
+/** Shows a line of text that can be binded */
+export type TextBindingComponent = InlineComponent<'text-binding', BindingValue>;
+
 /** Shows a text input field */
 export type TextInputComponent = InlineComponent<'text-input', BindingValue, TextInputComponentConfig>;
 

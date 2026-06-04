@@ -45,7 +45,7 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
             // In this case we need to add a new binding
             const bindingId = editStore.addBinding({
                 type: 'string',
-                initialValue: '',
+                initialValue: '¡New binding!',
             });
             return {
                 type: 'binding',
