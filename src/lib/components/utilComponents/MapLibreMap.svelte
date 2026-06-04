@@ -254,13 +254,13 @@
 	.marker-content {
 		border-radius: 100%;
 		padding: 0.5rem;
-        min-width: 1.75rem;
-		max-width: 1.75rem;
-        min-height: 1.75rem;
-		max-height: 1.75rem;
 		background-color: var(--scribe-doc-background);
 		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 		border: 1px solid var(--scribe-border-color);
+		aspect-ratio: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
     .marker-loading {
