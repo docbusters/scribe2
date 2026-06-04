@@ -1,4 +1,4 @@
-import type { BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode } from "$lib/types/ScribeProps.js";
+import type { BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode, UpdateType } from "$lib/types/ScribeProps.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import type { BindingValue, CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.ts";
 import type { BindingsDefinition } from "../domain/Document.ts";
@@ -69,7 +69,7 @@ class BindingStore {
      * Edit mode: Updates the value and initial value of default bindings and updates the value of custom bindings.
      * View mode: Only updates the value bindings without modifying the initial value.
      */
-    updateBindingValue(mode: ScribeMode, bindingId: string, bindingType: "default" | string, newValue: CollectionValue | PrimitiveValue) {
+    updateBindingValue(mode: ScribeMode, bindingId: string, bindingType: "default" | string, updateType: UpdateType, newValue: CollectionValue | PrimitiveValue) {
         const isDefaultBinding = bindingType === "default";
         const isEditMode = mode === "edit";
 
@@ -77,6 +77,8 @@ class BindingStore {
             this.emitChange(new CustomEvent<CustomBindingValueUpdate>('value_update', {
                 detail: {
                     type: 'value_update',
+                    updateType,
+                    bindingType,
                     id: bindingId,
                     value: newValue
                 }
@@ -90,6 +92,7 @@ class BindingStore {
             this.emitChange(new CustomEvent<BindingDefinitionUpdate>('binding_update', {
                 detail: {
                     type: 'binding_update',
+                    updateType,
                     id: bindingId,
                     definition: {
                         type: newValue.type,

@@ -32,9 +32,17 @@ export interface CustomBinding {
     };
 }
 
+/** 
+ * The type of update that occurred. 
+ * onchange: The value has updated but the user has not finished interacting with the input.
+ * onblur: The user has finished interacting with the input and the value is finalized.
+ */
+export type UpdateType = 'onchange' | 'onblur';
+
 /** A binding definition has been updated, most likely its initial value */
 export interface BindingDefinitionUpdate {
     type: 'binding_update';
+    updateType: UpdateType;
     id: string;
     definition: BindingsDefinition;
 } 
@@ -42,6 +50,8 @@ export interface BindingDefinitionUpdate {
 /** A custom binding value has been updated */
 export interface CustomBindingValueUpdate {
     type: 'value_update';
+    updateType: UpdateType;
+    bindingType: string;
     id: string;
     value: PrimitiveValue | CollectionValue;
 }

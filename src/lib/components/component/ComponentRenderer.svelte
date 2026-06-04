@@ -4,6 +4,7 @@
 	import { editStore } from "$lib/stores/edit-store.svelte.js";
 	import { globalRegistry } from "$lib/stores/global-registry.svelte.js";
 	import type { ComponentRendererProps } from "$lib/types/CustomRendererProps.js";
+	import type { UpdateType } from "$lib/types/ScribeProps.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 
     let { mode, componentData, sectionId }: ComponentRendererProps = $props();
@@ -21,6 +22,7 @@
 			const bindingValue = bindingStore.getBindingValue(componentValue.value, componentValue.bindingType);
 
 			if (!bindingTypes.includes(bindingValue.type)) {
+				console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
 				throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
 			}
 
@@ -30,7 +32,7 @@
 		return componentValue;
 	})
 
-	function updateComponentValue(newValue: DataValue) {
+	function updateComponentValue(newValue: DataValue, updateType: UpdateType) {
 		const { types, bindingTypes } = componentSupportedTypes;
 
 		if (componentValue.type === 'binding') {
@@ -39,7 +41,7 @@
 				throw new Error(`Updated value type ${newValue.type} is not supported by component's binding`);
 			}
 
-			bindingStore.updateBindingValue(mode, componentValue.value, componentValue.bindingType, newValue as PrimitiveValue | CollectionValue);
+			bindingStore.updateBindingValue(mode, componentValue.value, componentValue.bindingType, updateType, newValue as PrimitiveValue | CollectionValue);
 		} else {
 			// Other data values can only be updated in edit mode
 			if (mode !== 'edit') {

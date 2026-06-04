@@ -68,11 +68,11 @@
     });
 
     const oninput = () => {
-        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) });
+        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) }, 'onchange');
     };
 
     const onblur = () => {
-        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) });
+        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) }, 'onblur');
     }
 </script>
 

@@ -2,7 +2,7 @@ import type { BaseComponent, ComponentConfig } from '../domain/components/Compon
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 import type { Component } from 'svelte';
 import type { DefaultComponents } from './defaultRegistry.js';
-import type { ScribeMode } from '../types/ScribeProps.js';
+import type { ScribeMode, UpdateType } from '../types/ScribeProps.js';
 import type { ComponentEditOptions } from './ComponentEditOptions.ts';
 
 /** Props that should be implemented by every user-defined component */
@@ -13,7 +13,7 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     /** Component value with bindings resolved */
     resolvedValue: PrimitiveValue | CollectionValue;
     /** Updates the component value handling binding updates */
-    updateComponentValue: (newValue: DataValue) => void;
+    updateComponentValue: (newValue: DataValue, updateType: UpdateType) => void;
 }
 
 export type ComponentRegistry<

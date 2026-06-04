@@ -59,7 +59,7 @@
                 longitude: { type: 'number', value: newLocation.lng },
                 address: { type: 'string', value: newLocation.address },
             }
-        });
+        }, 'onblur');
     };
 
 </script>

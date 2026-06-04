@@ -69,9 +69,7 @@
 		moveMapCamera(lat, lng);
 		const success = await getLocationInfo(lat, lng);
 		if (success) {
-			onLocationSelect?.({ lat, lng, address: searchBarValue });
 			location = { lat, lng, address: searchBarValue };
-
 		}
 	}
 
@@ -80,7 +78,6 @@
 		moveMapCamera(pinCoords.lat, pinCoords.lng);
 		const success = await getLocationInfo(pinCoords.lat, pinCoords.lng);
 		if (success) {
-			onLocationSelect?.({ lat: pinCoords.lat, lng: pinCoords.lng, address: searchBarValue });
 			location = { lat: pinCoords.lat, lng: pinCoords.lng, address: searchBarValue };
 		}
 	}
@@ -258,7 +255,9 @@
 		border-radius: 100%;
 		padding: 0.5rem;
         min-width: 1.75rem;
+		max-width: 1.75rem;
         min-height: 1.75rem;
+		max-height: 1.75rem;
 		background-color: var(--scribe-doc-background);
 		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 		border: 1px solid var(--scribe-border-color);
