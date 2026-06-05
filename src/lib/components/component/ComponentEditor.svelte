@@ -14,9 +14,10 @@
         componentId: string;
         disabled?: boolean;
         options?: ComponentEditOptions[];
+        disabledOptions: string[];
     }
 
-    let { componentType, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions,  ...restProps }: ComponentEditorProps = $props();
+    let { componentType, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, disabledOptions,  ...restProps }: ComponentEditorProps = $props();
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -34,7 +35,7 @@
                         componentValue,
                         sectionId,
                         componentId,
-                        disabled,
+                        disabled: disabled || disabledOptions.includes(option.type),
                         name: option.name,
                         onclick: option.props.onclick,
                         icon: option.props.icon,
@@ -50,7 +51,7 @@
                         props: {
                             sectionId,
                             componentId,
-                            disabled,
+                            disabled: disabled || disabledOptions.includes(option.type),
                             name: option.name,
                             onclick: (e) => option.props!.onclick?.({ event: e, sectionId, componentId }),
                             icon: option.props.icon,

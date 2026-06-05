@@ -6,4 +6,5 @@ export interface ComponentRendererProps {
     componentData: BaseComponent<string, DataValue, ComponentConfig | undefined>;
     sectionId: string;
     mode: ScribeMode; 
+    disabledOptions?: string[];
 }

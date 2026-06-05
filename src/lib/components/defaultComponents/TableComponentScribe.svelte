@@ -35,7 +35,7 @@
                         {@const componentData = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
                             {#if componentData}
-                                <ComponentRenderer {componentData} {sectionId} {mode}   />
+                                <ComponentRenderer {componentData} {sectionId} {mode} disabledOptions={['add', 'duplicate']} />
                             {/if}
                         </td>
                     {/each}

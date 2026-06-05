@@ -57,12 +57,17 @@
     border: none;
   }
 
-  :global(.scribe-document .scribe-btn:active) {
+  :global(.scribe-document .scribe-btn:active:not(:disabled)) {
     transform: scale(0.98);
   }
 
-  :global(.scribe-document .scribe-btn:hover) {
+  :global(.scribe-document .scribe-btn:hover:not(:disabled)) {
     opacity: 0.9;
+  }
+
+  :global(.scribe-document .scribe-btn:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   :global(.scribe-document .scribe-btn[style*="border:"]) {

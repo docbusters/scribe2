@@ -7,7 +7,7 @@
 	import type { UpdateType } from "$lib/types/ScribeProps.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 
-    let { mode, componentData, sectionId }: ComponentRendererProps = $props();
+    let { mode, componentData, sectionId, disabledOptions = [] }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
 	let componentValue = $derived(componentData.value);
@@ -62,7 +62,7 @@
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
 			<div class="component-editor" contenteditable="false">
-				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} />
+				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
 			</div>
 			<Component {componentData} {sectionId} {mode} {resolvedValue} {updateComponentValue} />
 		</div>
