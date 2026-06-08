@@ -370,12 +370,16 @@ class EditStore<C> {
             return false;
         }
 
-        if (this.bindings[bindingId].type !== initialValue.type) {
-            console.warn(`Initial value type ${initialValue.type} does not match binding type ${this.bindings[bindingId].type}.`);
+        const currentBinding = this.bindings[bindingId];
+
+        // Note: When treating with empty values we allow switching the binding type without warning
+        if (initialValue.type !== 'empty' && currentBinding.type !== 'empty' && currentBinding.type !== initialValue.type) {
+            console.warn(`Initial value type ${initialValue.type} does not match binding type ${currentBinding.type}.`);
             return false;
         }
 
         this.bindings[bindingId].initialValue = initialValue.value;
+        this.bindings[bindingId].type = initialValue.type;
         return true;
     }
 }

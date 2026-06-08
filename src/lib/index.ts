@@ -1,7 +1,6 @@
 import type { BindingsDefinition, Document } from './domain/Document.js';
 import type { CustomBinding, ScribeMode, ScribeProps, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
-import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
 import type { Component } from 'svelte';
 
@@ -22,8 +21,8 @@ export type { Document, BindingsDefinition } from './domain/Document.js';
 export type { Section, ParagraphSection, GridSection, GridSectionContent } from './domain/Section.js';
 
 // DATA VALUES
-import type { DataValue, PrimitiveValue, CollectionValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
-export type { DataValue, PrimitiveValue, CollectionValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
+import type { DataValue, PrimitiveValue, CollectionValue, EmptyValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
+export type { DataValue, PrimitiveValue, CollectionValue, EmptyValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
 
 // COMPONENTS
 import type { ComponentRegistry, ScribeComponentProps } from './registry/ComponentRegistry.js';
@@ -51,7 +50,11 @@ export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComp
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
 // UTILS
+import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
+import EmptyContentSvelte from './components/utilComponents/EmptyContent.svelte';
 export const ComponentRenderer = ComponentRendererSvelte as Component<ComponentRendererProps>;
+export const EmptyContent = EmptyContentSvelte;
+
 
 declare global {
     interface HTMLElementTagNameMap {

@@ -39,7 +39,7 @@
                 </div>
             </DropdownMenu.Item>
         {/each}
-        <div class="help-container">Press ENTER to add component</div>
+        <div class="help-container">Press ENTER to add a component</div>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 

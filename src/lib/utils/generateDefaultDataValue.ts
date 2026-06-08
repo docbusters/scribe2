@@ -10,6 +10,11 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
         throw new Error(`Initial value type (${initialValue.type}) does not match the specified type (${type})`);
     }
     switch (type) {
+        case 'empty':
+            return {
+                type: 'empty',
+                value: undefined,
+            };
         case 'string':
             return {
                 type: 'string',
@@ -44,14 +49,13 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
         case 'binding': {
             // In this case we need to add a new binding
             const bindingId = editStore.addBinding({
-                type: 'string',
-                initialValue: '¡New binding!',
+                type: 'empty',
+                initialValue: undefined,
             });
             return {
                 type: 'binding',
                 bindingType: 'default',
                 value: bindingId,
-                valueType: 'string',
             };
 
         }

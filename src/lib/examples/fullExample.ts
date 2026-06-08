@@ -26,7 +26,6 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'image-url',
-                        valueType: 'string',
                     },
                     config: {
                         placeholder: 'https://example.com/image.jpg',
@@ -41,7 +40,6 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'image-url',
-                        valueType: 'string',
                     },
                 },
                 'image-1': {
@@ -52,7 +50,6 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'image-url',
-                        valueType: 'string',
                     },
                     config: {
                         emptyText: 'No image URL provided. Please enter an URL in the input above.',
@@ -79,7 +76,6 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'latex-string',
-                        valueType: 'string',
                     }
                 },
                 'latex-1': {
@@ -90,7 +86,6 @@ export const fullExampleDocument: Document = {
                         type: 'binding',
                         bindingType: 'default',
                         value: 'latex-string',
-                        valueType: 'string',
                     }
                 },
                 'map-1': {
@@ -167,7 +162,6 @@ export const fullExampleDocument: Document = {
                                         type: 'binding',
                                         bindingType: 'default',
                                         value: 'table-latex-binding',
-                                        valueType: 'string',
                                     }
                                 }
                             },
@@ -181,7 +175,6 @@ export const fullExampleDocument: Document = {
                                         type: 'binding',
                                         bindingType: 'default',
                                         value: 'table-latex-binding',
-                                        valueType: 'string',
                                     }
                                 }
                             }
@@ -312,6 +305,7 @@ export const fullExampleDocument: Document = {
 };
 
 export const fullExampleBindings: Record<string, BindingsDefinition> = {
+    undefined: { type: 'empty', initialValue: undefined },
     name: { type: 'string', initialValue: 'I am a binded name!!!' },
     'image-url': { type: 'string', initialValue: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' },
     'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },

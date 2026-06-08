@@ -4,10 +4,15 @@ import type { BaseComponent, ComponentConfig } from "../components/Component.ts"
 export type DataValue = PrimitiveValue | BindingValue | CollectionValue;
 
 export type CollectionValue = ArrayValue<DataValue> | RecordValue<string, DataValue>;
-export type PrimitiveValue = StringValue | NumberValue | BooleanValue | DateValue | ComponentValue;
+export type PrimitiveValue = EmptyValue | StringValue | NumberValue | BooleanValue | DateValue | ComponentValue;
 
 export interface BaseValue {
     type: string;
+}
+
+export interface EmptyValue extends BaseValue {
+    type: "empty";
+    value: undefined;
 }
 
 export interface StringValue {
@@ -50,5 +55,4 @@ export interface BindingValue {
     bindingType: "default" | string;
     /** The id of the bound value */
     value: string;
-    valueType: DataValue['type'];
 }

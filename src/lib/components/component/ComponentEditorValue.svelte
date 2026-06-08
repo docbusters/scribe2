@@ -30,7 +30,7 @@
 						const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined };
 						let newDataValue: DataValue;
 						if (valType.type === 'binding') {
-							newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string, valueType: initialVal.type } as BindingValue;
+							newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string } as BindingValue;
 						} else {
 							newDataValue = { type: valType.type as DataValue['type'], value: initialVal.value } as DataValue;
 						}

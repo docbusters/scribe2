@@ -46,7 +46,7 @@
 
 {#key resolvedValue}
     <div class="image-container" in:fade>
-        {#if resolvedValue && !errorLoadingImage}
+        {#if resolvedValue.type === 'string' && !errorLoadingImage}
             <img style={style} height={config?.height} width={config?.width} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
         {:else if errorLoadingImage}
             <EmptyContent

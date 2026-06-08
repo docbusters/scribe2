@@ -26,7 +26,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'binding',
         },
         valueTypes: ['binding'],
-        supportedBindingValueTypes: ['string'],
+        supportedBindingValueTypes: ['empty', 'string'],
     },
     'text': {
         name: 'Text',
@@ -38,7 +38,7 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'inline',
             value: 'string',
         },
-        valueTypes: ['string'],
+        valueTypes: ['empty', 'string'],
     },
     'text-input': {
         name: 'Text Input',
@@ -51,7 +51,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'binding',
         },
         valueTypes: ['binding'],
-        supportedBindingValueTypes: ['string'],
+        supportedBindingValueTypes: ['empty', 'string'],
         options: [
             ...defaultComponentOptions,
             {
@@ -166,7 +166,7 @@ export const defaultRegistry: ComponentRegistry = {
             },
         ],
         valueTypes: ['string', 'binding'],
-        supportedBindingValueTypes: ['string'],
+        supportedBindingValueTypes: ['empty', 'string'],
     },
     'latex': {
         name: 'LaTeX',
@@ -179,7 +179,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'string',
         },
         valueTypes: ['string', 'binding'],
-        supportedBindingValueTypes: ['string'],
+        supportedBindingValueTypes: ['empty', 'string'],
     },
     'table': {
         name: 'Table',
@@ -310,7 +310,7 @@ export const defaultRegistry: ComponentRegistry = {
             }
         ],
         valueTypes: ['record', 'binding'],
-        supportedBindingValueTypes: ['record'],
+        supportedBindingValueTypes: ['empty', 'record'],
         
     }
 };

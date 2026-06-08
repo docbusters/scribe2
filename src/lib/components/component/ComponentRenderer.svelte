@@ -10,38 +10,48 @@
     let { mode, componentData, sectionId, disabledOptions = [] }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
-	let componentValue = $derived(componentData.value);
-	const resolvedValue = $derived.by(() => {
-		const { types, bindingTypes } = componentSupportedTypes;
+	let resolvedValue = $state(resolveValue());
 
-		if (!types.includes(componentValue.type)) {
-			throw new Error(`Unsupported component value type: ${componentValue.type}`);
+	function resolveValue() {
+		const { types, bindingTypes } = componentSupportedTypes;
+		console.log('a')
+		
+		if (!types.includes(componentData.value.type)) {
+			throw new Error(`Unsupported component value type: ${componentData.value.type}`);
 		}
 
-		if (componentValue.type === 'binding') {
-			const bindingValue = bindingStore.getBindingValue(componentValue.value, componentValue.bindingType);
+		if (componentData.value.type === 'binding') {
+			const bindingValue = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
 
 			if (!bindingTypes.includes(bindingValue.type)) {
 				console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
 				throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
 			}
+			console.log("new binding value", bindingValue);
 
 			return bindingValue;
 		}
+		console.log("new component value", componentData.value);
+		return componentData.value;
+	}
 
-		return componentValue;
-	})
+	$effect(() => {
+		const val = resolveValue();
+		// Asignamos un shallow clone para forzar que la referencia cambie y Svelte notifique a los componentes externos
+		resolvedValue = { ...val };
+	});
 
+	
 	function updateComponentValue(newValue: DataValue, updateType: UpdateType) {
 		const { types, bindingTypes } = componentSupportedTypes;
 
-		if (componentValue.type === 'binding') {
+		if (componentData.value.type === 'binding') {
 			// Bindings can be updated in any mode
 			if (!bindingTypes.includes(newValue.type)) {
 				throw new Error(`Updated value type ${newValue.type} is not supported by component's binding`);
 			}
 
-			bindingStore.updateBindingValue(mode, componentValue.value, componentValue.bindingType, updateType, newValue as PrimitiveValue | CollectionValue);
+			bindingStore.updateBindingValue(mode, componentData.value.value, componentData.value.bindingType, updateType, newValue as PrimitiveValue | CollectionValue);
 		} else {
 			// Other data values can only be updated in edit mode
 			if (mode !== 'edit') {

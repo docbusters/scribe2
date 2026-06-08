@@ -8,6 +8,10 @@
     let { componentData, resolvedValue, updateComponentValue }: ScribeComponentProps<MapComponent> = $props();
 
     const value = $derived.by(() => {
+        if (resolvedValue.type === 'empty') {
+            return undefined;
+        }
+
         // Verify it contains the correct arttributes
         if (resolvedValue.type !== 'record' || !resolvedValue.value.latitude || !resolvedValue.value.longitude || !resolvedValue.value.address) {
             throw new Error(`Invalid value for MapComponent: ${$state.snapshot(resolvedValue)}`);

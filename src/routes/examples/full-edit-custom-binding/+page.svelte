@@ -91,7 +91,6 @@
 							type: 'binding',
 							bindingType: 'custom-binding',
 							value: 'example-image-binding',
-							valueType: 'string',
 						}
 					},
 					"latex-bind": {
@@ -102,7 +101,6 @@
 							type: 'binding',
 							bindingType: 'custom-binding',
 							value: 'example-binding',
-							valueType: 'string',
 						}
 					}
 				}
@@ -120,7 +118,6 @@
 							type: 'binding',
 							bindingType: 'live-clock',
 							value: 'not-used', // In this case, the value can be ignored since the live clock binding doesn't use it
-							valueType: 'string'
 						}
 					}
 				}
