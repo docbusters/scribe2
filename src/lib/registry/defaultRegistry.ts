@@ -1,4 +1,5 @@
-import type { ComponentRegistry } from './ComponentRegistry.js';
+import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistry.js';
+import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
 import type { ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
@@ -19,7 +20,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Text Binding',
         description: 'Text that can be binded',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text-icon lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>',
-        component: TextBindingComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<TextBindingComponent>>(TextBindingComponentScribe),
         empty: {
             type: 'text-binding',
             mode: 'inline',
@@ -32,7 +33,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Text',
         description: 'As simple as it gets',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-case-sensitive-icon lucide-case-sensitive"><path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16"/><path d="M22 9v7"/><path d="M3.304 13h6.392"/><circle cx="18.5" cy="12.5" r="3.5"/></svg>',
-        component: TextComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<TextComponent>>(TextComponentScribe),
         empty: {
             type: 'text',
             mode: 'inline',
@@ -44,7 +45,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Text Input',
         description: 'Used to input text',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-cursor-input-icon lucide-text-cursor-input"><path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"/><path d="M9 6v12"/></svg>',
-        component: TextInputComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<TextInputComponent>>(TextInputComponentScribe),
         empty: {
             type: 'text-input',
             mode: 'inline',
@@ -74,7 +75,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Image',
         description: 'Display online images',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-icon lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
-        component: ImageComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<ImageComponent>>(ImageComponentScribe),
         empty: {
             type: 'image',
             mode: 'block',
@@ -172,7 +173,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'LaTeX',
         description: 'Render LaTeX formulas',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sigma-icon lucide-sigma"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></svg>',
-        component: LatexComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<LatexComponent>>(LatexComponentScribe),
         empty: {
             type: 'latex',
             mode: 'block',
@@ -185,7 +186,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Table',
         description: 'Create tables to organize your content',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table2-icon lucide-table-2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>',
-        component: TableComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<TableComponent>>(TableComponentScribe),
         empty: {
             type: 'table',
             mode: 'block',
@@ -201,7 +202,7 @@ export const defaultRegistry: ComponentRegistry = {
         name: 'Map',
         description: 'Create interactive maps',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-icon lucide-map"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>',
-        component: MapComponentScribe,
+        ...createSvelte5Mount<ScribeComponentProps<MapComponent>>(MapComponentScribe),
         empty: {
             type: 'map',
             mode: 'block',

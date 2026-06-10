@@ -5,16 +5,16 @@
 	import { globalRegistry } from "$lib/stores/global-registry.svelte.js";
 	import type { ComponentRendererProps } from "$lib/types/CustomRendererProps.js";
 	import type { UpdateType } from "$lib/types/ScribeProps.js";
+	import type { Action } from 'svelte/action';
+	import type { ScribeComponentProps } from "$lib/registry/ComponentRegistry.js";
+	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 
     let { mode, componentData, sectionId, disabledOptions = [] }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
-	let resolvedValue = $state(resolveValue());
-
-	function resolveValue() {
+	let resolvedValue = $derived.by(() => {
 		const { types, bindingTypes } = componentSupportedTypes;
-		console.log('a')
 		
 		if (!types.includes(componentData.value.type)) {
 			throw new Error(`Unsupported component value type: ${componentData.value.type}`);
@@ -27,18 +27,11 @@
 				console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
 				throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
 			}
-			console.log("new binding value", bindingValue);
 
 			return bindingValue;
 		}
-		console.log("new component value", componentData.value);
+		
 		return componentData.value;
-	}
-
-	$effect(() => {
-		const val = resolveValue();
-		// Asignamos un shallow clone para forzar que la referencia cambie y Svelte notifique a los componentes externos
-		resolvedValue = { ...val };
 	});
 
 	
@@ -64,20 +57,39 @@
 			editStore.setComponentValue(sectionId, componentData.id, newValue);
 		}
 	}
+
+	type AgnosticActionProps = ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>;
+
+	const mountComponent: Action<HTMLElement, AgnosticActionProps> = (node, props) => {
+		const componentDef = globalRegistry.getComponent(props.componentData.type);
+		const instanceData = componentDef.mount(node, props);
+
+		return {
+			update(newProps) {
+				if (componentDef.update) {
+					componentDef.update(instanceData, newProps);
+				}
+			},
+			destroy() {
+				if (componentDef.unmount) {
+					componentDef.unmount(instanceData);
+				}
+			}
+		};
+	};
 </script>
 
 {#if componentData}
-    {@const Component = globalRegistry.getComponent(componentData.type)}
 	{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 		<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
 			<div class="component-editor" contenteditable="false">
 				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
 			</div>
-			<Component {componentData} {sectionId} {mode} {resolvedValue} {updateComponentValue} />
+			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue }}></div>
 		</div>
 	{:else}
-    	<Component {componentData} {sectionId} {mode} {resolvedValue} {updateComponentValue} />
+    	<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue }}></div>
 	{/if}
 {/if}
 

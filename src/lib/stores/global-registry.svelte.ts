@@ -16,7 +16,7 @@ class GlobalRegistry {
         if (!comp) {
             throw new Error(`Component of type ${type} not found in registry`);
         }
-        return comp.component;
+        return comp;
     }
 
     getEmptyComponent(type: string) {

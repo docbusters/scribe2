@@ -49,7 +49,7 @@ export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComp
 export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
-// UTILS
+// UTIL COMPONENTS
 import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
 import EmptyContentSvelte from './components/utilComponents/EmptyContent.svelte';
 export const ComponentRenderer = ComponentRendererSvelte as Component<ComponentRendererProps>;

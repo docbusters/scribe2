@@ -1,9 +1,10 @@
 import type { BaseComponent, ComponentConfig } from '../domain/components/Component.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
-import type { Component } from 'svelte';
+
 import type { DefaultComponents } from './defaultRegistry.js';
 import type { ScribeMode, UpdateType } from '../types/ScribeProps.js';
 import type { ComponentEditOptions } from './ComponentEditOptions.ts';
+import type { InstanceData } from './svelteMountHelper.svelte.ts';
 
 /** Props that should be implemented by every user-defined component */
 export interface ScribeComponentProps<T extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
@@ -23,7 +24,12 @@ export type ComponentRegistry<
         name: string;
         description: string;
         icon: string;
-        component: Component<ScribeComponentProps<C>>;
+        /** Mount the component into the given DOM node */
+        mount: (node: HTMLElement, props: ScribeComponentProps<C>) => InstanceData<ScribeComponentProps<C>>;
+        /** Optional method to update the component with new props */
+        update?: (instance: InstanceData<ScribeComponentProps<C>>, props: ScribeComponentProps<C>) => void;
+        /** Optional method to unmount the component and clean up */
+        unmount?: (instance: InstanceData<ScribeComponentProps<C>>) => void;
         /** Contains the default configuration for the component when inserted. Id will be generated automatically */
         empty: Omit<C, 'id' | 'value'> & { value: C['value']['type'] };
         /** 
