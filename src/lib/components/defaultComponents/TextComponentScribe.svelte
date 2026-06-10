@@ -118,10 +118,8 @@
         // If the component is not found, we can assume it is a blank space
         if (!success) {
             // We add a new text component with the value and remove the ghost component
-            const newId = editStore.addComponent(sectionId, null, 'text');
+            const newId = editStore.addComponent(sectionId, null, 'text', false, newValue);
             if (typeof newId === 'string') {
-                editStore.setComponentValue(sectionId, newId, newValue);
-                
                 // Clear the ghost component UI visually
                 target.innerText = '';
                 isEmpty = true;

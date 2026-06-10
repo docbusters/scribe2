@@ -1,5 +1,5 @@
 import type { BaseComponent, ComponentConfig } from "../domain/components/Component.js";
-import type { CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.js";
+import type { CollectionValue, DataValue, PrimitiveValue, StringValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 import type { ParagraphSection, Section } from "../domain/Section.js";
 import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
@@ -8,7 +8,7 @@ import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
-class EditStore<C> {
+class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
     document = $state<Document<C>>(null!);
     bindings = $state<Record<string, BindingsDefinition>>({});
 
@@ -92,8 +92,7 @@ class EditStore<C> {
 
         // Generate a new id for each of the components in the duplicated section to ensure uniqueness
         for (const comp of Object.values(sectionToDuplicate.content)) {
-            const typedComp = comp as BaseComponent<string, DataValue, ComponentConfig>;
-            const dupComp = this.cloneComponent(typedComp);
+            const dupComp = this.cloneComponent(comp);
 
             // Add the duplicated component to the new content map with its new ID
             newContent[dupComp.id] = {
@@ -172,14 +171,13 @@ class EditStore<C> {
         if (!section) return null;
 
         // First attempt to find the component at the top level of the section content
-        const component = section.content[componentId] as unknown as BaseComponent<string, DataValue, ComponentConfig>;
+        const component = section.content[componentId];
         // If found return it immediately
         if (component) return component;
 
         // If not found, we try to find nested components within component values
         for (const topLevelComponent of Object.values(section.content)) {
-            const castedComp = topLevelComponent as unknown as BaseComponent<string, DataValue, ComponentConfig>;
-            const found = this.searchComponentInValue(castedComp.value, componentId);
+            const found = this.searchComponentInValue(topLevelComponent.value, componentId);
             if (found) return found;
         }
 
@@ -187,14 +185,14 @@ class EditStore<C> {
     }
 
     /** Duplicates a component and assigns it a new ID. Also handles nested components that may be present in values */
-    private cloneComponent(comp: BaseComponent<string, DataValue, ComponentConfig>): BaseComponent<string, DataValue, ComponentConfig> {
+    private cloneComponent(comp: BaseComponent<string, DataValue, ComponentConfig | undefined>): BaseComponent<string, DataValue, ComponentConfig | undefined> {
         const newCompId = generateRandomId(comp.type);
-        const clonedComponent = { ...comp, id: newCompId } as BaseComponent<string, DataValue, ComponentConfig>;
+        const clonedComponent = { ...comp, id: newCompId } as BaseComponent<string, DataValue, ComponentConfig | undefined>;
 
         // Verify the component value as it may have nested components that also need new IDs
         const value = {...clonedComponent.value};
         if (value.type === "component") {
-            const nestedComp = value.value as BaseComponent<string, DataValue, ComponentConfig>;
+            const nestedComp = value.value;
             const newNestedCompId = generateRandomId(nestedComp.type);
             value.value = {
                 ...nestedComp,
@@ -203,7 +201,7 @@ class EditStore<C> {
         } else if (value.type === "array") {
             value.value = value.value.map(item => {
                 if (item.type === "component") {
-                    const nestedComp = item.value as BaseComponent<string, DataValue, ComponentConfig>;
+                    const nestedComp = item.value;
                     const newNestedCompId = generateRandomId(nestedComp.type);
                     return {
                         ...item,
@@ -219,7 +217,7 @@ class EditStore<C> {
             const newRecord: Record<string, DataValue> = {};
             for (const [key, item] of Object.entries(value.value)) {
                 if (item.type === "component") {
-                    const nestedComp = item.value as BaseComponent<string, DataValue, ComponentConfig>;
+                    const nestedComp = item.value;
                     const newNestedCompId = generateRandomId(nestedComp.type);
                     newRecord[key] = {
                         ...item,
@@ -282,13 +280,14 @@ class EditStore<C> {
         const componentToDuplicate = this.findComponent(sectionId, componentId);
         if (!componentToDuplicate) return false;
 
-        const dupComp = this.cloneComponent(componentToDuplicate as BaseComponent<string, DataValue, ComponentConfig>);
+        const dupComp = this.cloneComponent(componentToDuplicate);
 
         const entries = Object.entries(section.content);
         const targetIndex = entries.findIndex(([key]) => key === componentId);
         if (targetIndex !== -1) {
             entries.splice(targetIndex + 1, 0, [dupComp.id, dupComp as C]);
             section.content = Object.fromEntries(entries);
+            this.mergeAdjacentTextComponents(sectionId);
             return dupComp.id;
         }
         return null;
@@ -298,15 +297,22 @@ class EditStore<C> {
     deleteComponent(sectionId: string, componentId: string) {
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
         if (!section) return false;
+        
+        const componentToDelete = section.content[componentId];
+        const separator = componentToDelete?.mode === 'block' ? '\n' : ' ';
+
         const newContent = { ...section.content };
         delete newContent[componentId];
         section.content = newContent;
+        
+        this.mergeAdjacentTextComponents(sectionId, undefined, separator);
+        
         return true;
     }
 
 
     /** Add a new component to a section. If componentId is null, the component will be appended to the end */
-    addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false) {
+    addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false, overrideValue?: DataValue) {
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
         if (!section) return null;
 
@@ -321,13 +327,13 @@ class EditStore<C> {
         const newComponent = {
             ...emptyComponent,
             id: newId,
-            value,
+            value: overrideValue !== undefined ? overrideValue : value,
         } as C;
 
         // If no target component is specified, just append to the end
         if (!componentId) {
             section.content[newId] = newComponent;
-            return newId;
+            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         }
 
         // Reconstruct the section content object to preserve order and insert after or replace the target
@@ -342,12 +348,85 @@ class EditStore<C> {
                 entries.splice(targetIndex + 1, 0, [newId, newComponent]);
             }
             section.content = Object.fromEntries(entries);
-            return newId;
+            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         } else {
             console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
             section.content[newId] = newComponent;
-            return newId;
+            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         }
+    }
+
+    /** Merges adjacent text components into a single text component and returns the ID of the merged component if targetId was merged into it */
+    private mergeAdjacentTextComponents(sectionId: string, targetId?: string, separator: string = ''): string | undefined {
+        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        if (!section) return undefined;
+
+        const entries = Object.entries(section.content);
+        if (entries.length < 2) return undefined;
+
+        const newEntries: [string, C][] = [];
+        let i = 0;
+        let resultingTargetId: string | undefined = undefined;
+
+        while (i < entries.length) {
+            const currentId = entries[i][0];
+            let currentComp = entries[i][1];
+            
+            if (currentComp.type === 'text') {
+                let mergedText = (currentComp.value as StringValue).value;
+                let j = i + 1;
+                
+                let didMergeTarget = currentId === targetId;
+
+                while (j < entries.length && entries[j][1].type === 'text') {
+                    const [nextId, nextComp] = entries[j];
+                    const nextText = (nextComp.value as StringValue).value;
+                    
+                    if (separator) {
+                        if (mergedText && nextText) {
+                            if (separator === ' ') {
+                                if (!mergedText.endsWith(' ') && !nextText.startsWith(' ')) {
+                                    mergedText += ' ';
+                                }
+                            } else if (separator === '\n') {
+                                if (!mergedText.endsWith('\n') && !nextText.startsWith('\n')) {
+                                    mergedText += '\n';
+                                }
+                            }
+                        }
+                    }
+                    mergedText += nextText;
+                    
+                    if (nextId === targetId) {
+                        didMergeTarget = true;
+                    }
+                    j++;
+                }
+                
+                if (j > i + 1) {
+                    currentComp = {
+                        ...currentComp,
+                        value: { type: 'string', value: mergedText }
+                    } as C;
+                }
+                
+                if (didMergeTarget) {
+                    resultingTargetId = currentId;
+                }
+
+                newEntries.push([currentId, currentComp]);
+                i = j;
+            } else {
+                newEntries.push([currentId, currentComp]);
+                i++;
+            }
+        }
+
+        if (newEntries.length !== entries.length) {
+            section.content = Object.fromEntries(newEntries);
+        }
+        
+        return resultingTargetId;
     }
 
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from "./Button.svelte";
 	import { textFormatToolbarStore, type TextFormatCommand } from "../../stores/text-format-toolbar-store.svelte.js";
+	import { editStore } from "../../stores/edit-store.svelte.js";
 
 	let toolbarRef: HTMLDivElement | null = $state(null);
 
@@ -18,6 +19,16 @@
     function applyFormat(command: TextFormatCommand) {
         textFormatToolbarStore.applyFormat(command);
     }
+
+	$effect(() => {
+        // If the toolbar is open but the component it references no longer exists, close the toolbar
+		if (textFormatToolbarStore.isOpen && textFormatToolbarStore.sectionId && textFormatToolbarStore.componentId) {
+			const comp = editStore.getComponentValue(textFormatToolbarStore.sectionId, textFormatToolbarStore.componentId);
+			if (!comp) {
+				textFormatToolbarStore.close();
+			}
+		}
+	});
 </script>
 
 <svelte:window onpointerdown={handleOutsideClick} />
