@@ -1,6 +1,7 @@
 import type { ScribeProps } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
+import type { EmptyContentProps } from './types/EmptyContentProps.ts';
 import type { Component } from 'svelte';
 
 // COMPONENTS
@@ -47,15 +48,6 @@ export const TextInputComponentScribe = TextInputComponentSvelte as Component<Sc
 export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComponentProps<ImageComponent>>;
 export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
-
-export interface EmptyContentProps {
-    message: string;
-    description?: string;
-    icon?: string;
-    isError?: boolean;
-    valueStyle?: string;
-    style?: string;
-}
 
 declare global {
     interface HTMLElementTagNameMap {

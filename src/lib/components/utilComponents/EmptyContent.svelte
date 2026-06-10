@@ -14,16 +14,9 @@
 />
 
 <script lang="ts">
-    /* eslint-disable svelte/no-at-html-tags */
-    interface EmptyContentProps {
-        message: string;
-        description?: string;
-        icon?: string;
-        isError?: boolean;
-        valueStyle?: string;
-        style?: string;
-    }
+	import type { EmptyContentProps } from "$lib/types/EmptyContentProps.js";
 
+    /* eslint-disable svelte/no-at-html-tags */
     let { message, description, icon, isError = false, valueStyle, style }: EmptyContentProps = $props();
 
 </script>
