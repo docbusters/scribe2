@@ -2,11 +2,13 @@
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { ImageComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
+	import Skeleton from '../utilComponents/Skeleton.svelte';
 	import { fade } from 'svelte/transition';
 
     let { componentData, resolvedValue }: ScribeComponentProps<ImageComponent> = $props();
 
     let errorLoadingImage = $state(false);
+    let imageLoaded = $state(false);
 
     const src = $derived(resolvedValue.value as string);
     const config = $derived(componentData.config);
@@ -15,6 +17,7 @@
         // We interact with value so that error state is reset when it changes
         void resolvedValue; 
         errorLoadingImage = false;
+        imageLoaded = false;
     });
 
     const style = $derived.by(() => {
@@ -47,7 +50,10 @@
 {#key resolvedValue}
     <div class="image-container" in:fade>
         {#if resolvedValue.type === 'string' && !errorLoadingImage}
-            <img style={style} height={config?.height} width={config?.width} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
+            {#if !imageLoaded}
+                <Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
+            {/if}
+            <img class:hidden={!imageLoaded} style={style} height={config?.height} width={config?.width} onload={() => imageLoaded = true} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
         {:else if errorLoadingImage}
             <EmptyContent
                 style="padding: 2rem;"
@@ -66,6 +72,10 @@
 {/key}
 
 <style>
+    .hidden {
+        display: none;
+    }
+
     img {
         width: 100%;
         aspect-ratio: initial;
