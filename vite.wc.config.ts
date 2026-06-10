@@ -32,7 +32,9 @@ export default defineConfig({
 				css: 'injected'
 			},
 			dynamicCompileOptions({ filename }) {
-				if (filename.includes('Scribe.svelte')) {
+				if (filename.includes('Scribe.svelte') || 
+					filename.includes('EmptyContent.svelte') || 
+					filename.includes('ComponentRenderer.svelte')) {
 					return {
 						customElement: true
 					};

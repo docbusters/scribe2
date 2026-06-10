@@ -1,3 +1,18 @@
+<svelte:options
+    customElement={{
+        tag: 'scribe-empty-content',
+        shadow: 'none',
+        props: {
+            message: { type: 'String' },
+            description: { type: 'String' },
+            icon: { type: 'String' },
+            isError: { type: 'Boolean' },
+            valueStyle: { type: 'String' },
+            style: { type: 'String' }
+        }
+    }}
+/>
+
 <script lang="ts">
     /* eslint-disable svelte/no-at-html-tags */
     interface EmptyContentProps {
@@ -30,7 +45,10 @@
 </div>
 
 <style>
-
+    :global(scribe-empty-content) {
+        display: block;
+        width: 100%;
+    }
     .empty-container {
         display: flex;
         flex-direction: column;

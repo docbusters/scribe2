@@ -1,5 +1,4 @@
-import type { BindingsDefinition, Document } from './domain/Document.js';
-import type { CustomBinding, ScribeMode, ScribeProps, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
+import type { ScribeProps } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
 import type { Component } from 'svelte';
@@ -49,33 +48,28 @@ export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComp
 export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
-// UTIL COMPONENTS
-import ComponentRendererSvelte from './components/component/ComponentRenderer.svelte';
-import EmptyContentSvelte from './components/utilComponents/EmptyContent.svelte';
-export const ComponentRenderer = ComponentRendererSvelte as Component<ComponentRendererProps>;
-export const EmptyContent = EmptyContentSvelte;
-
+export interface EmptyContentProps {
+    message: string;
+    description?: string;
+    icon?: string;
+    isError?: boolean;
+    valueStyle?: string;
+    style?: string;
+}
 
 declare global {
     interface HTMLElementTagNameMap {
-        'scribe-interpreter': HTMLElement & {
-            id?: string;
-            class?: string;
-            style?: string;
-            document: Document;
-            registry?: ComponentRegistry;
-            mode?: ScribeMode;
-            bindings?: Record<string, BindingsDefinition>;
-            customBindings?: Record<string, CustomBinding>;
-			ondocumentchange?: (event: CustomEvent<Document>) => void;
-            onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
-        };
+        'scribe-interpreter': HTMLElement & ScribeProps;
+        'scribe-component-renderer': HTMLElement & ComponentRendererProps;
+        'scribe-empty-content': HTMLElement & EmptyContentProps;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace svelteHTML {
         interface IntrinsicElements {
             'scribe-interpreter': ScribeProps;
+            'scribe-component-renderer': ComponentRendererProps;
+            'scribe-empty-content': EmptyContentProps;
         }
     }
 
@@ -83,6 +77,20 @@ declare global {
     namespace JSX {
         interface IntrinsicElements {
             'scribe-interpreter': ScribeProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                [key: string]: any;
+            };
+            'scribe-component-renderer': ComponentRendererProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                [key: string]: any;
+            };
+            'scribe-empty-content': EmptyContentProps & {
                 id?: string;
                 class?: string;
                 style?: string;

@@ -1,3 +1,16 @@
+<svelte:options
+	customElement={{
+		tag: 'scribe-component-renderer',
+		shadow: 'none',
+		props: {
+			mode: { type: 'String' },
+			componentData: { type: 'Object' },
+			sectionId: { type: 'String' },
+			disabledOptions: { type: 'Array' }
+		}
+	}}
+/>
+
 <script lang="ts">
 	import type { CollectionValue, DataValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
 	import { bindingStore } from "$lib/stores/binding-store.svelte.js";
@@ -94,6 +107,9 @@
 {/if}
 
 <style>
+	:global(scribe-component-renderer) {
+		display: contents;
+	}
 	.component-edit-contents {
 		position: relative;
 		transition: background-color 0.2s ease;
