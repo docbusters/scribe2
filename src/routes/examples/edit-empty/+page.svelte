@@ -4,7 +4,6 @@
 	import type { Document } from '$lib/index.js';
 
 	const document: Document = {
-		id: "empty-doc",
 		title: 'Empty Editable Document',
 		sections: {
 			"section-1": {

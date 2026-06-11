@@ -1,7 +1,6 @@
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 
 export const fullExampleDocument: Document = {
-    id: 'example-doc',
     title: 'Full Example Document',
     sections: {
         'section-1': {

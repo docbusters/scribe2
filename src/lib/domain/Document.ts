@@ -3,7 +3,6 @@ import type { CollectionValue, PrimitiveValue } from "./data/DataValue.js";
 import type { Section } from "./Section.js";
 
 export interface Document<C = never> {
-    id: string;
     title: string;
     sections: Record<string, Section<DefaultComponents | C>>;
 }
