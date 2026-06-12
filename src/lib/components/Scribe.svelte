@@ -16,7 +16,7 @@
 	}}
 />
 
-<script lang="ts" generics="C extends BaseComponent<string, DataValue> = never">
+<script lang="ts" generics="C extends BaseComponent<string, DataValue>">
 	import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 	import type { BaseComponent } from '../domain/components/Component.js';
 	import type { DataValue } from '../domain/data/DataValue.js';
@@ -25,10 +25,10 @@
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { bindingStore } from '../stores/binding-store.svelte.ts';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
-	import type { ScribeProps } from '../types/ScribeProps.js';
-	import { setContext, onDestroy, untrack } from 'svelte';
+	import type { ScribeProps, CustomBinding } from '../types/ScribeProps.js';
+	import { setContext, onDestroy } from 'svelte';
 	import Sortable from 'sortablejs';
-	import type { Document } from '../domain/Document.js';
+	import type { Document, BindingsDefinition } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
@@ -36,6 +36,35 @@
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 
 	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange }: ScribeProps = $props();
+
+	// We clone document and bindings to completely isolate Scribe from external reactivity
+	// They are kept in state so they can be refreshed externally via exposed methods
+	// svelte-ignore state_referenced_locally
+	let initialDocument = $state<Document<C>>(document ? structuredClone($state.snapshot(document)) : document);
+	// svelte-ignore state_referenced_locally
+	let initialBindings = $state(bindings ? structuredClone($state.snapshot(bindings)) : bindings);
+	// svelte-ignore state_referenced_locally
+	let initialCustomBindings = $state(customBindings);
+
+	// EXPOSED METHODS FOR EXTERNAL UPDATES
+
+	export function refreshDocument(newDocument: Document<C>) {
+		initialDocument = newDocument ? structuredClone($state.snapshot(newDocument)) as Document<C> : newDocument;
+	}
+
+	export function refreshBindings(newBindings: Record<string, BindingsDefinition>) {
+		initialBindings = newBindings ? structuredClone($state.snapshot(newBindings)) : newBindings;
+		if (initialBindings) {
+			bindingStore.initialize(initialBindings);
+		}
+	}
+
+	export function refreshCustomBindings(newCustomBindings: Record<string, CustomBinding>) {
+		initialCustomBindings = newCustomBindings;
+		if (initialCustomBindings) {
+			customBindingsStore.initialize(initialCustomBindings);
+		}
+	}
 
 	let portalTarget = $state<HTMLElement | null>(null);
 	setContext('scribe-portal-target', () => portalTarget);
@@ -45,34 +74,39 @@
 	let isInitialized = false;
 	let dataOrder = $state<HTMLElement>();
 
-	let documentState = $derived<Document<C>>(mode === 'edit' ? editStore.document as Document<C> : document);
+	let documentState = $derived<Document<C>>(mode === 'edit' ? editStore.document as Document<C> : initialDocument as Document<C>);
 	let sections = $derived(Object.values(documentState?.sections || {}));
 
+	// Initialize binding stores
 	$effect.pre(() => {
-		// We treat document as an initial value
-		const doc = untrack(() => document)
-		// Initialize the global registry with the default components and any custom components provided via props
+		console.log('Initializing bindings with:', initialBindings);
+		if (initialBindings) {
+			bindingStore.initialize(initialBindings);
+		}
+	});
+
+	$effect.pre(() => {
+		console.log('Initializing custom bindings with:', initialCustomBindings);
+		if (initialCustomBindings) {
+			customBindingsStore.initialize(initialCustomBindings);
+		}
+	});
+
+	// Initialize the global registry with the default components and any custom components provided via props
+	$effect.pre(() => {
 		globalRegistry.initialize({
 			...defaultRegistry,
 			...(registry || {})
 		} as ComponentRegistry<C>);
-			
-		// If using edit mode, initialize the data store with the document's initial bindings
-		if (mode === 'edit' && doc) {
-			editStore.initialize(doc, bindings || {});
-		}
-
-		loading = false;
 	});
 
+
+	// Initialize the edit store
 	$effect.pre(() => {
-		if (bindings) {
-			// Initialize the data store with the initial values from the document's components
-			bindingStore.initialize(bindings);
+		if (mode === 'edit' && initialDocument) {
+			editStore.initialize(initialDocument as Document<C>, initialBindings || {});
 		}
-		if (customBindings) {
-			customBindingsStore.initialize(customBindings);
-		}
+		loading = false;
 	});
 
 	// Subscribe to binding changes

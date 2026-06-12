@@ -1,13 +1,20 @@
-import type { ScribeProps } from './types/ScribeProps.js';
+import type { ScribeProps, CustomBinding } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
 import type { EmptyContentProps } from './types/EmptyContentProps.ts';
 import type { Component } from 'svelte';
+import type { Document, BindingsDefinition } from './domain/Document.js';
 
 // COMPONENTS
+export interface ScribeInterpreterElement<C extends BaseComponent<string, DataValue> = never> extends HTMLElement, Omit<ScribeProps<C>, 'style' | 'id' | 'class'> {
+    refreshDocument(newDocument: Document<C>): void;
+    refreshBindings(newBindings: Record<string, BindingsDefinition>): void;
+    refreshCustomBindings(newCustomBindings: Record<string, CustomBinding>): void;
+}
+
 export interface ScribeConstructor {
-    new (): HTMLElement & ScribeProps;
-    prototype: HTMLElement & ScribeProps;
+    new (): ScribeInterpreterElement;
+    prototype: ScribeInterpreterElement;
 }
 
 export const Scribe = ScribeComponent as unknown as ScribeConstructor;
@@ -51,7 +58,7 @@ export const TableComponentScribe = TableComponentSvelte as Component<ScribeComp
 
 declare global {
     interface HTMLElementTagNameMap {
-        'scribe-interpreter': HTMLElement & ScribeProps;
+        'scribe-interpreter': ScribeInterpreterElement;
         'scribe-component-renderer': HTMLElement & ComponentRendererProps;
         'scribe-empty-content': HTMLElement & EmptyContentProps;
     }
