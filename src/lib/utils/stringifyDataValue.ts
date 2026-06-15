@@ -1,8 +1,5 @@
 import type { DataValue } from "../domain/data/DataValue.js";
-import { bindingStore } from "../stores/binding-store.svelte.js";
-import { customBindingsStore } from "../stores/custom-bindings-store.svelte.js";
 
-/** @deprecated Use the resolved value directly instead */
 export const stringifyDataValue = (value: DataValue): string => {
     switch (value.type) {
         case 'string':
@@ -10,19 +7,17 @@ export const stringifyDataValue = (value: DataValue): string => {
         case 'number':
             return value.value.toString();
         case 'boolean':
-            return value.value ? 'true' : 'false';
+            return value.value ? 'True' : 'False';
         case 'date':
             return value.value.toISOString();
-        case 'binding': {
-            // Check if it is a default document binding
-            if (value.bindingType === undefined || value.bindingType === 'default') {
-                return stringifyDataValue(bindingStore.data[value.value]); 
-            }
-            
-            // Resolve the custom binding
-            const customValue = customBindingsStore.getValue(value.bindingType, value.value);
-            return stringifyDataValue(customValue);
-        }
+        case 'array':
+            return value.value.map(stringifyDataValue).join(', ');
+        case 'record':
+            return Object.entries(value.value)
+                .map(([key, val]) => `${key}: ${stringifyDataValue(val)}`)
+                .join(', ');
+        case 'empty':
+            return '';
         default:
             throw new Error('Unsupported data value type');
     }

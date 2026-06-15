@@ -1,10 +1,11 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextBindingComponent } from '../../domain/components/DefaultComponents.ts';
+	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
 
     let { componentData, resolvedValue, mode }: ScribeComponentProps<TextBindingComponent> = $props();
-
-    let value = $derived(resolvedValue.value as string);
+            
+    let value = $derived(resolvedValue ? stringifyDataValue(resolvedValue) : '');
 </script>
 
 <span 

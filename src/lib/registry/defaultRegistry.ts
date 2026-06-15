@@ -27,7 +27,7 @@ export const defaultRegistry: ComponentRegistry = {
             value: 'binding',
         },
         valueTypes: ['binding'],
-        supportedBindingValueTypes: ['empty', 'string'],
+        supportedBindingValueTypes: ['empty', 'string', 'number', 'boolean', 'date'],
     },
     'text': {
         name: 'Text',
