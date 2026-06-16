@@ -1,6 +1,6 @@
 :root {
 	/* Document-level variables */
-	--scribe-doc-background: oklch(0.97 0 0); /* Document background color */
+	--scribe-doc-background: oklch(0.9521 0 0); /* Document background color */
 	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
 	--scribe-doc-width: 70vw; /* Maximum width of the document content */
 	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */

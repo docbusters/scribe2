@@ -256,7 +256,7 @@
 	.marker-content {
 		border-radius: 100%;
 		padding: 0.5rem;
-		background-color: var(--scribe-doc-background);
+		background-color: var(--scribe-section-background);
 		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 		border: 1px solid var(--scribe-border-color);
 		aspect-ratio: 1;
