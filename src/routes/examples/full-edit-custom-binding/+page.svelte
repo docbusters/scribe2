@@ -141,12 +141,11 @@
 	}
 </script>
 
-<div class="flex flex-col items-center w-full py-10 border-box gap-8">
+<div class="flex flex-col items-center w-full py-10 border-box gap-8 bg-(--scribe-doc-background)">
 	<div class="fixed z-1 top-5 right-5 flex flex-col gap-4 p-4 border rounded bg-gray-50">
 		<label class="flex flex-col text-sm font-semibold">
 			Example
 			<input 
-				type="text" 
 				bind:value={bindingData['example-binding'].value} 
 				class="border p-2 mt-1 rounded font-normal"
 			/>
@@ -154,7 +153,6 @@
 		<label class="flex flex-col text-sm font-semibold">
 			Image url
 			<input 
-				type="text" 
 				bind:value={bindingData['example-image-binding'].value} 
 				class="border p-2 mt-1 rounded font-normal"
 			/>

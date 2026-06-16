@@ -7,4 +7,5 @@ export interface ComponentRendererProps {
     sectionId: string;
     mode: ScribeMode; 
     disabledOptions?: string[];
+    isDarkMode: boolean;
 }

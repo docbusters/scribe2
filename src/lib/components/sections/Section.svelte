@@ -15,9 +15,10 @@
         data: Section<DefaultComponents | C>;
         mode: ScribeMode;
         isNested?: boolean;
+        isDarkMode: boolean;
     }
 
-    let { data, mode, isNested = false }: SectionProps = $props();
+    let { data, mode, isNested = false, isDarkMode }: SectionProps = $props();
 
     let isEditMode = $derived(mode === 'edit' && !isNested);
     let sectionTitle = $derived(parseStringForContentEditable(data.title));
@@ -38,7 +39,7 @@
         <SectionTitle {isEditMode} sectionId={data.id} text={sectionTitle} />
     </div>
     {#if data.type === 'paragraph-section'}
-        <ParagraphSection {data} {mode} />
+        <ParagraphSection {data} {mode} {isDarkMode} />
     {:else if data.type === 'grid-section'}
         <GridSection {data} {mode} />
     {/if}

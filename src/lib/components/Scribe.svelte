@@ -45,6 +45,7 @@
 	let initialBindings = $state(bindings ? structuredClone($state.snapshot(bindings)) : bindings);
 	// svelte-ignore state_referenced_locally
 	let initialCustomBindings = $state(customBindings);
+	let isDarkMode = $derived(className.includes('dark'));
 
 	// EXPOSED METHODS FOR EXTERNAL UPDATES
 
@@ -225,7 +226,7 @@
 		<div {style} bind:this={dataOrder} class="scribe-sections">
 			{#if !loading}
 				{#each sections as section (section.id)}
-					<Section data={section} {mode} />
+					<Section data={section} {mode} {isDarkMode} />
 				{:else}
 					<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null)}>
 						Add first section

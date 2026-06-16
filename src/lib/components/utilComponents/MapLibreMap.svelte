@@ -17,6 +17,7 @@
 		class?: string;
 		onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
 		hasSearchbar?: boolean;
+		style?: string;
 		markerColor?: string;
 		hasGlobeBtn?: boolean;
 		hasZoomBtn?: boolean;
@@ -40,6 +41,7 @@
 		hasSearchbar = false,
 		class: className,
 		location = $bindable(),
+		style = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
 		markerColor = '#277ee8',
 		hasGlobeBtn = false,
 		hasZoomBtn = false,
@@ -145,7 +147,7 @@
 		{center}
 		bind:map
         inlineStyle="height: 100%; width: 100%;"
-		style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+		{style}
 		doubleClickZoom={false}
 		ondblclick={(e) => handleMapAddMarkerInteraction(e)}
 	>

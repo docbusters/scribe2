@@ -16,6 +16,6 @@
 	}
 </script>
 
-<div class="flex justify-center w-full py-10 border-box">
+<div class="flex w-full py-10 border-box justify-center bg-(--scribe-doc-background)">
 	<Scribe {document} class="max-w-[70vw]" mode="edit" />
 </div>

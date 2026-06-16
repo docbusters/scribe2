@@ -15,6 +15,8 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     resolvedValue: PrimitiveValue | CollectionValue;
     /** Updates the component value handling binding updates */
     updateComponentValue: (newValue: DataValue, updateType: UpdateType) => void;
+    /** Indicates whether the component is in dark mode */
+    isDarkMode: boolean;
 }
 
 export type ComponentRegistry<

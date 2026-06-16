@@ -1,6 +1,6 @@
 :root {
 	/* Document-level variables */
-	--scribe-doc-background: oklch(1 0 0); /* Document background color */
+	--scribe-doc-background: oklch(0.97 0 0); /* Document background color */
 	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
 	--scribe-doc-width: 70vw; /* Maximum width of the document content */
 	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */
@@ -11,7 +11,7 @@
     --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
 
 	/* Section-level variables */
-	--scribe-section-background: oklch(0.97 0 0); /* Background color for sections */
+	--scribe-section-background: oklch(1 0 0); /* Background color for sections */
 	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
 	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
 	--scribe-section-separation: 0.75rem; /* Gap between sections */
@@ -73,11 +73,26 @@
 }
 
 :root .dark {
-    --scribe-doc-background: oklch(0.145 0 0);
-	--scribe-doc-foreground: oklch(0.985 0 0);
+    /* Document-level variables */
+	--scribe-doc-background: oklch(0.1149 0 0); /* Document background color */
+	--scribe-doc-foreground: oklch(1 0 0); /* Default text color */
 
-    --scribe-secondary: oklch(0.269 0 0);
-    --scribe-secondary-foreground: oklch(0.985 0 0);
+	--scribe-primary: oklch(0.922 0 0); /* Primary background color for elements like buttons, etc. */
+  	--scribe-primary-foreground: ooklch(0.205 0 0); /* Text color for elements with primary background */
+    --scribe-secondary: oklch(0.269 0 0); /* Secondary background color for elements like cards, modals, etc. */
+    --scribe-secondary-foreground: oklch(0.985 0 0); /* Text color for elements with secondary background */
 
-	/* ... */
+	/* Section-level variables */
+	--scribe-section-background: oklch(0.209 0 0); /* Background color for sections */
+	--scribe-section-foreground: oklch(0.922 0 0); /* Text color for sections */
+
+	/* Misc. variables */
+	--scribe-border-color: oklch(0.4568 0 0); /* Default border color for elements */
+	--scribe-selection-color: oklch(0.6792 0.1752 251.13 / 25%); /* Color for text selection */
+	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
+	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
+	--scribe-popover: oklch(0.205 0 0);
+  	--scribe-popover-foreground: oklch(0.985 0 0);
+	--scribe-muted: oklch(0.269 0 0); /* Background color for muted elements like disabled buttons, etc. */
+	--scribe-muted-foreground: oklch(0.708 0 0); /* Text color for muted elements */
 }

@@ -5,7 +5,7 @@
 	import MapLibreMap from '../utilComponents/MapLibreMap.svelte';
 	import { untrack } from 'svelte';
 
-    let { componentData, resolvedValue, updateComponentValue }: ScribeComponentProps<MapComponent> = $props();
+    let { componentData, resolvedValue, updateComponentValue, isDarkMode }: ScribeComponentProps<MapComponent> = $props();
 
     const value = $derived.by(() => {
         if (resolvedValue.type === 'empty') {
@@ -74,6 +74,9 @@
             initialZoom={config?.initialZoom}
             initialPosition={config?.initialPosition || value}
             readonly={config?.readonly}
+            style={isDarkMode
+                ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+                : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'}
             hasSearchbar={config?.hasSearchbar}
             markerColor={config?.markerColor}
             hasCurrentPosBtn={config?.hasCurrentPosBtn}

@@ -4,6 +4,7 @@
 		shadow: 'none',
 		props: {
 			mode: { type: 'String' },
+			isDarkMode: { type: 'Boolean' },
 			componentData: { type: 'Object' },
 			sectionId: { type: 'String' },
 			disabledOptions: { type: 'Array' }
@@ -23,7 +24,7 @@
 	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 
-    let { mode, componentData, sectionId, disabledOptions = [] }: ComponentRendererProps = $props();
+    let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
 	let resolvedValue = $derived.by(() => {
@@ -99,10 +100,10 @@
 			<div class="component-editor" contenteditable="false">
 				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
 			</div>
-			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue }}></div>
+			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
 		</div>
 	{:else}
-    	<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue }}></div>
+    	<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
 	{/if}
 {/if}
 

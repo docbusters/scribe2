@@ -9,9 +9,10 @@
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;
         mode: ScribeMode;
+        isDarkMode: boolean;
     }
 
-    let { data, mode }: ParagraphSectionProps = $props();
+    let { data, mode, isDarkMode }: ParagraphSectionProps = $props();
 
     // We add a ghost component at the end of the section in edit mode to allow adding new components by typing
     let ghostComponent = {
@@ -31,11 +32,11 @@
     {#each components as component, index (`${data.id}-${component.id}-${index}`)}
         {#if component.mode === 'block'}
             <div class="block-component-container">
-                <ComponentRenderer componentData={component} sectionId={data.id} {mode} />
+                <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
             </div>
         {:else}
             <div class="inline-component-container">
-                <ComponentRenderer componentData={component} sectionId={data.id} {mode} />
+                <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
             </div>
         {/if}
     {/each}

@@ -94,7 +94,7 @@
 <style>
     .text-input {
         padding: 0.5em;
-        border: 1px solid #ccc;
+        border: 1px solid var(--scribe-border-color);
         border-radius: 0.5em;
         min-width: 10rem;
         margin: 0 0.5rem;
