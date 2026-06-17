@@ -1,4 +1,4 @@
-import type { CustomBinding } from '$lib/types/ScribeProps.js';
+import type { CustomBinding, CustomBindingSubscribable } from '$lib/types/ScribeProps.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 
 interface CustomBindingInstance {
@@ -41,19 +41,25 @@ class CustomBindingsStore {
         const instance: CustomBindingInstance = { value: { type: 'string', value: '' } };
         this.cache.set(key, instance);
 
-        // Initialize the binding and get the initial value
-        const result = def.getData(id, (newValue) => {
-            instance.value = newValue; // Update the cached initial value
-            
-            // Create a microtask that updates the trigger in order to notify Svelte of the change without causing state_unsafe_mutation
-            queueMicrotask(() => {
-                this.triggers[key] = (this.triggers[key] || 0) + 1;
-            });
-        });
+        // Get the value or the subscribable object
+        const result = def.getData(id);
+        const isSubscribable = result !== null && typeof result === 'object' && 'subscribe' in result;
+        
+        instance.value = isSubscribable 
+            ? (result as CustomBindingSubscribable).value 
+            : (result as PrimitiveValue | CollectionValue);
 
-        // Update the cache with the actual value and destroy function
-        instance.value = result.value;
-        instance.destroy = result.destroy;
+        if (isSubscribable) {
+            const subscribable = result as CustomBindingSubscribable;
+            instance.destroy = subscribable.subscribe((newValue) => {
+                instance.value = newValue; 
+                
+                // Create a microtask that updates the trigger in order to notify Svelte of the change without causing state_unsafe_mutation
+                queueMicrotask(() => {
+                    this.triggers[key] = (this.triggers[key] || 0) + 1;
+                });
+            });
+        }
 
         return instance.value;
     }

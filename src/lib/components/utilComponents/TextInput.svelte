@@ -115,7 +115,7 @@
   :global(.scribe-document .scribe-input) {
     border-radius: 10px;
     font-size: 1rem;
-    color: var(--scribe-doc-foreground);
+    color: var(--scribe-doc-foreground) !important;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     padding-top: 1.5rem;

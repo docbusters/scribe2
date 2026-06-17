@@ -19,17 +19,19 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
 }
 
+export interface CustomBindingSubscribable {
+    value: PrimitiveValue | CollectionValue;
+    /** Subscribes to value changes and returns an unsubscribe function */
+    subscribe: (update: (newValue: PrimitiveValue | CollectionValue) => void) => () => void;
+}
+
 export interface CustomBinding {
     type: string;
     name: string;
     /** Returns the available ids and their labels for the editor */
     getAvailableIds: () => { id: string; label: string; type: string }[];
-    /** Returns the current value and provides an update function */
-    getData: (id: string, update: (newValue: PrimitiveValue | CollectionValue) => void) => {
-        value: PrimitiveValue | CollectionValue;
-        /** Optional cleanup function */
-        destroy?: () => void;
-    };
+    /** Returns the static value or a subscribable value object */
+    getData: (id: string) => PrimitiveValue | CollectionValue | CustomBindingSubscribable;
 }
 
 /** 

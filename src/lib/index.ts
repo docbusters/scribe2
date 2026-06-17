@@ -21,7 +21,7 @@ export const Scribe = ScribeComponent as unknown as ScribeConstructor;
 export { defaultRegistry } from './registry/defaultRegistry.js';
 
 // TYPES
-export type { ScribeProps, CustomBinding, ScribeMode, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
+export type { ScribeProps, CustomBinding, CustomBindingSubscribable, ScribeMode, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
 
 // DOCUMENT STRUCTURE
 export type { Document, BindingsDefinition } from './domain/Document.js';

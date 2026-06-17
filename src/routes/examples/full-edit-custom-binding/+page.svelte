@@ -14,45 +14,19 @@
 		'example-image-binding': { type: 'string', value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' }
 	});
 
-	// Stores the update callbacks for each binding ID
-	// IMPORTANT: Use a regular Map, not SvelteMap, because the app is deriving the value
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const updaters = new Map<string, Set<(val: PrimitiveValue | CollectionValue) => void>>();
-
 	const customBinding: CustomBinding = {
 		type: 'custom-binding',
 		name: 'Custom Binding',
 		getAvailableIds: () => {
 			return Object.entries(bindingData).map(([id, value]) => ({ id, label: id, type: value.type }));
 		},
-		getData: (id, update) => {
+		getData: (id) => {
 			if (!bindingData[id]) {
 				throw new Error(`No binding data found for ID: ${id}`);
 			}
-
-			// Initialize the set of updaters for this ID if it doesn't exist, and add the current updater
-			if (!updaters.has(id)) updaters.set(id, new Set());
-			updaters.get(id)!.add(update);
-
-			// Return the initial value and a cleanup function to remove the updater when the field is destroyed
-			return {
-				value: bindingData[id] || { type: 'string', value: '' },
-				destroy: () => {
-					updaters.get(id)?.delete(update);
-				}
-			};
+			return bindingData[id];
 		}
 	};
-
-	// If binding data changes, we need to notify all updaters associated with that binding ID
-	$effect(() => {
-		for (const [id, value] of Object.entries(bindingData)) {
-			const listeners = updaters.get(id);
-			if (listeners) {
-				listeners.forEach((update) => update(value));
-			}
-		}
-	});
 
 
 	// LIVE CLOCK BINDING EXAMPLE
@@ -61,16 +35,17 @@
 		type: 'live-clock',
 		name: 'Live clock',
 		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],
-		getData: (id, update) => {
-			const timer = setInterval(() => {
-				const timeString = new Date().toLocaleTimeString();
-				update({ type: 'string', value: `Current time: ${timeString}` });
-			}, 1000);
-
-			// Retornamos el valor inicial y la función de limpieza
+		getData: () => {
 			return {
 				value: { type: 'string', value: 'Calculating time...' },
-				destroy: () => clearInterval(timer)
+				subscribe: (update) => {
+					const timer = setInterval(() => {
+						const timeString = new Date().toLocaleTimeString();
+						update({ type: 'string', value: `Current time: ${timeString}` });
+					}, 1000);
+
+					return () => clearInterval(timer);
+				}
 			};
 		}
 	};

@@ -228,9 +228,11 @@
 				{#each sections as section (section.id)}
 					<Section data={section} {mode} {isDarkMode} />
 				{:else}
-					<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null)}>
-						Add first section
-					</Button>
+					{#if mode === 'edit'}
+						<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null)}>
+							Add first section
+						</Button>
+					{/if}
 				{/each}
 			{/if}
 		</div>
@@ -265,7 +267,7 @@
 		font-size: var(--scribe-font-size-body);
         color: var(--scribe-doc-foreground);
 		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale; 
+		-moz-osx-font-smoothing: grayscale;
 	}
 
 	.scribe-document *,
