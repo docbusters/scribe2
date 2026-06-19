@@ -45,7 +45,25 @@
 	let initialBindings = $state(bindings ? structuredClone($state.snapshot(bindings)) : bindings);
 	// svelte-ignore state_referenced_locally
 	let initialCustomBindings = $state(customBindings);
-	let isDarkMode = $derived(className.includes('dark'));
+	
+	let isDarkMode = $state(false);
+	let isWebComponent = $state(false);
+	
+	// We check for dark mode and web component status on the host element
+	$effect(() => {
+		if (rootElement) {
+			const host = rootElement.closest('scribe-interpreter');
+			if (host) {
+				isWebComponent = true;
+				isDarkMode = host.classList.contains('dark') || window.document.documentElement.classList.contains('dark');
+			} else {
+				isWebComponent = false;
+				isDarkMode = className.includes('dark') || window.document.documentElement.classList.contains('dark');
+			}
+		}
+	});
+
+	let computedClass = $derived(isWebComponent ? 'scribe-document' : `${className} scribe-document`);
 
 	// EXPOSED METHODS FOR EXTERNAL UPDATES
 
@@ -203,7 +221,7 @@
     }
 </script>
 
-<div {id} bind:this={rootElement} class={`${className} scribe-document`}>
+<div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass}>
 	{#if mode === 'edit'}
 		<Button size="icon" style="max-width: fit-content; margin-left: auto;" variant="outline" title="Print document (debugging)" onclick={() => console.log($state.snapshot(documentState))}>
 			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>

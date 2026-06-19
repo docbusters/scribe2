@@ -67,8 +67,6 @@ To style the default components, CSS variables can be used. It is recommended us
 	/* Document-level variables */
 	--scribe-doc-background: oklch(1 0 0); /* Document background color */
 	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
-	--scribe-doc-width: 70vw; /* Maximum width of the document content */
-	--scribe-doc-width-mobile: 90vw; /* Maximum width for mobile devices */
 
 	--scribe-primary: oklch(0.205 0 0); /* Primary background color for elements like buttons, etc. */
   	--scribe-primary-foreground: oklch(0.985 0 0); /* Text color for elements with primary background */
