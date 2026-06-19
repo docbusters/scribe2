@@ -31,6 +31,20 @@ export const fullExampleDocument: Document = {
                         expandWithContent: true,
                     }
                 },
+                'input-number': {
+                    id: 'input-number',
+                    mode: 'inline',
+                    type: 'text-input',
+                    value: {
+                        type: 'binding',
+                        bindingType: 'default',
+                        value: 'number-binding',
+                    },
+                    config: {
+                        placeholder: 'Enter a number',
+                        expandWithContent: true,
+                    }
+                },
                 'text-bind': {
                     id: 'text-bind',
                     mode: 'inline',
@@ -309,4 +323,5 @@ export const fullExampleBindings: Record<string, BindingsDefinition> = {
     'image-url': { type: 'string', initialValue: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg' },
     'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
     'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
+    'number-binding': { type: 'number', initialValue: 42 },
 }

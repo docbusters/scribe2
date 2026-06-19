@@ -2,10 +2,11 @@
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextInputComponent } from '../../domain/components/DefaultComponents.ts';
     import { navigateToAdjacentComponent } from '../../utils/focusNavigation.ts';
+	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
 
     let { componentData, resolvedValue, updateComponentValue }: ScribeComponentProps<TextInputComponent> = $props();
 
-    let inputValue = $derived(resolvedValue.value as string);
+    let inputValue = $derived(stringifyDataValue(resolvedValue));
     const config = $derived(componentData.config);
 
     let inputElement: HTMLInputElement | null = $state(null);
@@ -68,11 +69,23 @@
     });
 
     const oninput = () => {
-        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) }, 'onchange');
+        const inputValueSnapshot = $state.snapshot(inputValue);
+
+        if (isNaN(Number(inputValueSnapshot))) {
+            updateComponentValue({ type: 'string', value: inputValueSnapshot }, 'onchange');
+        } else {
+            updateComponentValue({ type: 'number', value: Number(inputValueSnapshot) }, 'onchange');
+        }
     };
 
     const onblur = () => {
-        updateComponentValue({ type: 'string', value: $state.snapshot(inputValue) }, 'onblur');
+        const inputValueSnapshot = $state.snapshot(inputValue);
+
+        if (isNaN(Number(inputValueSnapshot))) {
+            updateComponentValue({ type: 'string', value: inputValueSnapshot }, 'onblur');
+        } else {
+            updateComponentValue({ type: 'number', value: Number(inputValueSnapshot) }, 'onblur');
+        }
     }
 </script>
 
