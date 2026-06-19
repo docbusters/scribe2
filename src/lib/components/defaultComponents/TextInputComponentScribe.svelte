@@ -14,7 +14,7 @@
         let styleString = '';
 
         if (config?.expandWithContent) {
-            styleString += 'field-sizing: content;';
+            styleString += 'field-sizing: content; max-width: calc(100% - 1rem);';
         }
 
         return styleString;

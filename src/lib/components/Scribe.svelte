@@ -288,10 +288,10 @@
 		-moz-osx-font-smoothing: grayscale;
 	}
 
-	.scribe-document *,
+	:global(.scribe-document *,
 	.scribe-document *::before,
-	.scribe-document *::after {
-		box-sizing: inherit;
+	.scribe-document *::after) {
+		box-sizing: border-box;
 	}
 
 	.title-container {
