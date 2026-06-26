@@ -42,6 +42,7 @@
 		"@sveltejs/kit": "^2.65.2",
 		"@sveltejs/package": "^2.5.8",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"@tailwindcss/vite": "^4.3.1",
 		"@types/node": "^22",
 		"@types/sortablejs": "^1.15.9",
 		"eslint": "^10.4.1",
@@ -50,10 +51,11 @@
 		"globals": "^17.6.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.1",
+		"prettier-plugin-tailwindcss": "^0.8.0",
 		"publint": "^0.3.21",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.6.0",
-		"svelte-maplibre-gl": "^2.0.1",
+		"tailwindcss": "^4.3.1",
 		"typescript": "^6.0.2",
 		"typescript-eslint": "^8.60.1",
 		"vite": "^8.0.16"
@@ -62,12 +64,10 @@
 		"svelte"
 	],
 	"dependencies": {
-		"@tailwindcss/vite": "^4.3.1",
 		"bits-ui": "^2.18.1",
 		"katex": "^0.17.0",
-		"prettier-plugin-tailwindcss": "^0.8.0",
 		"sortablejs": "^1.15.7",
-		"tailwindcss": "^4.3.1",
+		"svelte-maplibre-gl": "^2.0.1",
 		"uuid": "^14.0.0"
 	}
 }
