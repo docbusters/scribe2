@@ -20,10 +20,11 @@
 		getAvailableIds: () => {
 			return Object.entries(bindingData).map(([id, value]) => ({ id, label: id, type: value.type }));
 		},
-		getData: (id) => {
+		getData: async (id) => {
 			if (!bindingData[id]) {
 				throw new Error(`No binding data found for ID: ${id}`);
 			}
+			await new Promise(resolve => setTimeout(resolve, 2000));
 			return bindingData[id];
 		}
 	};

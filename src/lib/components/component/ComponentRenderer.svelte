@@ -23,11 +23,12 @@
 	import type { ScribeComponentProps } from "$lib/registry/ComponentRegistry.js";
 	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
+	import Skeleton from "../utilComponents/Skeleton.svelte";
 
     let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
-	let resolvedValue = $derived.by(() => {
+	let resolvedValue = $derived.by(async () => {
 		const { types, bindingTypes } = componentSupportedTypes;
 		
 		if (!types.includes(componentData.value.type)) {
@@ -35,7 +36,7 @@
 		}
 
 		if (componentData.value.type === 'binding') {
-			const bindingValue = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
+			const bindingValue = await bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
 
 			if (!bindingTypes.includes(bindingValue.type)) {
 				console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
@@ -94,17 +95,21 @@
 </script>
 
 {#if componentData}
-	{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
-		{@const options = globalRegistry.getComponentOptions(componentData.type)}
-		<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
-			<div class="component-editor" contenteditable="false">
-				<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
+	{#await resolvedValue}
+		<Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
+	{:then resolvedValue} 
+		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
+			{@const options = globalRegistry.getComponentOptions(componentData.type)}
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
+				<div class="component-editor" contenteditable="false">
+					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
+				</div>
+				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
 			</div>
+		{:else}
 			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
-		</div>
-	{:else}
-    	<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
-	{/if}
+		{/if}
+	{/await}
 {/if}
 
 <style>

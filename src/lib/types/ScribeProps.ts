@@ -31,7 +31,7 @@ export interface CustomBinding {
     /** Returns the available ids and their labels for the editor */
     getAvailableIds: () => { id: string; label: string; type: string }[];
     /** Returns the static value or a subscribable value object */
-    getData: (id: string) => PrimitiveValue | CollectionValue | CustomBindingSubscribable;
+    getData: (id: string) => Promise<PrimitiveValue | CollectionValue> | CustomBindingSubscribable;
 }
 
 /** 

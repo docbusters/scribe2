@@ -20,7 +20,7 @@ class CustomBindingsStore {
     }
 
     /** Obtains a reactive value for a given binding type and ID */
-    getValue(bindingType: string, id: string): PrimitiveValue | CollectionValue {
+    async getValue(bindingType: string, id: string): Promise<PrimitiveValue | CollectionValue> {
         const key = `${bindingType}:${id}`;
         
         // Read trigger to make Svelte subscribe to changes
@@ -42,7 +42,7 @@ class CustomBindingsStore {
         this.cache.set(key, instance);
 
         // Get the value or the subscribable object
-        const result = def.getData(id);
+        const result = await def.getData(id);
         const isSubscribable = result !== null && typeof result === 'object' && 'subscribe' in result;
         
         instance.value = isSubscribable 
