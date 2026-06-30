@@ -1,12 +1,14 @@
 import type { ScribeProps, CustomBinding } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
-import type { ComponentRendererProps } from './types/CustomRendererProps.ts';
-import type { EmptyContentProps } from './types/EmptyContentProps.ts';
+import type { ComponentRendererProps } from './types/CustomRendererProps.js';
+import type { EmptyContentProps } from './types/EmptyContentProps.js';
 import type { Component } from 'svelte';
 import type { Document, BindingsDefinition } from './domain/Document.js';
+import type { CustomBindingUsages } from './utils/bindingUsages.js';
 
 // COMPONENTS
 export interface ScribeInterpreterElement<C extends BaseComponent<string, DataValue> = never> extends HTMLElement, Omit<ScribeProps<C>, 'style' | 'id' | 'class'> {
+    getCustomBindingUsages(): CustomBindingUsages;
     refreshDocument(newDocument: Document<C>): void;
     refreshBindings(newBindings: Record<string, BindingsDefinition>): void;
     refreshCustomBindings(newCustomBindings: Record<string, CustomBinding>): void;
@@ -26,6 +28,7 @@ export type { ScribeProps, CustomBinding, CustomBindingSubscribable, ScribeMode,
 // DOCUMENT STRUCTURE
 export type { Document, BindingsDefinition } from './domain/Document.js';
 export type { Section, ParagraphSection, GridSection, GridSectionContent } from './domain/Section.js';
+export type { CustomBindingUsages } from './utils/bindingUsages.js';
 
 // DATA VALUES
 import type { DataValue, PrimitiveValue, CollectionValue, EmptyValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';

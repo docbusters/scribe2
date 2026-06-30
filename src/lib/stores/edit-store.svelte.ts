@@ -6,15 +6,19 @@ import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
 import { generateRandomId } from "../utils/generateRandomId.js";
 import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
+import { calculateDocumentBindingUsages, extractBindingUsages, type CustomBindingUsages } from "../utils/bindingUsages.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
     document = $state<Document<C>>(null!);
     bindings = $state<Record<string, BindingsDefinition>>({});
+    
+    customBindingUsages: CustomBindingUsages = {};
 
     initialize(document: Document<C>, bindings: Record<string, BindingsDefinition>) {
         this.document = document;
         this.bindings = bindings;
+        this.customBindingUsages = calculateDocumentBindingUsages(this.document);
     }
 
     /* * DOCUMENT MANAGEMENT * */
@@ -98,6 +102,8 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
             newContent[dupComp.id] = {
                 ...dupComp,
             } as C;
+
+            extractBindingUsages(this.customBindingUsages, dupComp.id, dupComp.value, true);
         }
 
         // Create the duplicated section with the new ID and the brand new content map
@@ -122,6 +128,13 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     deleteSection(sectionId: string) {
         const section = this.findSection(sectionId);
         if (!section) return false;
+        
+        if ('content' in section && section.content) {
+            for (const [componentId, component] of Object.entries(section.content)) {
+                extractBindingUsages(this.customBindingUsages, componentId, (component as C).value, false);
+            }
+        }
+
         const newSections = { ...this.document.sections };
         delete newSections[sectionId];
         this.document.sections = newSections;
@@ -254,7 +267,14 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         // TODO: Verifiy the value with more detail
 
+        // Check if the old value was a custom binding and if we need to remove it from the usages
+        extractBindingUsages(this.customBindingUsages, componentId, component.value, false);
+
         component.value = newValue;
+        
+        // When setting a new custom binding we register the custom binding as being used
+        extractBindingUsages(this.customBindingUsages, componentId, newValue, true);
+
         console.log(`Updated component ${componentId} value:`, newValue);
         
         return true;
@@ -288,6 +308,9 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
             entries.splice(targetIndex + 1, 0, [dupComp.id, dupComp as C]);
             section.content = Object.fromEntries(entries);
             this.mergeAdjacentTextComponents(sectionId);
+            
+            extractBindingUsages(this.customBindingUsages, dupComp.id, dupComp.value, true);
+
             return dupComp.id;
         }
         return null;
@@ -300,6 +323,10 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         
         const componentToDelete = section.content[componentId];
         const separator = componentToDelete?.mode === 'block' ? '\n' : ' ';
+
+        if (componentToDelete) {
+            extractBindingUsages(this.customBindingUsages, componentId, componentToDelete.value, false);
+        }
 
         const newContent = { ...section.content };
         delete newContent[componentId];
@@ -333,6 +360,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         // If no target component is specified, just append to the end
         if (!componentId) {
             section.content[newId] = newComponent;
+            extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
             return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         }
 
@@ -343,15 +371,19 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         if (targetIndex !== -1) {
             // Target is a top-level component in the section
             if (replaceComponent) {
+                const [oldId, oldComponent] = entries[targetIndex];
+                extractBindingUsages(this.customBindingUsages, oldId, oldComponent.value, false);
                 entries.splice(targetIndex, 1, [newId, newComponent]);
             } else {
                 entries.splice(targetIndex + 1, 0, [newId, newComponent]);
             }
             section.content = Object.fromEntries(entries);
+            extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
             return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         } else {
             console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
             section.content[newId] = newComponent;
+            extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
             return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
         }
     }

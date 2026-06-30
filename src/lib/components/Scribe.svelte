@@ -65,7 +65,11 @@
 
 	let computedClass = $derived(isWebComponent ? 'scribe-document' : `${className} scribe-document`);
 
-	// EXPOSED METHODS FOR EXTERNAL UPDATES
+	// EXPOSED METHODS
+
+	export function getCustomBindingUsages() {
+		return editStore.customBindingUsages;
+	}
 
 	export function refreshDocument(newDocument: Document<C>) {
 		initialDocument = newDocument ? structuredClone($state.snapshot(newDocument)) as Document<C> : newDocument;
