@@ -1,5 +1,8 @@
 # Scribe Web Component
 
+> [!NOTE]  
+> It is neccessary to define an env variable named `GITHUB_TOKEN` to publish the package
+
 ## Development
 
 > **Note:** Read [Important considerations](#important-considerations) before starting development.

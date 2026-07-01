@@ -1,7 +1,6 @@
 {
-	"name": "scribe2",
+	"name": "@antonii22/scribe2",
 	"version": "0.0.1",
-	"private": false,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
@@ -23,6 +22,14 @@
 		"**/*.css"
 	],
 	"main": "./dist/scribe.js",
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com",
+		"access": "restricted"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/docbusters/scribe2.git"
+	},
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"exports": {
