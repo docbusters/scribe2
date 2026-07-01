@@ -11,7 +11,8 @@
 			document: { type: 'Object' },
 			bindings: { type: 'Object' },
 			ondocumentchange: { type: 'Object' },
-			onbindingchange: { type: 'Object' }
+			onbindingchange: { type: 'Object' },
+			customBindings: { type: 'Object' },
 		}
 	}}
 />

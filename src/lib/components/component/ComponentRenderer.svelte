@@ -97,17 +97,17 @@
 {#if componentData}
 	{#await resolvedValue}
 		<Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
-	{:then resolvedValue} 
+	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 			{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
 				<div class="component-editor" contenteditable="false">
-					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} sectionId={sectionId} componentId={componentData.id} {options} {disabledOptions} />
+					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
-				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
+				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, isDarkMode }}></div>
 			</div>
 		{:else}
-			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }}></div>
+			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, isDarkMode }}></div>
 		{/if}
 	{/await}
 {/if}
