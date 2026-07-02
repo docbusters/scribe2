@@ -93,7 +93,9 @@
 		z-index: 50;
 		width: calc(100% - 2rem);
 		max-width: 490px;
+		max-height: calc(100vh - 4rem);
 		padding: 1.5rem;
+    padding-right: 0.5rem;
 		background-color: var(--scribe-popover);
 		border: 1px solid var(--scribe-border-color);
 		border-radius: var(--scribe-radius-xl);
@@ -131,6 +133,11 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 1rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding: 0.125rem;
+    padding-right: 1rem;
   }
 
   :global(.scribe-document .scribe-dialog-footer) {
@@ -138,5 +145,6 @@
     justify-content: flex-end;
     gap: 0.5rem;
     margin-top: 1.5rem;
+    padding-right: 1rem;
   }
 </style>

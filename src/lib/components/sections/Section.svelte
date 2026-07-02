@@ -41,7 +41,7 @@
     {#if data.type === 'paragraph-section'}
         <ParagraphSection {data} {mode} {isDarkMode} />
     {:else if data.type === 'grid-section'}
-        <GridSection {data} {mode} />
+        <GridSection {data} {mode} {isDarkMode} />
     {/if}
 </section>
 

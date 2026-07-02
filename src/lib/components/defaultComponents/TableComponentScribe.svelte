@@ -6,7 +6,7 @@
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 	import type { ComponentValue, RecordValue } from '$lib/domain/data/DataValue.js';
 
-    let { componentData, mode, sectionId, resolvedValue }: ScribeComponentProps<TableComponent> = $props();
+    let { componentData, mode, sectionId, resolvedValue, isDarkMode }: ScribeComponentProps<TableComponent> = $props();
 
     const recordValue = $derived(resolvedValue as RecordValue<TableCellIndex, ComponentValue>);
     const config = $derived(componentData.config);
@@ -35,7 +35,7 @@
                         {@const componentData = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
                             {#if componentData}
-                                <ComponentRenderer {componentData} {sectionId} {mode} disabledOptions={['add', 'duplicate']} />
+                                <ComponentRenderer {componentData} {sectionId} {mode} {isDarkMode} disabledOptions={['add', 'duplicate']} />
                             {/if}
                         </td>
                     {/each}

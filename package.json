@@ -73,6 +73,7 @@
 	"dependencies": {
 		"bits-ui": "^2.18.1",
 		"katex": "^0.17.0",
+		"layerchart": "^2.0.0",
 		"sortablejs": "^1.15.7",
 		"svelte-maplibre-gl": "^2.0.1",
 		"uuid": "^14.0.0"

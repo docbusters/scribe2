@@ -2,7 +2,7 @@ import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistr
 import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
-import type { ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
+import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
@@ -11,8 +11,9 @@ import { editStore } from '$lib/stores/edit-store.svelte.js';
 import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
+import ChartComponentScribe from '$lib/components/defaultComponents/ChartComponentScribe.svelte';
 
-export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent;
+export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
 /** Contains default component implementations */
 export const defaultRegistry: ComponentRegistry = {
@@ -312,6 +313,48 @@ export const defaultRegistry: ComponentRegistry = {
         ],
         valueTypes: ['record', 'binding'],
         supportedBindingValueTypes: ['empty', 'record'],
-        
-    }
+    },
+    'chart': {
+        name: 'Chart',
+        description: 'Create charts to visualize your data',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column-icon lucide-chart-column"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+        ...createSvelte5Mount<ScribeComponentProps<ChartComponent>>(ChartComponentScribe),
+        empty: {
+            type: 'chart',
+            mode: 'block',
+            value: 'array',
+            config: {
+                type: 'pie',
+                xAxisKey: 'vegetable',
+                series: [{ key: 'amount', label: 'Amount' }]
+            }
+        },
+        initialValue: {
+            type: 'array',
+            value: [
+                { 
+                    type: 'record',
+                    value: { vegetable: { type: 'string', value: 'Carrots' }, amount: { type: 'number', value: 10 } },
+                },
+                { 
+                    type: 'record',
+                    value: { vegetable: { type: 'string', value: 'Broccoli' }, amount: { type: 'number', value: 15 } },
+                },
+                { 
+                    type: 'record',
+                    value: { vegetable: { type: 'string', value: 'Spinach' }, amount: { type: 'number', value: 7 } },
+                },
+                {
+                    type: 'record',
+                    value: { vegetable: { type: 'string', value: 'Peas' }, amount: { type: 'number', value: 12 } },
+                },
+                {
+                    type: 'record',
+                    value: { vegetable: { type: 'string', value: 'Corn' }, amount: { type: 'number', value: 20 } },
+                }
+            ]
+        },
+        valueTypes: ['array', 'binding'],
+        supportedBindingValueTypes: ['array']
+    },
 };

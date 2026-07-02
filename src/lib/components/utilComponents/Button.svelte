@@ -3,7 +3,7 @@
 	import type { HTMLButtonAttributes } from "svelte/elements";
 
   export interface ButtonProps extends HTMLButtonAttributes {
-    variant?: "default" | "secondary" | "ghost" | "destructive" | "outline";
+    variant?: "default" | "secondary" | "ghost" | "destructive" | "outline" | "ghost-destructive";
     size?: "default" | "sm" | "lg" | "icon" | "icon-sm";
     loading?: boolean;
   }
@@ -13,9 +13,10 @@
   const variantStyles: Record<string, string> = {
     default: "background-color: var(--scribe-primary); color: var(--scribe-primary-foreground); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
     destructive: "background-color: var(--scribe-error); color: white; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    outline: "background-color: var(--scribe-doc-background); color: var(--scribe-doc-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground);  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
+    outline: "background-color: transparent; color: var(--scribe-doc-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
+    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
     ghost: "background-color: transparent; color: inherit; box-shadow: none;",
+    "ghost-destructive": "background-color: transparent; color: var(--scribe-muted-foreground); box-shadow: none;",
   };
 
   const sizeStyles: Record<string, string> = {
@@ -31,7 +32,7 @@
 
 <Button.Root
   style={mergedStyle}
-  class="scribe-btn {className}"
+  class="scribe-btn scribe-btn-{variant} {className}"
   disabled={loading || disabled}
   {...restProps}
 >
@@ -76,6 +77,11 @@
   :global(.scribe-document .scribe-btn[style*="border:"]:hover), :global(.scribe-document .scribe-btn[style*="transparent"]:not([style*="underline"]):hover) {
     background-color: var(--accent, #f1f5f9) !important;
     color: var(--accent-foreground, #0f172a) !important;
+  }
+
+  :global(.scribe-document .scribe-btn.scribe-btn-ghost-destructive:hover:not(:disabled)) {
+    background-color: oklch(from var(--scribe-error-foreground) l c h / 15%) !important;
+    color: var(--scribe-error-foreground) !important;
   }
 
   @keyframes spin {

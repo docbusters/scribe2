@@ -39,3 +39,9 @@ export interface MapComponentConfig extends ComponentConfig {
     hasCurrentPosBtn?: boolean;
     isMarkerDraggable?: boolean;
 }
+
+export interface ChartComponentConfig extends ComponentConfig {
+    type: 'bar' | 'line' | 'area' | 'pie';
+    xAxisKey?: string;
+    series: { key: string; label: string; color?: string }[];
+}

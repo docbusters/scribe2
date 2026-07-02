@@ -9,9 +9,10 @@
     interface GridSectionProps {
         data: GridSection<DefaultComponents | C>;
         mode: ScribeMode;
+        isDarkMode: boolean;
     }
 
-    let { data, mode }: GridSectionProps = $props();
+    let { data, mode, isDarkMode }: GridSectionProps = $props();
 
     const items = $derived(data.content);
     const gridStyle = $derived(`grid-template-columns: repeat(${data.columns}, 1fr); grid-template-rows: repeat(${data.rows}, 1fr); grid-column-gap: ${data.gapX}px; grid-row-gap: ${data.gapY}px;`);
@@ -29,7 +30,7 @@
 <div class="grid-section" style={gridStyle}>
     {#each items as item, index (`${item.section.type}-${index}`)}
         <div style={getItemStyle(item)}>
-            <Section data={item.section} {mode} isNested />
+            <Section data={item.section} {mode} {isDarkMode} isNested />
         </div>
     {/each}
 </div>
