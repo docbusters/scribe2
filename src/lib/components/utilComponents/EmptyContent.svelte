@@ -51,7 +51,7 @@
         text-align: center;
         border: 1px dashed var(--scribe-border-color);
         border-radius: var(--scribe-radius-2xl);
-        background-color: var(--scribe-doc-background);
+        background-color: var(--scribe-section-background);
         flex: 1;
     }
 

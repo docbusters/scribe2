@@ -5,6 +5,6 @@
 
 </script>
 
-<div class="flex w-full py-10 border-box justify-center bg-(--scribe-doc-background)">
+<div class="flex w-full py-10 border-box justify-center">
 	<Scribe document={fullExampleDocument} bindings={fullExampleBindings} class="max-w-[70vw]" />
 </div>

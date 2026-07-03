@@ -1,5 +1,6 @@
 <script lang="ts">
 	/* eslint-disable @typescript-eslint/no-unused-vars */
+	import { untrack } from 'svelte';
 	import Select from '../utilComponents/Select.svelte';
 	import TextInput from '../utilComponents/TextInput.svelte';
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
@@ -16,37 +17,59 @@
 		componentType: string;
 		initialDataValue?: DataValue;
 		placeholder?: string;
+		isStrict?: boolean;
 	}
 
-	let { parsedValueType, value = $bindable(), componentType, initialDataValue, placeholder = 'Value' }: ComponentEditorValueProps = $props();
+	let { parsedValueType, value = $bindable(), componentType, initialDataValue, placeholder = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
 
 	const componentInitialValue = $derived(initialDataValue ?? globalRegistry.getInitialComponentValue(componentType));
 
+	let lastInitializedValue = $state<unknown>();
+
 	$effect(() => {
-		if (parsedValueType?.type === 'record') {
-			if (!value || typeof value !== 'object') {
-				value = {};
-			}
-			const recordValue = value as Record<string, DataValue>;
-			if (componentInitialValue?.type === 'record') {
-				for (const [key, initialVal] of Object.entries(componentInitialValue.value)) {
-					if (recordValue[key] === undefined) {
-						const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined };
-						let newDataValue: DataValue;
-						if (valType.type === 'binding') {
-							newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string } as BindingValue;
-						} else {
-							newDataValue = { type: valType.type as DataValue['type'], value: initialVal.value } as DataValue;
+		const currentValue = value;
+		const pType = parsedValueType?.type;
+		const initVal = componentInitialValue;
+
+		untrack(() => {
+			if (currentValue === lastInitializedValue) return;
+
+			let newValue = currentValue;
+			let changed = false;
+
+			if (pType === 'record') {
+				if (!newValue || typeof newValue !== 'object') {
+					newValue = {};
+					changed = true;
+				}
+				const recordValue = newValue as Record<string, DataValue>;
+				if (initVal?.type === 'record' && isStrict) {
+					for (const [key, initialVal] of Object.entries(initVal.value)) {
+						if (recordValue[key] === undefined) {
+							const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? (initialVal as BindingValue).bindingType : undefined };
+							let newDataValue: DataValue;
+							if (valType.type === 'binding') {
+								newDataValue = { type: 'binding', bindingType: valType.bindingType, value: initialVal.value as string } as BindingValue;
+							} else {
+								newDataValue = { type: valType.type as DataValue['type'], value: initialVal.value } as DataValue;
+							}
+							recordValue[key] = newDataValue;
+							changed = true;
 						}
-						recordValue[key] = newDataValue;
 					}
 				}
+			} else if (pType === 'array') {
+				if (!Array.isArray(newValue)) {
+					newValue = [];
+					changed = true;
+				}
 			}
-		} else if (parsedValueType?.type === 'array') {
-			if (!Array.isArray(value)) {
-				value = [];
+
+			if (changed && newValue !== value) {
+				value = newValue;
 			}
-		}
+			lastInitializedValue = newValue;
+		});
 	});
 
 	let bindingOptions = $derived.by(() => {
@@ -60,7 +83,10 @@
 	});
 
 	function addArrayItem() {
-		if (componentInitialValue?.type === 'array' && componentInitialValue.value.length > 0) {
+		if (Array.isArray(value) && value.length > 0) {
+			const template = JSON.parse(JSON.stringify(value[value.length - 1]));
+			value = [...(value as unknown[]), template];
+		} else if (componentInitialValue?.type === 'array' && componentInitialValue.value.length > 0) {
 			const template = JSON.parse(JSON.stringify(componentInitialValue.value[0]));
 			value = [...(value as unknown[]), template];
 		}
@@ -95,18 +121,19 @@
 	/>
 {:else if parsedValueType?.type === 'record'}
 	<div class="record-container">
-		{#if componentInitialValue?.type === 'record'}
-			{#each Object.entries(componentInitialValue.value) as [key, initialVal], index (index)}
-				{@const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined }}
-				{#if value && typeof value === 'object' && (value as Record<string, DataValue>)[key]}
-					<ComponentEditorValue  
-						parsedValueType={valType}
-						bind:value={(value as Record<string, DataValue>)[key].value}
-						componentType={componentType}
-						initialDataValue={initialVal}
-						placeholder={capitalizeStrings(key)}
-					/>
-				{/if}
+		{#if value && typeof value === 'object'}
+			{#each Object.keys(value as Record<string, DataValue>) as key, index (index)}
+				{@const currentVal = (value as Record<string, DataValue>)[key]}
+				{@const isBinding = currentVal.type === 'binding'}
+				{@const valType = { type: currentVal.type, bindingType: isBinding ? (currentVal as BindingValue).bindingType : undefined }}
+				{@const initialVal = componentInitialValue?.type === 'record' ? componentInitialValue.value[key] : undefined}
+				<ComponentEditorValue  
+					parsedValueType={valType}
+					bind:value={(value as Record<string, DataValue>)[key].value}
+					componentType={componentType}
+					initialDataValue={initialVal ?? currentVal}
+					placeholder={capitalizeStrings(key)}
+				/>
 			{/each}
 		{/if}
 	</div>
@@ -124,6 +151,7 @@
 								bind:value={(value as DataValue[])[index].value}
 								componentType={componentType}
 								initialDataValue={initialVal}
+								isStrict={false}
 							/>
 						{/if}
 					</div>

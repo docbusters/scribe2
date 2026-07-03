@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
-	import { defaultComponentOptions, type ComponentEditOptions } from "$lib/registry/ComponentEditOptions.js";
+	import { defaultComponentOptions, type ComponentEditOptions, type BaseComponentEditOptions } from "$lib/registry/ComponentEditOptions.js";
 	import ComponentEditorButton from "./ComponentEditorButton.svelte";
     import { mount, unmount } from "svelte";
 	import type { DataValue } from "$lib/domain/data/DataValue.js";
@@ -27,19 +27,29 @@
         const cleanups: (() => void)[] = [];
 
         options.forEach(option => {
-            if (option.props) {
+            // Check if we need to render a separator
+            if (option.type === 'separator') {
+                const sep = document.createElement('div');
+                sep.className = 'component-editor-separator';
+                containerElement!.appendChild(sep);
+                cleanups.push(() => sep.remove());
+                return;
+            }
+
+            const baseOption = option as BaseComponentEditOptions;
+            if (baseOption.props) {
                 // If a custom render function is provided, use it to render the option
-                if (option.render) {
-                    const cleanup = option.render(containerElement!, {
+                if (baseOption.render) {
+                    const cleanup = baseOption.render(containerElement!, {
                         componentType,
                         componentValue,
                         sectionId,
                         componentId,
-                        disabled: disabled || disabledOptions.includes(option.type),
-                        name: option.name,
-                        onclick: option.props.onclick,
-                        icon: option.props.icon,
-                        isSelected: option.isSelected ? option.isSelected({ value: componentValue, config: componentConfig }) : false
+                        disabled: disabled || disabledOptions.includes(baseOption.type),
+                        name: baseOption.name,
+                        onclick: baseOption.props.onclick,
+                        icon: baseOption.props.icon,
+                        isSelected: baseOption.isSelected ? baseOption.isSelected({ value: componentValue, config: componentConfig }) : false
                     });
                     if (cleanup) {
                         cleanups.push(cleanup);
@@ -51,11 +61,11 @@
                         props: {
                             sectionId,
                             componentId,
-                            disabled: disabled || disabledOptions.includes(option.type),
-                            name: option.name,
-                            onclick: (e) => option.props!.onclick?.({ event: e, sectionId, componentId }),
-                            icon: option.props.icon,
-                            isSelected: option.isSelected ? option.isSelected({ value: componentValue, config: componentConfig }) : false
+                            disabled: disabled || disabledOptions.includes(baseOption.type),
+                            name: baseOption.name,
+                            onclick: (e) => baseOption.props!.onclick?.({ event: e, sectionId, componentId }),
+                            icon: baseOption.props.icon,
+                            isSelected: baseOption.isSelected ? baseOption.isSelected({ value: componentValue, config: componentConfig }) : false
                         }
                     });
                     cleanups.push(() => unmount(app));
@@ -84,5 +94,12 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         align-items: center;
         justify-content: center;
+    }
+    
+    :global(.component-editor-separator) {
+        width: 1px;
+        height: 1.25rem;
+        background-color: var(--scribe-border-color);
+        margin: 0 0.125rem;
     }
 </style>

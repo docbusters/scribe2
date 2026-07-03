@@ -23,7 +23,9 @@ export interface ComponentEditProps {
     isSelected: boolean;
 }
 
-export interface ComponentEditOptions {
+export type ComponentEditOptions = BaseComponentEditOptions | SeparatorEditOption;
+
+export interface BaseComponentEditOptions {
     type: string;
     name: string;
     /** Function to determine if the option is selected. If not provided, the option will not be considered selected. */
@@ -35,6 +37,10 @@ export interface ComponentEditOptions {
         icon: string;
         onclick: (data: ComponentEditOnClick) => void;
     };
+}
+
+export interface SeparatorEditOption {
+    type: 'separator';
 }
 
 export const addComponentOption: ComponentEditOptions = {

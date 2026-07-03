@@ -6,12 +6,14 @@ import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, Tabl
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
-import { defaultComponentOptions, type ComponentEditOnClick } from './ComponentEditOptions.js';
+import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
-import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
 import ChartComponentScribe from '$lib/components/defaultComponents/ChartComponentScribe.svelte';
+import ChartEditorDataConfig from '$lib/components/componentOptions/chart/ChartEditorDataConfig.svelte';
+import { mount, unmount } from 'svelte';
 
 export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
@@ -56,6 +58,7 @@ export const defaultRegistry: ComponentRegistry = {
         supportedBindingValueTypes: ['empty', 'string', 'number'],
         options: [
             ...defaultComponentOptions,
+            { type: 'separator' },
             {
                 type: 'expand-content',
                 name: 'Expand with content',
@@ -88,6 +91,7 @@ export const defaultRegistry: ComponentRegistry = {
         },
         options: [
             ...defaultComponentOptions,
+            { type: 'separator' },
             {
                 type: 'align-left',
                 name: 'Align Left',
@@ -127,6 +131,7 @@ export const defaultRegistry: ComponentRegistry = {
                     }
                 },
             },
+            { type: 'separator' },
             {
                 type: 'contain',
                 name: 'Set image fit to contain',
@@ -197,6 +202,11 @@ export const defaultRegistry: ComponentRegistry = {
                 rows: 2,
             }
         },
+        options: [
+            addComponentOption,
+            duplicateComponentOption,
+            deleteComponentOption,
+        ],
         valueTypes: ['record'],
     },
     'map': {
@@ -226,6 +236,7 @@ export const defaultRegistry: ComponentRegistry = {
         },
         options: [
             ...defaultComponentOptions,
+            { type: 'separator' },
             {
                 type: 'toggle-readonly',
                 name: 'Toggle Read-only',
@@ -324,9 +335,9 @@ export const defaultRegistry: ComponentRegistry = {
             mode: 'block',
             value: 'array',
             config: {
-                type: 'pie',
+                type: 'arc',
                 xAxisKey: 'vegetable',
-                series: [{ key: 'amount', label: 'Amount' }]
+                series: [{ key: 'vegetable', label: 'Vegetable', color: '#0388fc' }, { key: 'amount', label: 'Amount', color: '#fca303' }],
             }
         },
         initialValue: {
@@ -354,6 +365,91 @@ export const defaultRegistry: ComponentRegistry = {
                 }
             ]
         },
+        options: [
+            ...defaultComponentOptions,
+            { type: 'separator' },
+            {
+                type: 'chart-data-config',
+                name: 'Data Configuration',
+                render: (container, props) => {
+                    const app = mount(ChartEditorDataConfig, {
+                        target: container,
+                        props,
+                    });
+                    return () => unmount(app);
+                },
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers-icon lucide-layers"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>',
+                    onclick: () => {}
+                }
+            },
+            { type: 'separator' },
+            {
+                type: 'chart-type-bar',
+                name: 'Bar Chart',
+                isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'bar',
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column-icon lucide-chart-column"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, type: 'bar' });
+                    }
+                }
+            },
+            {
+                type: 'chart-type-line',
+                name: 'Line Chart',
+                isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'line',
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-line-icon lucide-chart-line"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, type: 'line' });
+                    }
+                }
+            },
+            {
+                type: 'chart-type-area',
+                name: 'Area Chart',
+                isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'area',
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-area-icon lucide-chart-area"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 11.207a.5.5 0 0 1 .146-.353l2-2a.5.5 0 0 1 .708 0l3.292 3.292a.5.5 0 0 0 .708 0l4.292-4.292a.5.5 0 0 1 .854.353V16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, type: 'area' });
+                    }
+                }
+            },
+            {
+                type: 'chart-type-pie',
+                name: 'Pie Chart',
+                isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'pie',
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-pie-icon lucide-chart-pie"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, type: 'pie' });
+                    }
+                }
+            },
+            {
+                type: 'chart-type-arc',
+                name: 'Arc Chart',
+                isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'arc',
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rainbow-icon lucide-rainbow"><path d="M22 17a10 10 0 0 0-20 0"/><path d="M6 17a6 6 0 0 1 12 0"/><path d="M10 17a2 2 0 0 1 4 0"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId);
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, type: 'arc' });
+                    }
+                }
+            },
+        ],
         valueTypes: ['array', 'binding'],
         supportedBindingValueTypes: ['array']
     },

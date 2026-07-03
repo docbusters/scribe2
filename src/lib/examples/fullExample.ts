@@ -123,6 +123,63 @@ export const fullExampleDocument: Document = {
                 },
             },
         },
+        'section-chart': {
+            id: 'section-chart',
+            title: 'Food that I hate',
+            type: 'paragraph-section',
+            content: {
+                'chart-1': {
+                    id: 'chart-1',
+                    type: 'chart',
+                    mode: 'block',
+                    value: {
+                        type: 'array',
+                        value: [
+                            {
+                                type: 'record',
+                                value: {
+                                    food: { type: 'string', value: 'Broccoli' },
+                                    hateLevel: { type: 'number', value: 40 },
+                                    disgust: { type: 'number', value: 20 }
+                                }
+                            },
+                            {
+                                type: 'record',
+                                value: {
+                                    food: { type: 'string', value: 'Olives' },
+                                    hateLevel: { type: 'number', value: 95 },
+                                    disgust: { type: 'number', value: 100 }
+                                }
+                            },
+                            {
+                                type: 'record',
+                                value: {
+                                    food: { type: 'string', value: 'Liver' },
+                                    hateLevel: { type: 'number', value: 85 },
+                                    disgust: { type: 'number', value: 90 }
+                                }
+                            },
+                            {
+                                type: 'record',
+                                value: {
+                                    food: { type: 'string', value: 'Mushrooms' },
+                                    hateLevel: { type: 'number', value: 60 },
+                                    disgust: { type: 'number', value: 70 }
+                                }
+                            }
+                        ]
+                    },
+                    config: {
+                        type: 'area',
+                        xAxisKey: 'food',
+                        series: [
+                            { key: 'hateLevel', label: 'Pure Hate Level', color: '#ff4b4b' },
+                            { key: 'disgust', label: 'Disgust Rating', color: '#880000' }
+                        ]
+                    }
+                }
+            }
+        },
         'section-4': {
             id: 'section-4',
             title: 'Table section',

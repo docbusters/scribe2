@@ -117,7 +117,7 @@
 	}
 </script>
 
-<div class="flex flex-col items-center w-full py-10 border-box gap-8 bg-(--scribe-doc-background)">
+<div class="flex flex-col items-center w-full py-10 border-box gap-8">
 	<div class="fixed z-1 top-5 right-5 flex flex-col gap-4 p-4 border rounded bg-gray-50">
 		<label class="flex flex-col text-sm font-semibold">
 			Example

@@ -24,73 +24,155 @@
         });
     });
 
-    const xKey = $derived(config?.xAxisKey || 'label');
-    const primaryYKey = $derived(config?.series?.[0]?.key || 'value1');
-
-    $effect(() => {
-        console.log(chartData);
-        console.log(xKey, primaryYKey)
-    })
-
+    const xKey = $derived(config?.xAxisKey);
+    const activeSeries = $derived(config?.series?.filter(s => s.key !== config?.xAxisKey) ?? []);
 </script>
 
 <div class="chart-container">
     {#if config && chartData.length > 0}
-        <div class="chart-wrapper">
-            {#if config.type === 'bar'}
-                <BarChart data={chartData} x={xKey} y={primaryYKey}>
-                    {#snippet tooltip({ context })}
-                        <Tooltip.Root {context} class="scribe-chart-tooltip">
-                            {#snippet children({ data })}
-                                <Tooltip.Header value={data[xKey]} />
-                                <Tooltip.List>
-                                    <Tooltip.Item label={capitalizeStrings(primaryYKey)} value={data[primaryYKey]} />
-                                </Tooltip.List>
-                            {/snippet}
-                        </Tooltip.Root>
-                    {/snippet}
-                </BarChart>
-            {:else if config.type === 'line'}
-                <LineChart data={chartData} x={xKey} y={primaryYKey}>
-                    {#snippet tooltip({ context })}
-                        <Tooltip.Root {context} class="scribe-chart-tooltip">
-                            {#snippet children({ data })}
-                                <Tooltip.Header value={data[xKey]} />
-                                <Tooltip.List>
-                                    <Tooltip.Item label={capitalizeStrings(primaryYKey)} value={data[primaryYKey]} />
-                                </Tooltip.List>
-                            {/snippet}
-                        </Tooltip.Root>
-                    {/snippet}
-                </LineChart>
-            {:else if config.type === 'area'}
-                <AreaChart data={chartData} x={xKey} y={primaryYKey}>
-                    {#snippet tooltip({ context })}
-                        <Tooltip.Root {context} class="scribe-chart-tooltip">
-                            {#snippet children({ data })}
-                                <Tooltip.Header value={data[xKey]} />
-                                <Tooltip.List>
-                                    <Tooltip.Item label={capitalizeStrings(primaryYKey)} value={data[primaryYKey]} />
-                                </Tooltip.List>
-                            {/snippet}
-                        </Tooltip.Root>
-                    {/snippet}
-                </AreaChart>
-            {:else if config.type === 'pie'}
-                <PieChart data={chartData} key={xKey} value={primaryYKey}>
-                    {#snippet tooltip({ context })}
-                        <Tooltip.Root {context} class="scribe-chart-tooltip">
-                            {#snippet children({ data })}
-                                <Tooltip.Header value={data[xKey]} />
-                                <Tooltip.List>
-                                    <Tooltip.Item label={capitalizeStrings(primaryYKey)} value={data[primaryYKey]} />
-                                </Tooltip.List>
-                            {/snippet}
-                        </Tooltip.Root>
-                    {/snippet}
-                </PieChart>
-            {/if}
-        </div>
+        {#if !xKey}
+            <EmptyContent 
+                message="Missing X-Axis" 
+                description="Please configure the X-axis in the chart settings."
+                icon='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3"/><path d="M3 21h18"/><path d="M11 16l-4 4"/><path d="M15 12l-4 4"/></svg>' 
+            />
+        {:else if activeSeries.length === 0}
+            <EmptyContent
+                message="No Series Defined" 
+                description="Add at least one data series to visualize the chart."
+                icon='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>' 
+            />
+        {:else}
+            <div class="chart-wrapper">
+                {#if config.type === 'bar'}
+                    <BarChart seriesLayout="group" data={chartData} x={xKey} series={activeSeries} props={{ bars: { class: 'bar-chart-bar', motion: { type: 'tween', duration: 500 } } }}>
+                        {#snippet tooltip({ context })}
+                            <Tooltip.Root {context} class="scribe-chart-tooltip">
+                                {#snippet children({ data })}
+                                    <Tooltip.Header value={data[xKey]} />
+                                    <Tooltip.List>
+                                        {#each activeSeries as s (s.key)}
+                                            <Tooltip.Item label={s.label || capitalizeStrings(s.key)} value={data[s.key]} color={s.color} />
+                                        {/each}
+                                    </Tooltip.List>
+                                {/snippet}
+                            </Tooltip.Root>
+                        {/snippet}
+                    </BarChart>
+                {:else if config.type === 'line'}
+                    <LineChart data={chartData} x={xKey} series={activeSeries} props={{ spline: { draw: true } }}>
+                        {#snippet tooltip({ context })}
+                            <Tooltip.Root {context} class="scribe-chart-tooltip">
+                                {#snippet children({ data })}
+                                    <Tooltip.Header value={data[xKey]} />
+                                    <Tooltip.List>
+                                        {#each activeSeries as s (s.key)}
+                                            <Tooltip.Item label={s.label || capitalizeStrings(s.key)} value={data[s.key]} color={s.color} />
+                                        {/each}
+                                    </Tooltip.List>
+                                {/snippet}
+                            </Tooltip.Root>
+                        {/snippet}
+                    </LineChart>
+                {:else if config.type === 'area'}
+                    <AreaChart data={chartData} x={xKey} series={activeSeries} props={{ area: { motion: 'tween' } }}>
+                        {#snippet tooltip({ context })}
+                            <Tooltip.Root {context} class="scribe-chart-tooltip">
+                                {#snippet children({ data })}
+                                    <Tooltip.Header value={data[xKey]} />
+                                    <Tooltip.List>
+                                        {#each activeSeries as s (s.key)}
+                                            <Tooltip.Item label={s.label || capitalizeStrings(s.key)} value={data[s.key]} color={s.color} />
+                                        {/each}
+                                    </Tooltip.List>
+                                {/snippet}
+                            </Tooltip.Root>
+                        {/snippet}
+                    </AreaChart>
+                {:else if config.type === 'pie'}
+                    <PieChart
+                        {...{ grid: false, rule: false }}
+                        key={xKey}
+                        value="value"
+                        series={activeSeries.map((s, i) => ({
+                            ...s,
+                            color: undefined,
+                            data: chartData.map(d => ({ [xKey]: d[xKey], value: d[s.key], _seriesKey: s.key })),
+                            props: {
+                                outerRadius: -(i * 30 + 0.1),
+                                ...(i < activeSeries.length - 1 ? { innerRadius: -20 } : {})
+                            }
+                        }))}
+                        padding={{ top: 5, bottom: 40, left: 5, right: 5 }}
+                        props={{ pie: { motion: 'spring' } }}
+                        legend={{
+                            classes: {
+                                root: 'pie-chart-root',
+                                items: 'pie-chart-items',
+                                swatch: 'pie-chart-color',
+                                item: 'pie-chart-item',
+                                label: 'pie-chart-label',
+                            }
+                        }}
+                    >
+                        {#snippet tooltip({ context })}
+                            <Tooltip.Root {context} class="scribe-chart-tooltip">
+                                {#snippet children({ data })}
+                                    <Tooltip.Header value={data[xKey]} />
+                                    <Tooltip.List>
+                                        {#each activeSeries.filter(s => s.key === data._seriesKey) as s (s.key)}
+                                            <Tooltip.Item label={s.label || capitalizeStrings(s.key)} value={data.value} color={context.cScale?.(context.c(data)) || s.color} />
+                                        {/each}
+                                    </Tooltip.List>
+                                {/snippet}
+                            </Tooltip.Root>
+                        {/snippet}
+                    </PieChart>
+                {:else if config.type === 'arc'}
+                    <PieChart
+                        {...{ grid: false, rule: false }}
+                        key={xKey}
+                        value="value"
+                        series={activeSeries.map((s, i) => ({
+                            ...s,
+                            color: undefined,
+                            data: chartData.map(d => ({ [xKey]: d[xKey], value: d[s.key], _seriesKey: s.key })),
+                            props: {
+                                outerRadius: 220 - (i * 30),
+                                innerRadius: 220 - (i * 30) - 20
+                            }
+                        }))}
+                        range={[-90, 90]}
+                        outerRadius={220}
+                        cornerRadius={10}
+                        padAngle={0.02}
+                        props={{ group: { y: 220 / 2.25 }, pie: { motion: 'spring' } }}
+                        legend={{
+                            classes: {
+                                root: 'pie-chart-root',
+                                items: 'pie-chart-items',
+                                swatch: 'pie-chart-color',
+                                item: 'pie-chart-item',
+                                label: 'pie-chart-label',
+                            }
+                        }}
+                    >
+                        {#snippet tooltip({ context })}
+                            <Tooltip.Root {context} class="scribe-chart-tooltip">
+                                {#snippet children({ data })}
+                                    <Tooltip.Header value={data[xKey]} />
+                                    <Tooltip.List>
+                                        {#each activeSeries.filter(s => s.key === data._seriesKey) as s (s.key)}
+                                            <Tooltip.Item label={s.label || capitalizeStrings(s.key)} value={data.value} color={context.cScale?.(context.c(data)) || s.color} />
+                                        {/each}
+                                    </Tooltip.List>
+                                {/snippet}
+                            </Tooltip.Root>
+                        {/snippet}
+                    </PieChart>
+                {/if}
+            </div>
+        {/if}
     {:else}
         <EmptyContent
             message="Chart component is missing configuration or data"
@@ -117,19 +199,30 @@
     .chart-wrapper {
         width: 100%;
         height: 300px;
-        --primary: var(--scribe-primary, #3b82f6);
-    }
-    :global(.fill-primary) {
-        fill: var(--primary);
-    }
-    :global(.stroke-primary) {
-        stroke: var(--primary);
-    }
-    :global(.fill-primary\/20) {
-        fill: var(--primary);
-        opacity: 0.2;
     }
     :global(.scribe-chart-tooltip) {
         font-family: var(--scribe-font-sans);
+    }
+    :global(.bar-chart-bar) {
+        stroke-width: 0;
+    }
+    :global(.pie-chart-item) {
+        border: 0;
+        background-color: transparent;
+    }
+    :global(.pie-chart-label) {
+        font-family: var(--scribe-font-sans);
+        color: var(--scribe-text-color);
+        font-size: var(--scribe-font-size-sm);
+    }
+    :global(.pie-chart-color) {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+    :global(.pie-chart-items) {
+        justify-content: center;
+    }
+    :global(.pie-chart-root) {
+        width: 100%;
     }
 </style>
