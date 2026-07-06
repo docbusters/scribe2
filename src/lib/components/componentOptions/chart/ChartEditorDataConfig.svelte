@@ -11,6 +11,8 @@
     import ComponentEditorButton from '$lib/components/component/ComponentEditorButton.svelte';
     import Divider from '$lib/components/utilComponents/Divider.svelte';
 	import { SvelteSet } from 'svelte/reactivity';
+    import { capitalizeStrings } from '$lib/utils/capitalizeStrings.js';
+    import { randomHexColor } from '$lib/utils/randomHexColor.js';
 
     let { name, icon, sectionId, disabled, componentId, componentValue, isSelected }: ComponentEditProps = $props();
 
@@ -21,6 +23,7 @@
     let draftDeletedSeriesKeys = $state(new Set<string>());
     let selectedKey = $state<string>();
     let newLabel = $state('');
+    let selectedNewKey = $state<string>();
 
     const config = $derived(editStore.getComponentConfig(sectionId, componentId) as ChartComponentConfig);
 
@@ -42,20 +45,28 @@
         return Array.from(keys).map(key => ({ value: key, label: key }));
     });
 
+    const availableKeysForNewSeries = $derived.by(() => {
+        return existingKeys
+            .filter(k => k !== selectedKey && !draftSeries.some(s => s.key === k))
+            .map(key => ({ value: key, label: key }));
+    });
+
     function addSeries() {
-        if (!newLabel) return;
+        if (!selectedNewKey) return;
         
-        const calculatedKey = newLabel.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (!calculatedKey) return;
-        
-        if (draftSeries.some(s => s.key === calculatedKey) || existingKeys.includes(calculatedKey)) {
+        if (draftSeries.some(s => s.key === selectedNewKey)) {
             return;
         }
         
-        draftSeries = [...draftSeries, { key: calculatedKey, label: newLabel, color: '#ff9999' }];
-        draftDeletedSeriesKeys.delete(calculatedKey);
+        draftSeries = [...draftSeries, { 
+            key: selectedNewKey, 
+            label: newLabel || capitalizeStrings(selectedNewKey), 
+            color: randomHexColor() 
+        }];
+        draftDeletedSeriesKeys.delete(selectedNewKey);
         
         newLabel = '';
+        selectedNewKey = undefined;
     }
 
     function removeSeries(keyToRemove: string) {
@@ -197,8 +208,9 @@
             <div class="add-series-card">
                 <p class="add-series-title">Add New Series</p>
                 <div class="add-form">
-                    <TextInput bind:value={newLabel} placeholder="Label" />
-                    <Button onclick={addSeries} disabled={!newLabel} variant="default">Add</Button>
+                    <Select placeholder="Select data key..." type="single" items={availableKeysForNewSeries} bind:value={selectedNewKey} />
+                    <TextInput bind:value={newLabel} placeholder="Custom label (optional)" />
+                    <Button onclick={addSeries} disabled={!selectedNewKey} variant="default">Add Series</Button>
                 </div>
             </div>
         </div>
@@ -408,11 +420,12 @@
 
     .add-form {
         display: flex;
+        flex-direction: column;
         gap: 0.75rem;
-        align-items: stretch;
+        align-items: end;
     }
 
-    .add-form :global(> *:first-child) {
-        flex: 1;
+    .add-form :global(> *:last-child) {
+        margin-top: 1rem;
     }
 </style>

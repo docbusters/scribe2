@@ -5,8 +5,9 @@
 	import type { ArrayValue, DataValue, RecordValue } from '$lib/domain/data/DataValue.js';
     import { BarChart, LineChart, AreaChart, PieChart, Tooltip } from 'layerchart';
 	import { capitalizeStrings } from '$lib/utils/capitalizeStrings.js';
+	import { randomHexColor } from '$lib/utils/randomHexColor.js';
 
-    let { componentData, resolvedValue }: ScribeComponentProps<ChartComponent> = $props();
+    let { componentData, resolvedValue, updateComponentConfig }: ScribeComponentProps<ChartComponent> = $props();
 
     const config = $derived(componentData.config);
 
@@ -26,6 +27,45 @@
 
     const xKey = $derived(config?.xAxisKey);
     const activeSeries = $derived(config?.series?.filter(s => s.key !== config?.xAxisKey) ?? []);
+
+    $effect(() => {
+        if (!arrayValue || arrayValue.type !== 'array' || arrayValue.value.length === 0) return;
+        
+        const firstRecord = arrayValue.value[0];
+        if (firstRecord.type !== 'record') return;
+        
+        const currentDataKeys = Object.keys(firstRecord.value);
+        const currentSeries = config?.series || [];
+        
+        let hasChanges = false;
+        let newSeries = [...currentSeries];
+        
+        // Add new series
+        for (const key of currentDataKeys) {
+            if (key !== config?.xAxisKey && !newSeries.some(s => s.key === key)) {
+                newSeries.push({
+                    key,
+                    label: capitalizeStrings(key),
+                    color: randomHexColor()
+                });
+                hasChanges = true;
+            }
+        }
+        
+        // Remove missing series
+        const initialLength = newSeries.length;
+        newSeries = newSeries.filter(s => currentDataKeys.includes(s.key));
+        if (newSeries.length !== initialLength) {
+            hasChanges = true;
+        }
+        
+        if (hasChanges && updateComponentConfig) {
+            updateComponentConfig({
+                ...config,
+                series: newSeries,
+            });
+        }
+    });
 </script>
 
 <div class="chart-container">

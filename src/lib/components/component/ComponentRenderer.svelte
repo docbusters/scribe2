@@ -73,6 +73,10 @@
 		}
 	}
 
+	function updateComponentConfig(newConfig: ComponentConfig) {
+		editStore.setComponentConfig(sectionId, componentData.id, newConfig);
+	}
+
 	type AgnosticActionProps = ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>;
 
 	const mountComponent: Action<HTMLElement, AgnosticActionProps> = (node, props) => {
@@ -104,10 +108,10 @@
 				<div class="component-editor" contenteditable="false">
 					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
-				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, isDarkMode }}></div>
+				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 			</div>
 		{:else}
-			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, isDarkMode }}></div>
+			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 		{/if}
 	{/await}
 {/if}
