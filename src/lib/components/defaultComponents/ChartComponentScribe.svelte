@@ -51,7 +51,7 @@
 
         // Add new series
         for (const key of currentDataKeys) {
-            if (key !== newXAxisKey && !newSeries.some(s => s.key === key)) {
+            if (!newSeries.some(s => s.key === key)) {
                 newSeries.push({
                     key,
                     label: capitalizeStrings(key),
