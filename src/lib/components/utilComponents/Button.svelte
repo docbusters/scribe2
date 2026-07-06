@@ -48,7 +48,7 @@
     align-items: center;
     justify-content: center;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--scribe-font-weight-semibold);
     border-radius: var(--radius, 0.5rem);
     transition: all 0.2s ease;
     cursor: pointer;

@@ -188,6 +188,7 @@
                                     </div>
                                     <div class="series-text">
                                         <span class="series-label">{s.label}</span>
+                                        <span class="series-key">{s.key}</span>
                                     </div>
                                 </div>
                                 <button class="delete-btn" onclick={() => removeSeries(s.key)} title="Remove series">
@@ -208,9 +209,9 @@
             <div class="add-series-card">
                 <p class="add-series-title">Add New Series</p>
                 <div class="add-form">
-                    <Select placeholder="Select data key..." type="single" items={availableKeysForNewSeries} bind:value={selectedNewKey} />
-                    <TextInput bind:value={newLabel} placeholder="Custom label (optional)" />
-                    <Button onclick={addSeries} disabled={!selectedNewKey} variant="default">Add Series</Button>
+                    <Select placeholder="Key" type="single" items={availableKeysForNewSeries} bind:value={selectedNewKey} />
+                    <TextInput bind:value={newLabel} placeholder="Label (optional)" />
+                    <Button onclick={addSeries} disabled={!selectedNewKey} variant="default">Add</Button>
                 </div>
             </div>
         </div>
@@ -257,7 +258,7 @@
         margin: 0;
         font-family: var(--scribe-font-heading);
         font-size: var(--scribe-font-size-md);
-        font-weight: 600;
+        font-weight: var(--scribe-font-weight-semibold);
         letter-spacing: -0.01em;
         color: var(--scribe-text-color);
     }
@@ -321,13 +322,19 @@
 
     .series-text {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: start;
     }
 
     .series-label {
         font-size: var(--scribe-font-size-sm);
-        font-weight: 500;
+        font-weight: var(--scribe-font-weight-medium);
         color: var(--scribe-text-color);
+    }
+
+    .series-key {
+        font-size: var(--scribe-font-size-xs);
+        color: var(--scribe-muted-foreground);
     }
     
     .color-picker-container {
@@ -414,7 +421,7 @@
     .add-series-title {
         margin: 0 0 0.75rem 0;
         font-size: var(--scribe-font-size-sm);
-        font-weight: 600;
+        font-weight: var(--scribe-font-weight-semibold);
         color: var(--scribe-text-color);
     }
 
@@ -422,10 +429,10 @@
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        align-items: end;
+        align-items: stretch;
     }
 
-    .add-form :global(> *:last-child) {
-        margin-top: 1rem;
+    .add-form :global(> *:first-child) {
+        flex: 1;
     }
 </style>

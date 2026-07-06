@@ -173,6 +173,7 @@ export const fullExampleDocument: Document = {
                         type: 'area',
                         xAxisKey: 'food',
                         series: [
+                            { key: 'food', label: "Food", color: '#ff0000' },
                             { key: 'hateLevel', label: 'Pure Hate Level', color: '#ff4b4b' },
                             { key: 'disgust', label: 'Disgust Rating', color: '#880000' }
                         ]

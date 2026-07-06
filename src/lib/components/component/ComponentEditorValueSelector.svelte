@@ -22,8 +22,14 @@
 			if (type === 'binding') {
 				options.push({ value: JSON.stringify({ type: 'binding', bindingType: 'default' }), label: 'Default Binding' });
 				const customBindings = customBindingsStore.getBindingsList();
+				const supportedBindingTypes = globalRegistry.getComponentSupportedBindingValueTypes(props.componentType);
 				for (const cb of customBindings) {
-					options.push({ value: JSON.stringify({ type: 'binding', bindingType: cb.type }), label: cb.name });
+					const availableIds = customBindingsStore.getAvailableIds(cb.type, supportedBindingTypes);
+					const hasSupportedValues = availableIds.length === 0 || availableIds.some(item => !item.disabled);
+					// We only add to the list binding types that contain supported values
+					if (hasSupportedValues) {
+						options.push({ value: JSON.stringify({ type: 'binding', bindingType: cb.type }), label: cb.name });
+					}
 				}
 			} else {
 				options.push({ value: JSON.stringify({ type }), label: type });

@@ -39,10 +39,19 @@
         
         let hasChanges = false;
         let newSeries = [...currentSeries];
+        let newXAxisKey = config?.xAxisKey;
         
+        // Check if xAxisKey is missing
+        if (newXAxisKey && !currentDataKeys.includes(newXAxisKey)) {
+            newXAxisKey = currentDataKeys.length > 0 ? currentDataKeys[0] : undefined;
+            if (newXAxisKey !== config?.xAxisKey) {
+                hasChanges = true;
+            }
+        }
+
         // Add new series
         for (const key of currentDataKeys) {
-            if (key !== config?.xAxisKey && !newSeries.some(s => s.key === key)) {
+            if (key !== newXAxisKey && !newSeries.some(s => s.key === key)) {
                 newSeries.push({
                     key,
                     label: capitalizeStrings(key),
@@ -62,6 +71,7 @@
         if (hasChanges && updateComponentConfig) {
             updateComponentConfig({
                 ...config,
+                xAxisKey: newXAxisKey,
                 series: newSeries,
             });
         }
