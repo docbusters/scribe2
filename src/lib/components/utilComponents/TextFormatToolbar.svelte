@@ -62,6 +62,7 @@
         padding: 0.25rem;
         box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
         opacity: 0;
+        pointer-events: none;
         transition: opacity 200ms ease-in-out;
         user-select: none;
         z-index: 2;
@@ -69,6 +70,7 @@
 
     .text-toolbar-visible {
         opacity: 1;
+        pointer-events: auto;
         user-select: auto;
     }
 </style>

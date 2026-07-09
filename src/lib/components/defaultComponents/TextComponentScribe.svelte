@@ -104,13 +104,19 @@
     }
 
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
-        if (isEmpty) return;
+        if (!isDirty || isEmpty) return;
         const target = event.target as HTMLSpanElement;
+        
+        if (!target.isConnected) return;
         
         let newContent = '';
         for (const child of Array.from(target.childNodes)) {
             newContent += parseDOM(child);
         }
+
+        isDirty = false;
+
+        if (newContent === componentData.value.value) return;
 
         const newValue: StringValue = { type: 'string', value: newContent };
         const success = editStore.setComponentValue(sectionId, componentData.id, newValue);
@@ -224,9 +230,12 @@
         }
     }
 
+    let isDirty = false;
+
     function handleInput(event: Event) {
         const target = event.target as HTMLSpanElement;
         isEmpty = (target.textContent || '').length === 0;
+        isDirty = true;
     }
 
     function handleSelectionChange(event?: Event) {
@@ -273,7 +282,7 @@
                 end: endIndex,
                 text: selectedText
             }
-            textFormatToolbarStore.open(rect.x, rect.top, sectionId, componentData.id, selectionRange);
+            textFormatToolbarStore.open(rect.x + window.scrollX, rect.top + window.scrollY, sectionId, componentData.id, selectionRange);
         }
     }
 
@@ -325,6 +334,80 @@
             textDiv?.removeEventListener('scribe-focus-start', onFocusStart);
             textDiv?.removeEventListener('scribe-focus-end', onFocusEnd);
         };
+    });
+
+    /**
+     * Restores the native DOM text selection using absolute string indices, useful when the component is re rendered
+     * and the selection is lost
+     */
+    function restoreSelection(element: HTMLElement, start: number, end: number) {
+        let currentPos = 0;
+        let startNode: Node | null = null;
+        let startOffset = 0;
+        let endNode: Node | null = null;
+        let endOffset = 0;
+
+        function traverse(node: Node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const length = node.textContent?.length || 0;
+                
+                // If the target start index falls within this text node, calculate its exact offset
+                if (!startNode && start <= currentPos + length) {
+                    startNode = node;
+                    startOffset = Math.max(0, start - currentPos);
+                }
+                
+                // If the target end index falls within this text node, calculate its exact offset
+                if (!endNode && end <= currentPos + length) {
+                    endNode = node;
+                    endOffset = Math.max(0, end - currentPos);
+                }
+                currentPos += length;
+            } else if (node.nodeName === 'BR') {
+                // A <br> visually counts as 1 character (newline)
+                const length = 1;
+                
+                // We cannot select inside a <br>. Instead, we select its parent and use the <br>'s child index as the offset.
+                if (!startNode && start <= currentPos + length) {
+                    startNode = node.parentNode;
+                    const index = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode);
+                    startOffset = start === currentPos ? index : index + 1;
+                }
+                if (!endNode && end <= currentPos + length) {
+                    endNode = node.parentNode;
+                    const index = Array.from(node.parentNode!.childNodes).indexOf(node as ChildNode);
+                    endOffset = end === currentPos ? index : index + 1;
+                }
+                currentPos += length;
+            } else {
+                // For other elements (like spans), recursively traverse their children
+                for (const child of Array.from(node.childNodes)) {
+                    traverse(child);
+                    // Optimization: stop traversing if both start and end nodes have been found
+                    if (startNode && endNode) return;
+                }
+            }
+        }
+
+        traverse(element);
+
+        // Apply the calculated nodes and offsets to the native DOM Selection API
+        if (startNode && endNode) {
+            element.focus();
+            const range = document.createRange();
+            range.setStart(startNode, startOffset);
+            range.setEnd(endNode, endOffset);
+            const selection = getSelection(element);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+        }
+    }
+
+    $effect(() => {
+        // When value changes and textDiv is recreated, we restore the selection if the toolbar is still open for this component
+        if (textDiv && textFormatToolbarStore.isOpen && textFormatToolbarStore.componentId === componentData.id && textFormatToolbarStore.selectionRange) {
+            restoreSelection(textDiv, textFormatToolbarStore.selectionRange.start, textFormatToolbarStore.selectionRange.end);
+        }
     });
 </script>
 

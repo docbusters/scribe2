@@ -204,7 +204,8 @@ export class TextFormatToolbarStore {
 
         editStore.setComponentValue(this.sectionId, this.componentId, { type: 'string', value: newText });
 
-        this.close();
+        // Update active formats to reflect the new state
+        this.computeActiveFormats(newText, this.selectionRange.start, this.selectionRange.end);
     }
 }
 
