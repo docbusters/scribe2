@@ -28,7 +28,7 @@
     let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
-	let resolvedValue = $derived.by(async () => {
+	let resolvedValue = $derived.by(() => {
 		const { types, bindingTypes } = componentSupportedTypes;
 		
 		if (!types.includes(componentData.value.type)) {
@@ -36,14 +36,23 @@
 		}
 
 		if (componentData.value.type === 'binding') {
-			const bindingValue = await bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
+			const result = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
 
-			if (!bindingTypes.includes(bindingValue.type)) {
-				console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
-				throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
+			if (result instanceof Promise) {
+				return result.then(bindingValue => {
+					if (!bindingTypes.includes(bindingValue.type)) {
+						console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
+						throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
+					}
+					return bindingValue;
+				});
+			} else {
+				if (!bindingTypes.includes(result.type)) {
+					console.error(`Component ${componentData.type} does not support binding value type ${result.type}`, { componentData, result });
+					throw new Error(`Unsupported binding value type: ${result.type}`);
+				}
+				return result;
 			}
-
-			return bindingValue;
 		}
 		
 		return componentData.value;

@@ -68,23 +68,23 @@
         };
     });
 
-    const oninput = () => {
-        const inputValueSnapshot = $state.snapshot(inputValue);
+    const oninput = (event: Event & { currentTarget: EventTarget & HTMLInputElement; }) => {
+        const val = event.currentTarget.value;
 
-        if (isNaN(Number(inputValueSnapshot))) {
-            updateComponentValue({ type: 'string', value: inputValueSnapshot }, 'onchange');
+        if (isNaN(Number(val))) {
+            updateComponentValue({ type: 'string', value: val }, 'onchange');
         } else {
-            updateComponentValue({ type: 'number', value: Number(inputValueSnapshot) }, 'onchange');
+            updateComponentValue({ type: 'number', value: Number(val) }, 'onchange');
         }
     };
 
-    const onblur = () => {
-        const inputValueSnapshot = $state.snapshot(inputValue);
+    const onblur = (event: Event & { currentTarget: EventTarget & HTMLInputElement; }) => {
+        const val = event.currentTarget.value;
 
-        if (isNaN(Number(inputValueSnapshot))) {
-            updateComponentValue({ type: 'string', value: inputValueSnapshot }, 'onblur');
+        if (isNaN(Number(val))) {
+            updateComponentValue({ type: 'string', value: val }, 'onblur');
         } else {
-            updateComponentValue({ type: 'number', value: Number(inputValueSnapshot) }, 'onblur');
+            updateComponentValue({ type: 'number', value: Number(val) }, 'onblur');
         }
     }
 </script>
@@ -101,7 +101,7 @@
     type="text"
     {oninput}
     {onblur}
-    bind:value={inputValue} 
+    value={inputValue} 
 />
 
 <style>

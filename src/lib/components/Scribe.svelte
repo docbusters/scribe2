@@ -103,14 +103,14 @@
 
 	// Initialize binding stores
 	$effect.pre(() => {
-		console.log('Initializing bindings with:', initialBindings);
+		console.log('Initializing bindings with:', $state.snapshot(initialBindings));
 		if (initialBindings) {
 			bindingStore.initialize(initialBindings);
 		}
 	});
 
 	$effect.pre(() => {
-		console.log('Initializing custom bindings with:', initialCustomBindings);
+		console.log('Initializing custom bindings with:', $state.snapshot(initialCustomBindings));
 		if (initialCustomBindings) {
 			customBindingsStore.initialize(initialCustomBindings);
 		}

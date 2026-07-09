@@ -52,7 +52,7 @@ class BindingStore {
     }
 
     /** Returns the value of a binding based on its ID and type */
-    async getBindingValue(id: string, bindingType: "default" | string) {
+    getBindingValue(id: string, bindingType: "default" | string) {
         if (bindingType === "default") {
             if (!this.data[id]) {
                 throw new Error(`Binding with id ${id} does not exist.`);
@@ -61,7 +61,7 @@ class BindingStore {
             return this.data[id];
         }
 
-        return await customBindingsStore.getValue(bindingType, id);
+        return customBindingsStore.getValue(bindingType, id);
     }
 
     /**
