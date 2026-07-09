@@ -24,6 +24,7 @@
 	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
 	import ComponentEditor from "./ComponentEditor.svelte";
 	import Skeleton from "../utilComponents/Skeleton.svelte";
+	import EmptyContent from "../utilComponents/EmptyContent.svelte";
 
     let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
 
@@ -31,31 +32,35 @@
 	let resolvedValue = $derived.by(() => {
 		const { types, bindingTypes } = componentSupportedTypes;
 		
-		if (!types.includes(componentData.value.type)) {
-			throw new Error(`Unsupported component value type: ${componentData.value.type}`);
-		}
-
-		if (componentData.value.type === 'binding') {
-			const result = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
-
-			if (result instanceof Promise) {
-				return result.then(bindingValue => {
-					if (!bindingTypes.includes(bindingValue.type)) {
-						console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
-						throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
-					}
-					return bindingValue;
-				});
-			} else {
-				if (!bindingTypes.includes(result.type)) {
-					console.error(`Component ${componentData.type} does not support binding value type ${result.type}`, { componentData, result });
-					throw new Error(`Unsupported binding value type: ${result.type}`);
-				}
-				return result;
+		try {
+			if (!types.includes(componentData.value.type)) {
+				throw new Error(`Unsupported value type: ${componentData.value.type}`);
 			}
+
+			if (componentData.value.type === 'binding') {
+				const result = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
+
+				if (result instanceof Promise) {
+					return result.then(bindingValue => {
+						if (!bindingTypes.includes(bindingValue.type)) {
+							console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
+							throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
+						}
+						return bindingValue;
+					});
+				} else {
+					if (!bindingTypes.includes(result.type)) {
+						console.error(`Component ${componentData.type} does not support binding value type ${result.type}`, { componentData, result });
+						throw new Error(`Unsupported binding value type: ${result.type}`);
+					}
+					return result;
+				}
+			}
+			
+			return componentData.value;
+		} catch (error) {
+			return Promise.reject(error);
 		}
-		
-		return componentData.value;
 	});
 
 	
@@ -122,6 +127,19 @@
 		{:else}
 			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 		{/if}
+	{:catch error}
+		{@const options = globalRegistry.getComponentOptions(componentData.type)}
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
+				<div class="component-editor" contenteditable="false">
+					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+				</div>
+				<EmptyContent 
+					message="Component Error" 
+					description={error.message} 
+					icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-triangle-alert&quot;><path d=&quot;m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3&quot;/><path d=&quot;M12 9v4&quot;/><path d=&quot;M12 17h.01&quot;/></svg>" 
+					isError={true} 
+				/>
+			</div>
 	{/await}
 {/if}
 
