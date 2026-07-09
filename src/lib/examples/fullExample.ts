@@ -382,4 +382,44 @@ export const fullExampleBindings: Record<string, BindingsDefinition> = {
     'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
     'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
     'number-binding': { type: 'number', initialValue: 42 },
+    'chart-binding': { 
+        type: 'array',
+        initialValue: [
+            {
+                type: 'record',
+                value: {
+                    year: { type: 'string', value: '2022' },
+                    price: { type: 'number', value: 140 },
+                }
+            },
+            {
+                type: 'record',
+                value: {
+                    year: { type: 'string', value: '2023' },
+                    price: { type: 'number', value: 120 },
+                }
+            },
+            {
+                type: 'record',
+                value: {
+                    year: { type: 'string', value: '2024' },
+                    price: { type: 'number', value: 100 },
+                }
+            },
+            {
+                type: 'record',
+                value: {
+                    year: { type: 'string', value: '2025' },
+                    price: { type: 'number', value: 600 },
+                }
+            },
+            {
+                type: 'record',
+                value: {
+                    year: { type: 'string', value: '2026' },
+                    price: { type: 'number', value: 400 },
+                }
+            },
+        ],
+    }
 }
