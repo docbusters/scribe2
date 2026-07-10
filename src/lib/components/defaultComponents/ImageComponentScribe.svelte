@@ -5,10 +5,22 @@
 	import Skeleton from '../utilComponents/Skeleton.svelte';
 	import { fade } from 'svelte/transition';
 
-    let { componentData, resolvedValue }: ScribeComponentProps<ImageComponent> = $props();
+    let { componentData, resolvedValue, updateComponentConfig, mode }: ScribeComponentProps<ImageComponent> = $props();
 
     let errorLoadingImage = $state(false);
     let imageLoaded = $state(false);
+
+    let isDragging = $state(false);
+    let tempWidth = $state<string | null>(null);
+    let tempHeight = $state<string | null>(null);
+    let containerRef: HTMLDivElement | undefined = $state();
+
+    let startX = 0;
+    let startY = 0;
+    let initialWidth = 0;
+    let initialHeight = 0;
+    let containerWidth = 0;
+    let dragMode: 'both' | 'width' | 'height' | null = null;
 
     const src = $derived(resolvedValue.value as string);
     const config = $derived(componentData.config);
@@ -35,16 +47,72 @@
             styleString += 'object-position: center;';
         }
 
-        if (config?.height) {
-            styleString += `height: ${config.height};`;
-        }
-
-        if (config?.width) {
-            styleString += `width: ${config.width};`;
-        }
-
         return styleString;
-    })
+    });
+
+    function onPointerDown(e: PointerEvent, type: 'both' | 'width' | 'height') {
+        if (mode !== 'edit') return;
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const target = e.target as HTMLElement;
+        target.setPointerCapture(e.pointerId);
+
+        isDragging = true;
+        dragMode = type;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        if (containerRef) {
+            const rect = containerRef.getBoundingClientRect();
+            initialWidth = rect.width;
+            initialHeight = rect.height;
+            const parent = containerRef.parentElement;
+            if (parent) {
+                const parentRect = parent.getBoundingClientRect();
+                containerWidth = parentRect.width;
+            }
+        }
+    }
+
+    function onPointerMove(e: PointerEvent) {
+        if (!isDragging) return;
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        if (dragMode === 'both' || dragMode === 'width') {
+            const newWidth = Math.max(50, initialWidth + deltaX);
+            if (containerWidth > 0) {
+                const percentage = (newWidth / containerWidth) * 100;
+                tempWidth = `${percentage.toFixed(2)}%`;
+            } else {
+                tempWidth = `${newWidth}px`;
+            }
+        }
+
+        if (dragMode === 'both' || dragMode === 'height') {
+            const newHeight = Math.max(50, initialHeight + deltaY);
+            tempHeight = `${newHeight}px`;
+        }
+    }
+
+    function onPointerUp(e: PointerEvent) {
+        if (!isDragging) return;
+        isDragging = false;
+        dragMode = null;
+
+        const target = e.target as HTMLElement;
+        target.releasePointerCapture(e.pointerId);
+
+        let newConfig = { ...config };
+        if (tempWidth) newConfig.width = tempWidth;
+        if (tempHeight) newConfig.height = tempHeight;
+
+        updateComponentConfig(newConfig);
+        
+        tempWidth = null;
+        tempHeight = null;
+    }
 </script>
 
 {#key resolvedValue}
@@ -53,7 +121,22 @@
             {#if !imageLoaded}
                 <Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
             {/if}
-            <img class:hidden={!imageLoaded} style={style} height={config?.height} width={config?.width} onload={() => imageLoaded = true} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
+            <div 
+                class="image-wrapper" 
+                class:hidden={!imageLoaded} 
+                class:is-dragging={isDragging} 
+                bind:this={containerRef} 
+                style:width={tempWidth || config?.width || '100%'} 
+                style:height={tempHeight || config?.height || 'auto'}
+            >
+                <img style={style} onload={() => imageLoaded = true} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
+                
+                {#if mode === 'edit'}
+                    <div role="separator" aria-orientation="horizontal" class="resize-handle right" onpointerdown={(e) => onPointerDown(e, 'width')} onpointermove={onPointerMove} onpointerup={onPointerUp}></div>
+                    <div role="separator" aria-orientation="vertical" class="resize-handle bottom" onpointerdown={(e) => onPointerDown(e, 'height')} onpointermove={onPointerMove} onpointerup={onPointerUp}></div>
+                    <div role="separator" class="resize-handle bottom-right" onpointerdown={(e) => onPointerDown(e, 'both')} onpointermove={onPointerMove} onpointerup={onPointerUp}></div>
+                {/if}
+            </div>
         {:else if errorLoadingImage}
             <EmptyContent
                 style="padding: 2rem;"
@@ -73,12 +156,7 @@
 
 <style>
     .hidden {
-        display: none;
-    }
-
-    img {
-        width: 100%;
-        aspect-ratio: initial;
+        display: none !important;
     }
 
     .image-container {
@@ -90,5 +168,70 @@
         align-items: center;
         display: flex;
         justify-content: center;
+    }
+
+    .image-wrapper {
+        position: relative;
+        display: inline-flex;
+        max-width: 100%;
+        border-radius: var(--scribe-radius-2xl);
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        aspect-ratio: initial;
+    }
+
+    /* Resize handles */
+    .resize-handle {
+        position: absolute;
+        background-color: var(--scribe-primary);
+        border: 1px solid var(--scribe-doc-background);
+        opacity: 0;
+        transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+        z-index: 10;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        touch-action: none; /* Prevent touch scrolling while dragging */
+    }
+
+    .image-wrapper:hover .resize-handle,
+    .image-wrapper.is-dragging .resize-handle {
+        opacity: 1;
+    }
+
+    .resize-handle:hover {
+        transform: scale(1.15);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .resize-handle.right {
+        top: 50%;
+        right: -3px;
+        margin-top: -12px;
+        width: 6px;
+        height: 24px;
+        border-radius: 3px;
+        cursor: ew-resize;
+    }
+
+    .resize-handle.bottom {
+        bottom: -3px;
+        left: 50%;
+        margin-left: -12px;
+        width: 24px;
+        height: 6px;
+        border-radius: 3px;
+        cursor: ns-resize;
+    }
+
+    .resize-handle.bottom-right {
+        bottom: -5px;
+        right: -5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        cursor: nwse-resize;
     }
 </style>
