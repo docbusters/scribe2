@@ -24,6 +24,10 @@
   	--scribe-popover-foreground: oklch(0.145 0 0);
 	--scribe-muted: oklch(0.97 0 0); /* Background color for muted elements like disabled buttons, etc. */
 	--scribe-muted-foreground: oklch(0.556 0 0); /* Text color for muted elements */
+	--scribe-overlay: rgba(0, 0, 0, 0.5); /* Modal and overlay background color */
+	--scribe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--scribe-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	--scribe-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
     /** Font family variables */
     --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
@@ -93,9 +97,8 @@
   	--scribe-popover-foreground: oklch(0.985 0 0);
 	--scribe-muted: oklch(0.269 0 0); /* Background color for muted elements like disabled buttons, etc. */
 	--scribe-muted-foreground: oklch(0.708 0 0); /* Text color for muted elements */
-}
-
-scribe-interpreter {
-    display: block;
-    width: 100%;
+	--scribe-overlay: rgba(0, 0, 0, 0.7); /* Modal and overlay background color */
+	--scribe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+	--scribe-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+	--scribe-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }

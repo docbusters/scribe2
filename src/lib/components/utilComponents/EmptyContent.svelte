@@ -38,7 +38,7 @@
 </div>
 
 <style>
-    :global(scribe-empty-content) {
+    :host {
         display: block;
         width: 100%;
     }

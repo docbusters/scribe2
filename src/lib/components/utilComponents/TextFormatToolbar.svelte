@@ -60,7 +60,7 @@
         flex-direction: row;
         gap: 0.25rem;
         padding: 0.25rem;
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+        box-shadow: var(--scribe-shadow-sm);
         opacity: 0;
         pointer-events: none;
         transition: opacity 200ms ease-in-out;

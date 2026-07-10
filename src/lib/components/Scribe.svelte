@@ -18,6 +18,7 @@
 />
 
 <script lang="ts" generics="C extends BaseComponent<string, DataValue>">
+	import '$lib/styles/main.css';
 	import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 	import type { BaseComponent } from '../domain/components/Component.js';
 	import type { DataValue } from '../domain/data/DataValue.js';
@@ -312,27 +313,32 @@
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h1);
 		font-size: var(--scribe-font-size-h1);
+		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
 	:global(.scribe-document h2) {
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h2);
 		font-size: var(--scribe-font-size-h2);
+		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
     :global(.scribe-document h3) {
         font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h3);
 		font-size: var(--scribe-font-size-h3);
+		color: var(--scribe-doc-foreground);
 		margin: 0;
     }
 	:global(.scribe-document p) {
+		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
 	:global(.scribe-document span) {
 		font-family: var(--scribe-font-sans);
 		font-weight: var(--scribe-font-weight-body);
 		font-size: var(--scribe-font-size-body);
+		color: var(--scribe-doc-foreground);
 	}
 
 	.scribe-sections {
@@ -350,7 +356,7 @@
         background-color: var(--scribe-popover);
         border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-radius-xl);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-popover */
+        box-shadow: var(--scribe-shadow-md); /* shadow-popover */
         outline: none;
 		z-index: 1;
 		display: flex;

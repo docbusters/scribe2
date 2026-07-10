@@ -1,0 +1,82 @@
+/* ==========================================================================
+   SCRIBE SCOPED CSS RESET (Light DOM Protection)
+   These rules ensure that the Scribe components are isolated from the host
+   application's global styles (like Tailwind preflight).
+   ========================================================================== */
+
+scribe-interpreter {
+    display: block;
+    width: 100%;
+}
+
+.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer {
+    /* Base typography and coloring to stop inheritance from host body */
+    color: var(--scribe-doc-foreground);
+    font-family: var(--scribe-font-sans);
+    font-size: var(--scribe-font-size-body);
+    font-weight: var(--scribe-font-weight-body);
+    line-height: 1.5;
+    text-align: left;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Override global selectors (e.g. *, p, h1) from host application with higher specificity */
+.scribe-document *, 
+.scribe-document *::before, 
+.scribe-document *::after {
+    box-sizing: border-box;
+    border-color: var(--scribe-border-color);
+}
+
+.scribe-document p,
+.scribe-document h1,
+.scribe-document h2,
+.scribe-document h3,
+.scribe-document h4,
+.scribe-document h5,
+.scribe-document h6,
+.scribe-document blockquote,
+.scribe-document figure,
+.scribe-document hr,
+.scribe-document ul,
+.scribe-document ol,
+.scribe-document dl,
+.scribe-document dd,
+.scribe-document pre {
+    margin: 0;
+    padding: 0;
+    /* Force color inheritance so they don't pick up host tag styles */
+    color: inherit;
+}
+
+.scribe-document h1,
+.scribe-document h2,
+.scribe-document h3,
+.scribe-document h4,
+.scribe-document h5,
+.scribe-document h6 {
+    /* Prevent host heading rules from affecting Scribe headings */
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.scribe-document a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.scribe-document button, 
+.scribe-document input, 
+.scribe-document optgroup, 
+.scribe-document select, 
+.scribe-document textarea {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+}

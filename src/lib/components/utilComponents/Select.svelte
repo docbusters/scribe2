@@ -81,14 +81,14 @@
 </div>
 
 <style>
-  :global(.scribe-document .scribe-select-container) {
+  :global(.scribe-select-container) {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-height: 3.1875rem;
   }
 
-  :global(.scribe-document .scribe-select-trigger) {
+  :global(.scribe-select-trigger) {
     position: relative;
     display: flex;
     align-items: flex-start;
@@ -96,7 +96,7 @@
     width: 100%;
     background-color: var(--scribe-doc-background);
     border: 1px solid var(--scribe-border-color);
-    border-radius: 10px;
+    border-radius: var(--scribe-radius-md);
     font-family: var(--scribe-font-sans);
     color: var(--scribe-doc-foreground);
     cursor: pointer;
@@ -109,24 +109,24 @@
     padding-bottom: 0;
   }
 
-  :global(.scribe-document .scribe-select-trigger.has-placeholder) {
+  :global(.scribe-select-trigger.has-placeholder) {
     min-height: 3.1875rem;
     max-height: 3.1875rem;
     padding-top: 0.875rem;
   }
 
-  :global(.scribe-document .scribe-select-trigger.no-placeholder) {
+  :global(.scribe-select-trigger.no-placeholder) {
     min-height: 2.25rem;
     max-height: 2.25rem;
     padding-top: 0.625rem;
   }
 
-  :global(.scribe-document .scribe-select-trigger.error) {
+  :global(.scribe-select-trigger.error) {
     border-color: var(--scribe-error);
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: oklch(from var(--scribe-error-foreground) l c h / 5%);
   }
 
-  :global(.scribe-document .scribe-select-label) {
+  :global(.scribe-select-label) {
     color: var(--scribe-muted-foreground);
     pointer-events: none;
     position: absolute;
@@ -135,17 +135,17 @@
     transition: all 0.3s ease;
   }
 
-  :global(.scribe-document .scribe-select-label.idle) {
+  :global(.scribe-select-label.idle) {
     top: 0.75rem;
     font-size: 1rem;
   }
 
-  :global(.scribe-document .scribe-select-label.active) {
+  :global(.scribe-select-label.active) {
     top: 0.25rem;
     font-size: 0.75rem;
   }
 
-  :global(.scribe-document .scribe-select-value) {
+  :global(.scribe-select-value) {
     font-size: 1rem;
     color: var(--scribe-doc-foreground);
     white-space: nowrap;
@@ -158,37 +158,37 @@
     transition: all 0.3s ease;
   }
 
-  :global(.scribe-document .scribe-select-value.with-placeholder) {
+  :global(.scribe-select-value.with-placeholder) {
     top: 1.25rem;
   }
 
-  :global(.scribe-document .scribe-select-value.without-placeholder) {
+  :global(.scribe-select-value.without-placeholder) {
     top: 0.25rem;
   }
 
-  :global(.scribe-document .scribe-select-chevron) {
+  :global(.scribe-select-chevron) {
     color: var(--scribe-muted-foreground);
     transition: transform 0.2s ease;
     margin-top: 0.125rem;
   }
 
-  :global(.scribe-document .scribe-select-content) {
+  :global(.scribe-select-content) {
     min-width: var(--bits-select-anchor-width);
     max-height: 300px;
     padding: 0.375rem 0.25rem;
     background-color: var(--scribe-popover);
     border: 1px solid var(--scribe-border-color);
     border-radius: var(--scribe-radius-xl);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--scribe-shadow-lg);
     outline: none;
     z-index: 100;
   }
 
-  :global(.scribe-document .scribe-select-viewport) {
+  :global(.scribe-select-viewport) {
     padding: 0.25rem;
   }
 
-  :global(.scribe-document .scribe-select-item) {
+  :global(.scribe-select-item) {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -205,16 +205,16 @@
     transition: background-color 0.15s ease;
   }
 
-  :global(.scribe-document .scribe-select-item[data-highlighted]) {
+  :global(.scribe-select-item[data-highlighted]) {
     background-color: var(--scribe-muted);
   }
 
-  :global(.scribe-document .scribe-select-item[data-disabled]) {
+  :global(.scribe-select-item[data-disabled]) {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  :global(.scribe-document .scribe-select-scroll-btn) {
+  :global(.scribe-select-scroll-btn) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -224,7 +224,7 @@
     cursor: default;
   }
 
-  :global(.scribe-document .scribe-select-error-container) {
+  :global(.scribe-select-error-container) {
     display: flex;
     align-items: flex-end;
     gap: 0.5rem;
@@ -234,7 +234,7 @@
     color: var(--scribe-error);
   }
 
-  :global(.scribe-document .scribe-select-error-text) {
+  :global(.scribe-select-error-text) {
     font-size: 0.75rem;
     margin: 0;
   }

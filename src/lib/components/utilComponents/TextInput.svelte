@@ -70,28 +70,28 @@
 </div>
 
 <style>
-  :global(.scribe-document .scribe-input-container) {
+  .scribe-input-container {
     display: flex;
     flex-direction: column;
     width: 100%;
   }
 
-  :global(.scribe-document .scribe-input-wrapper) {
+  .scribe-input-wrapper {
     min-height: 3.1875rem;
     max-height: 3.1875rem;
     position: relative;
     border: 1px solid var(--scribe-border-color);
     background-color: var(--scribe-doc-background);
-    border-radius: 10px;
+    border-radius: var(--scribe-radius-md);
     transition: all 0.3s ease;
   }
 
-  :global(.scribe-document .scribe-input-wrapper.error) {
+  .scribe-input-wrapper.error {
     border-color: var(--scribe-error);
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: oklch(from var(--scribe-error-foreground) l c h / 5%);
   }
 
-  :global(.scribe-document .scribe-input-label) {
+  .scribe-input-label {
     color: var(--scribe-muted-foreground);
     margin-bottom: 0.25rem;
     pointer-events: none;
@@ -102,18 +102,18 @@
     transition: all 0.3s ease;
   }
 
-  :global(.scribe-document .scribe-input-label.idle) {
+  .scribe-input-label.idle {
     top: 1rem;
     font-size: 1rem;
   }
 
-  :global(.scribe-document .scribe-input-label.active) {
+  .scribe-input-label.active {
     top: 0.25rem;
     font-size: 0.75rem;
   }
 
-  :global(.scribe-document .scribe-input) {
-    border-radius: 10px;
+  .scribe-input {
+    border-radius: var(--scribe-radius-md);
     font-size: 1rem;
     color: var(--scribe-doc-foreground) !important;
     padding-left: 0.5rem;
@@ -129,17 +129,17 @@
     box-sizing: border-box;
   }
 
-  :global(.scribe-document .scribe-input.has-password-toggle) {
+  .scribe-input.has-password-toggle {
     padding-right: 3rem;
   }
 
-  :global(.scribe-document .scribe-input-password-toggle) {
+  .scribe-input-password-toggle {
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
   }
 
-  :global(.scribe-document .scribe-input-eye) {
+  .scribe-input-eye {
     position: absolute;
     color: var(--scribe-muted-foreground);
     width: 1.25rem;
@@ -147,28 +147,28 @@
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
-  :global(.scribe-document .scribe-input-eye-on) {
+  .scribe-input-eye-on {
     top: 0.375rem;
   }
 
-  :global(.scribe-document .scribe-input-eye-active) {
+  .scribe-input-eye-active {
     transform: rotate(0deg) scale(1);
     opacity: 1;
   }
 
-  :global(.scribe-document .scribe-input-eye-inactive) {
+  .scribe-input-eye-inactive {
     opacity: 0;
   }
 
-  :global(.scribe-document .scribe-input-eye-off.scribe-input-eye-inactive) {
+  .scribe-input-eye-off.scribe-input-eye-inactive {
     transform: rotate(-90deg) scale(0);
   }
 
-  :global(.scribe-document .scribe-input-eye-on.scribe-input-eye-inactive) {
+  .scribe-input-eye-on.scribe-input-eye-inactive {
     transform: rotate(90deg) scale(0);
   }
 
-  :global(.scribe-document .scribe-input-error-container) {
+  .scribe-input-error-container {
     display: flex;
     align-items: flex-end;
     gap: 0.5rem;
@@ -178,7 +178,7 @@
     color: var(--scribe-error);
   }
 
-  :global(.scribe-document .scribe-input-error-text) {
+  .scribe-input-error-text {
     font-size: 0.75rem;
     margin: 0;
   }

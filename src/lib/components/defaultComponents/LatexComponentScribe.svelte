@@ -20,7 +20,7 @@
                 displayMode: true,
                 throwOnError: true,
                 strict: true,
-                errorColor: '#ef4444'
+                errorColor: 'var(--scribe-error-foreground)'
             });
         } catch {
             return null;

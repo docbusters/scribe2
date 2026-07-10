@@ -81,11 +81,11 @@
 		position: fixed;
 		inset: 0;
 		z-index: 50;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--scribe-overlay);
 		backdrop-filter: blur(4px);
 	}
 
-	:global(.scribe-document .scribe-dialog-content) {
+	:global(.scribe-dialog-content) {
 		position: fixed;
 		left: 50%;
 		top: 50%;
@@ -99,14 +99,14 @@
 		background-color: var(--scribe-popover);
 		border: 1px solid var(--scribe-border-color);
 		border-radius: var(--scribe-radius-xl);
-		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		box-shadow: var(--scribe-shadow-lg);
 		outline: none;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 	}
 
-	:global(.scribe-document .scribe-dialog-title) {
+	:global(.scribe-dialog-title) {
 		font-family: var(--scribe-font-heading);
 		font-size: var(--scribe-font-size-lg);
 		font-weight: var(--scribe-font-weight-semibold);
@@ -115,20 +115,20 @@
 		text-align: center;
 	}
 
-	:global(.scribe-document .scribe-dialog-description) {
+	:global(.scribe-dialog-description) {
 		font-size: var(--scribe-font-size-sm);
 		color: var(--scribe-muted-foreground);
 		margin: 0;
 		text-align: center;
 	}
 
-	:global(.scribe-document .scribe-dialog-close-btn) {
+	:global(.scribe-dialog-close-btn) {
 		position: absolute;
 		top: 1rem;
 		right: 1rem;
 	}
 
-  :global(.scribe-document .scribe-dialog-body) {
+  :global(.scribe-dialog-body) {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -140,7 +140,7 @@
     padding-right: 1rem;
   }
 
-  :global(.scribe-document .scribe-dialog-footer) {
+  :global(.scribe-dialog-footer) {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;

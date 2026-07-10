@@ -11,18 +11,18 @@
   let { children, style = "", class: className = "", variant = "default", size = "default", loading = false, disabled, ...restProps }: ButtonProps = $props();
 
   const variantStyles: Record<string, string> = {
-    default: "background-color: var(--scribe-primary); color: var(--scribe-primary-foreground); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    destructive: "background-color: var(--scribe-error); color: white; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    outline: "background-color: transparent; color: var(--scribe-doc-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
-    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground); border: 1px solid var(--scribe-border-color); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);",
+    default: "background-color: var(--scribe-primary); color: var(--scribe-primary-foreground); box-shadow: var(--scribe-shadow-sm);",
+    destructive: "background-color: var(--scribe-error); color: white; box-shadow: var(--scribe-shadow-sm);",
+    outline: "background-color: transparent; color: var(--scribe-doc-foreground); border: 1px solid var(--scribe-border-color); box-shadow: var(--scribe-shadow-sm);",
+    secondary: "background-color: var(--scribe-secondary); color: var(--scribe-secondary-foreground); border: 1px solid var(--scribe-border-color); box-shadow: var(--scribe-shadow-sm);",
     ghost: "background-color: transparent; color: inherit; box-shadow: none;",
     "ghost-destructive": "background-color: transparent; color: var(--scribe-muted-foreground); box-shadow: none;",
   };
 
   const sizeStyles: Record<string, string> = {
     default: "height: 2.25rem; padding: 0.5rem 1rem;",
-    sm: "height: 2rem; padding: 0 0.75rem; border-radius: 0.375rem; gap: 0.375rem;",
-    lg: "height: 2.5rem; padding: 0 1.5rem; border-radius: 0.375rem;",
+    sm: "height: 2rem; padding: 0 0.75rem; border-radius: var(--scribe-radius-sm); gap: 0.375rem;",
+    lg: "height: 2.5rem; padding: 0 1.5rem; border-radius: var(--scribe-radius-sm);",
     icon: "min-height: 2.25rem; min-width: 2.25rem; padding: 0;",
     "icon-sm": "height: 1.5rem; width: 1.5rem; padding: 0;",
   };
@@ -43,13 +43,13 @@
 </Button.Root>
 
 <style>
-  :global(.scribe-document .scribe-btn) {
+  :global(.scribe-btn) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 15px;
     font-weight: var(--scribe-font-weight-semibold);
-    border-radius: var(--radius, 0.5rem);
+    border-radius: var(--scribe-radius-md);
     transition: all 0.2s ease;
     cursor: pointer;
     box-sizing: border-box;
@@ -58,28 +58,28 @@
     border: none;
   }
 
-  :global(.scribe-document .scribe-btn:active:not(:disabled)) {
+  :global(.scribe-btn:active:not(:disabled)) {
     transform: scale(0.98);
   }
 
-  :global(.scribe-document .scribe-btn:hover:not(:disabled)) {
+  :global(.scribe-btn:hover:not(:disabled)) {
     opacity: 0.9;
   }
 
-  :global(.scribe-document .scribe-btn:disabled) {
+  :global(.scribe-btn:disabled) {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  :global(.scribe-document .scribe-btn[style*="border:"]) {
-    border-color: var(--border, #e5e7eb);
+  :global(.scribe-btn[style*="border:"]) {
+    border-color: var(--scribe-border-color);
   }
-  :global(.scribe-document .scribe-btn[style*="border:"]:hover), :global(.scribe-document .scribe-btn[style*="transparent"]:not([style*="underline"]):hover) {
-    background-color: var(--accent, #f1f5f9) !important;
-    color: var(--accent-foreground, #0f172a) !important;
+  :global(.scribe-btn[style*="border:"]:hover), :global(.scribe-btn[style*="transparent"]:not([style*="underline"]):hover) {
+    background-color: var(--scribe-muted) !important;
+    color: var(--scribe-muted-foreground) !important;
   }
 
-  :global(.scribe-document .scribe-btn.scribe-btn-ghost-destructive:hover:not(:disabled)) {
+  :global(.scribe-btn.scribe-btn-ghost-destructive:hover:not(:disabled)) {
     background-color: oklch(from var(--scribe-error-foreground) l c h / 15%) !important;
     color: var(--scribe-error-foreground) !important;
   }

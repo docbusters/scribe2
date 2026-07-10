@@ -192,7 +192,7 @@
         opacity: 0;
         transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
         z-index: 10;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        box-shadow: var(--scribe-shadow-sm);
         touch-action: none; /* Prevent touch scrolling while dragging */
     }
 
@@ -203,7 +203,7 @@
 
     .resize-handle:hover {
         transform: scale(1.15);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        box-shadow: var(--scribe-shadow-md);
     }
 
     .resize-handle.right {

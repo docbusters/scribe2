@@ -138,7 +138,7 @@
     {disabled}
     onclick={() => {
         selectedKey = config?.xAxisKey;
-        draftSeries = config?.series ? config.series.map(s => ({...s, color: s.color || '#ff9999'})) : [];
+        draftSeries = config?.series ? config.series.map(s => ({...s, color: s.color || 'var(--scribe-primary)'})) : [];
         draftDeletedSeriesKeys.clear();
         open = true;
     }}
@@ -257,7 +257,7 @@
     }
 
     .section-icon {
-        color: var(--scribe-primary, #3b82f6);
+        color: var(--scribe-primary);
     }
 
     h5 {
@@ -294,7 +294,7 @@
         border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-radius-md);
         background: linear-gradient(145deg, var(--scribe-background), var(--scribe-muted));
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        box-shadow: var(--scribe-shadow-sm);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
@@ -317,13 +317,13 @@
         transition: background-color 0.3s;
     }
     .series-card:hover::before {
-        background-color: var(--scribe-primary, #3b82f6);
+        background-color: var(--scribe-primary);
     }
 
     .series-card:hover {
         border-color: var(--scribe-border-color-hover, var(--scribe-muted-foreground));
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        box-shadow: var(--scribe-shadow-md);
     }
     
     .series-info {
@@ -386,7 +386,7 @@
         background: none;
         overflow: hidden;
         z-index: 1;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.1) inset;
+        box-shadow: inset 0 0 0 1px var(--scribe-border-color);
         transition: transform 0.2s;
     }
     .color-picker:hover {

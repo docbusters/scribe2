@@ -42,7 +42,7 @@
 		class: className,
 		location = $bindable(),
 		style = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-		markerColor = '#277ee8',
+		markerColor = 'var(--scribe-primary)',
 		hasGlobeBtn = false,
 		hasZoomBtn = false,
 		hasCurrentPosBtn = false,
@@ -257,7 +257,7 @@
 		border-radius: 100%;
 		padding: 0.5rem;
 		background-color: var(--scribe-section-background);
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		box-shadow: var(--scribe-shadow-sm);
 		border: 1px solid var(--scribe-border-color);
 		aspect-ratio: 1;
 		display: flex;
@@ -303,7 +303,7 @@
 		border-style: solid;
 		padding-left: 0.75rem;
 		padding-right: 0.75rem;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		box-shadow: var(--scribe-shadow-sm);
 	}
 
 	.search-input {
@@ -343,7 +343,7 @@
 		border-width: 1px;
 		border-style: solid;
 		padding: 0.25rem;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		box-shadow: var(--scribe-shadow-sm);
 	}
 
 	.search-results-list {
