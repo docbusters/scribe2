@@ -97,7 +97,7 @@
     autocomplete="off"
     {style} 
     placeholder={config?.placeholder} 
-    class="text-input" 
+    class="scribe-text-input" 
     type="text"
     {oninput}
     {onblur}
@@ -105,7 +105,7 @@
 />
 
 <style>
-    .text-input {
+    .scribe-text-input {
         padding: 0.5em;
         border: 1px solid var(--scribe-border-color);
         border-radius: 0.5em;
