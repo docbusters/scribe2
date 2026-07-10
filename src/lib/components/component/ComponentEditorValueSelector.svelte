@@ -106,7 +106,7 @@
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 					<h5>Value Source</h5>
 				</div>
-				<p class="section-desc">Select the type of data or binding to use for this property.</p>
+				<p class="section-desc">Select the type of data or binding to use for this property</p>
 			</div>
 			
 			<div class="input-wrapper">
@@ -128,7 +128,7 @@
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
 						<h5>Value Configuration</h5>
 					</div>
-					<p class="section-desc">Configure the actual value or binding parameters.</p>
+					<p class="section-desc">Configure the actual value or binding parameters</p>
 				</div>
 				
 				<div class={parsedValueType.type === 'record' || parsedValueType.type === 'array' ? 'value-input-card' : 'input-wrapper'}>

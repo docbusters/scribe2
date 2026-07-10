@@ -1,5 +1,7 @@
 import type { BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode, UpdateType } from "$lib/types/ScribeProps.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
+import { stringifyDataValue } from "$lib/utils/stringifyDataValue.js";
+import { truncateString } from "$lib/utils/truncateString.js";
 import type { BindingValue, CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.ts";
 import type { BindingsDefinition } from "../domain/Document.ts";
 import { customBindingsStore } from "./custom-bindings-store.svelte.js";
@@ -44,7 +46,7 @@ class BindingStore {
             const disabled = !supportedTypes?.includes(type);
             return {
                 value: id,
-                label: `${id} (${this.data[id].value})`,
+                label: `${id} (${truncateString(stringifyDataValue(this.data[id]))})`,
                 disabled,
                 type
             };

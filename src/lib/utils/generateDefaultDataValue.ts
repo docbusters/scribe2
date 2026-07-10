@@ -5,7 +5,7 @@ import { generateRandomId } from "./generateRandomId.js";
 /**
  * Generates a default date value given a type. If specified, it will use the initialValue to generate the default value, but if the type of the initialValue does not match the specified type, it will throw an error.
  */
-export function generateDefaultDataValue(type: DataValue['type'], initialValue?: DataValue): DataValue {
+export function generateDefaultDataValue(type: DataValue['type'], initialValue?: DataValue, componentType?: string): DataValue {
     if (initialValue && initialValue.type !== type) {
         throw new Error(`Initial value type (${initialValue.type}) does not match the specified type (${type})`);
     }
@@ -51,7 +51,7 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
             const bindingId = editStore.addBinding({
                 type: 'empty',
                 initialValue: undefined,
-            });
+            }, componentType);
             return {
                 type: 'binding',
                 bindingType: 'default',

@@ -349,7 +349,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const initialValue = globalRegistry.getInitialComponentValue(componentType);
 
         // Generate a default value based on the value type
-        const value = generateDefaultDataValue(emptyComponent.value, initialValue);
+        const value = generateDefaultDataValue(emptyComponent.value, initialValue, componentType);
 
         const newComponent = {
             ...emptyComponent,
@@ -464,9 +464,17 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /* * BINDINGS MANAGEMENT * */
 
-    addBinding(definition: BindingsDefinition) {
+    addBinding(definition: BindingsDefinition, componentType?: string) {
+        // Generate a unique id
+        const prefix = componentType ? `${componentType}` : "";
+        let counter = 1;
+        let newId = `${prefix}-${counter}`;
+        while (this.bindings[newId]) {
+            counter++;
+            newId = `${prefix}-${counter}`;
+        }
+
         // Add the new binding to the document
-        const newId = generateRandomId("binding");
         this.bindings[newId] = definition;
 
         // Also initialize the binding value in the data store
