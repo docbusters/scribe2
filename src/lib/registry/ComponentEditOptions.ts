@@ -14,6 +14,7 @@ export interface ComponentEditOnClick {
 export interface ComponentEditProps {
     componentType: string;
     componentValue: DataValue;
+    isBinding: boolean;
     sectionId: string;
     componentId: string;
     disabled: boolean;

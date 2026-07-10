@@ -43,5 +43,5 @@ export interface MapComponentConfig extends ComponentConfig {
 export interface ChartComponentConfig extends ComponentConfig {
     type: 'bar' | 'line' | 'area' | 'pie' | 'arc';
     xAxisKey?: string;
-    series: { key: string; label: string; color?: string }[];
+    series: { key: string; label: string; color?: string; hidden?: boolean }[];
 }

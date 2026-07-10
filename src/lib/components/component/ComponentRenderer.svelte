@@ -31,33 +31,33 @@
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
 	let resolvedValue = $derived.by(() => {
 		const { types, bindingTypes } = componentSupportedTypes;
-		
+
 		try {
 			if (!types.includes(componentData.value.type)) {
 				throw new Error(`Unsupported value type: ${componentData.value.type}`);
 			}
 
 			if (componentData.value.type === 'binding') {
-				const result = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
+				const bindingResult = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
 
-				if (result instanceof Promise) {
-					return result.then(bindingValue => {
+				if (bindingResult instanceof Promise) {
+					return bindingResult.then(bindingValue => {
 						if (!bindingTypes.includes(bindingValue.type)) {
 							console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
 							throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
 						}
-						return bindingValue;
+						return { value: bindingValue, isBinding: true };
 					});
 				} else {
-					if (!bindingTypes.includes(result.type)) {
-						console.error(`Component ${componentData.type} does not support binding value type ${result.type}`, { componentData, result });
-						throw new Error(`Unsupported binding value type: ${result.type}`);
+					if (!bindingTypes.includes(bindingResult.type)) {
+						console.error(`Component ${componentData.type} does not support binding value type ${bindingResult.type}`, { componentData, result: bindingResult });
+						throw new Error(`Unsupported binding value type: ${bindingResult.type}`);
 					}
-					return result;
+					return { value: bindingResult, isBinding: true };
 				}
 			}
 			
-			return componentData.value;
+			return { value: componentData.value, isBinding: false };
 		} catch (error) {
 			return Promise.reject(error);
 		}
@@ -120,18 +120,18 @@
 			{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
 				<div class="component-editor" contenteditable="false">
-					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+					<ComponentEditor isBinding={resolvedValuePromise.isBinding} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
-				<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
+				<div style="display: contents;" use:mountComponent={{ componentData,  sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 			</div>
 		{:else}
-			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
+			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 		{/if}
 	{:catch error}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
 				<div class="component-editor" contenteditable="false">
-					<ComponentEditor componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+					<ComponentEditor isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
 				<EmptyContent 
 					message="Component Error" 

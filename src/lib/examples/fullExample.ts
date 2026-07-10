@@ -139,32 +139,32 @@ export const fullExampleDocument: Document = {
                                 type: 'record',
                                 value: {
                                     food: { type: 'string', value: 'Broccoli' },
-                                    hateLevel: { type: 'number', value: 40 },
-                                    disgust: { type: 'number', value: 20 }
+                                    hatelevel: { type: 'number', value: 40 },
+                                    disgustrating: { type: 'number', value: 20 }
                                 }
                             },
                             {
                                 type: 'record',
                                 value: {
                                     food: { type: 'string', value: 'Olives' },
-                                    hateLevel: { type: 'number', value: 95 },
-                                    disgust: { type: 'number', value: 100 }
+                                    hatelevel: { type: 'number', value: 95 },
+                                    disgustrating: { type: 'number', value: 100 }
                                 }
                             },
                             {
                                 type: 'record',
                                 value: {
                                     food: { type: 'string', value: 'Liver' },
-                                    hateLevel: { type: 'number', value: 85 },
-                                    disgust: { type: 'number', value: 90 }
+                                    hatelevel: { type: 'number', value: 85 },
+                                    disgustrating: { type: 'number', value: 90 }
                                 }
                             },
                             {
                                 type: 'record',
                                 value: {
                                     food: { type: 'string', value: 'Mushrooms' },
-                                    hateLevel: { type: 'number', value: 60 },
-                                    disgust: { type: 'number', value: 70 }
+                                    hatelevel: { type: 'number', value: 60 },
+                                    disgustrating: { type: 'number', value: 70 }
                                 }
                             }
                         ]
@@ -174,8 +174,8 @@ export const fullExampleDocument: Document = {
                         xAxisKey: 'food',
                         series: [
                             { key: 'food', label: "Food", color: '#ff0000' },
-                            { key: 'hateLevel', label: 'Pure Hate Level', color: '#ff4b4b' },
-                            { key: 'disgust', label: 'Disgust Rating', color: '#880000' }
+                            { key: 'hatelevel', label: 'Hate Level', color: '#ff4b4b' },
+                            { key: 'disgustrating', label: 'Disgust Rating', color: '#880000' }
                         ]
                     }
                 }

@@ -9,6 +9,7 @@
     interface ComponentEditorProps extends HTMLAttributes<HTMLDivElement> {
         componentType: string;
         componentValue: DataValue;
+        isBinding: boolean;
         componentConfig?: ComponentConfig;
         sectionId: string;
         componentId: string;
@@ -17,7 +18,7 @@
         disabledOptions: string[];
     }
 
-    let { componentType, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, disabledOptions,  ...restProps }: ComponentEditorProps = $props();
+    let { componentType, isBinding, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, disabledOptions,  ...restProps }: ComponentEditorProps = $props();
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -49,6 +50,7 @@
                         name: baseOption.name,
                         onclick: baseOption.props.onclick,
                         icon: baseOption.props.icon,
+                        isBinding,
                         isSelected: baseOption.isSelected ? baseOption.isSelected({ value: componentValue, config: componentConfig }) : false
                     });
                     if (cleanup) {

@@ -13,6 +13,8 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     mode: ScribeMode;
     /** Component value with bindings resolved */
     resolvedValue: PrimitiveValue | CollectionValue;
+    /** Indicates whether the component value is resolved from a binding */
+    isBinding: boolean;
     /** Updates the component value handling binding updates */
     updateComponentValue: (newValue: DataValue, updateType: UpdateType) => void;
     /** Updates the component config handling config updates */

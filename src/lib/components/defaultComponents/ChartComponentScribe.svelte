@@ -20,7 +20,7 @@
 	let chartData = $state<Record<string, unknown>[]>([]);
 
 	const xKey = $derived(config?.xAxisKey);
-	const activeSeries = $derived(config?.series?.filter((s) => s.key !== config?.xAxisKey) ?? []);
+	const activeSeries = $derived(config?.series?.filter((s) => s.key !== config?.xAxisKey && !s.hidden) ?? []);
 
 	$effect(() => {
 		if (!arrayValue || arrayValue.type !== 'array' || arrayValue.value.length === 0) return;
