@@ -11,6 +11,7 @@ class CustomBindingsStore {
     
     // Stores data values in a non-reactive way to avoid state_unsafe_mutation errors
     private cache = new Map<string, CustomBindingInstance>();
+    private pendingRequests = new Map<string, Promise<PrimitiveValue | CollectionValue>>();
     // Triggers used to notify Svelte of changes in a safe way (outside the render cycle)
     private triggers = $state<Record<string, number>>({});
 
@@ -27,9 +28,14 @@ class CustomBindingsStore {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         this.triggers[key]; 
 
-        // If the data already exists in the cache, return it immediately
-        if (this.cache.has(key)) {
+        // If the data already exists in the cache AND it's not pending, return it immediately
+        if (this.cache.has(key) && !this.pendingRequests.has(key)) {
             return this.cache.get(key)!.value;
+        }
+
+        // If a request is already in progress, wait for it instead of returning a temporary value
+        if (this.pendingRequests.has(key)) {
+            return this.pendingRequests.get(key)!;
         }
 
         const def = this.definitions[bindingType];
@@ -37,31 +43,40 @@ class CustomBindingsStore {
             throw new Error(`Custom binding definition '${bindingType}' not found.`);
         }
 
-        // Store temporarily an empty value to avoid infinite loops if getData calls getValue again
-        const instance: CustomBindingInstance = { value: { type: 'string', value: '' } };
-        this.cache.set(key, instance);
+        const fetchPromise = (async () => {
+            const instance: CustomBindingInstance = { value: { type: 'string', value: '' } };
+            
+            // Get the value or the subscribable object
+            const result = await def.getData(id);
+            const isSubscribable = result !== null && typeof result === 'object' && 'subscribe' in result;
+            
+            instance.value = isSubscribable 
+                ? (result as CustomBindingSubscribable).value 
+                : (result as PrimitiveValue | CollectionValue);
 
-        // Get the value or the subscribable object
-        const result = await def.getData(id);
-        const isSubscribable = result !== null && typeof result === 'object' && 'subscribe' in result;
-        
-        instance.value = isSubscribable 
-            ? (result as CustomBindingSubscribable).value 
-            : (result as PrimitiveValue | CollectionValue);
-
-        if (isSubscribable) {
-            const subscribable = result as CustomBindingSubscribable;
-            instance.destroy = subscribable.subscribe((newValue) => {
-                instance.value = newValue; 
-                
-                // Create a microtask that updates the trigger in order to notify Svelte of the change without causing state_unsafe_mutation
-                queueMicrotask(() => {
-                    this.triggers[key] = (this.triggers[key] || 0) + 1;
+            if (isSubscribable) {
+                const subscribable = result as CustomBindingSubscribable;
+                instance.destroy = subscribable.subscribe((newValue) => {
+                    instance.value = newValue; 
+                    
+                    // Create a microtask that updates the trigger in order to notify Svelte of the change without causing state_unsafe_mutation
+                    queueMicrotask(() => {
+                        this.triggers[key] = (this.triggers[key] || 0) + 1;
+                    });
                 });
-            });
-        }
+            }
 
-        return instance.value;
+            this.cache.set(key, instance);
+            return instance.value;
+        })();
+
+        this.pendingRequests.set(key, fetchPromise);
+
+        try {
+            return await fetchPromise;
+        } finally {
+            this.pendingRequests.delete(key);
+        }
     }
 
     // Called when Scribe unmounts or changes document
