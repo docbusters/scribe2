@@ -130,9 +130,11 @@
 	{:catch error}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
-				<div class="component-editor" contenteditable="false">
-					<ComponentEditor isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
-				</div>
+				{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
+					<div class="component-editor" contenteditable="false">
+						<ComponentEditor isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+					</div>
+				{/if}
 				<EmptyContent 
 					message="Component Error" 
 					description={error.message} 
