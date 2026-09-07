@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { editStore } from "../../stores/edit-store.svelte.js";
-    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.js';
-    import { getSelection } from '../../utils/selection.js';
-
+    import { handleArrowNavigation, setupFocusListeners } from '../../utils/focusNavigation.ts';
 
     interface SectionTitleProps {
         isEditMode: boolean;
@@ -20,103 +18,12 @@
     }
 
     function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLHeadingElement; }) {
-        const selection = getSelection(titleElement);
-        if (!selection || selection.rangeCount === 0) return;
-
-        const target = event.currentTarget;
-        const range = selection.getRangeAt(0);
-
-        const preRange = range.cloneRange();
-        preRange.selectNodeContents(target);
-        preRange.setEnd(range.startContainer, range.startOffset);
-        const textBefore = preRange.toString();
-
-        const postRange = range.cloneRange();
-        postRange.selectNodeContents(target);
-        postRange.setStart(range.endContainer, range.endOffset);
-        const textAfter = postRange.toString();
-
-        const isAtStart = textBefore.length === 0;
-        const isAtEnd = textAfter.length === 0;
-
-        switch (event.key) {
-            case 'ArrowLeft': {
-                if (isAtStart) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'left');
-                }
-                break;
-            }
-            case 'ArrowUp': {
-                if (isAtStart) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'up');
-                }
-                break;
-            }
-            case 'ArrowRight': {
-                if (isAtEnd) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'right');
-                }
-                break;
-            }
-            case 'ArrowDown': {
-                if (isAtEnd) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'down');
-                }
-                break;
-            }
-        }
-    }
-
-    function handleFocusStart() {
-        if (!titleElement) return;
-        titleElement.focus();
-        
-        // Move cursor to the start
-        const selection = getSelection(titleElement);
-        const range = document.createRange();
-        range.setStart(titleElement, 0);
-        range.collapse(true);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-    }
-
-    function handleFocusEnd() {
-        if (!titleElement) return;
-        titleElement.focus();
-        
-        // Move cursor to the end
-        const selection = getSelection(titleElement);
-        const range = document.createRange();
-        range.selectNodeContents(titleElement);
-        range.collapse(false);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
+        handleArrowNavigation(event, event.currentTarget);
     }
 
     $effect(() => {
         if (!titleElement) return;
-
-        const onFocusStart = (e: Event) => {
-            e.preventDefault();
-            handleFocusStart();
-        };
-
-        const onFocusEnd = (e: Event) => {
-            e.preventDefault();
-            handleFocusEnd();
-        };
-
-        titleElement.addEventListener('scribe-focus-start', onFocusStart);
-        titleElement.addEventListener('scribe-focus-end', onFocusEnd);
-
-        return () => {
-            titleElement?.removeEventListener('scribe-focus-start', onFocusStart);
-            titleElement?.removeEventListener('scribe-focus-end', onFocusEnd);
-        };
+        return setupFocusListeners(titleElement);
     });
 </script>
 

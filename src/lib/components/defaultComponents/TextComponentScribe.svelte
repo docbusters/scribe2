@@ -5,7 +5,7 @@
 	import { editStore } from '../../stores/edit-store.svelte.ts';
 	import { toolbarStore } from '../../stores/toolbar-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
-    import { navigateToAdjacentComponent } from '../../utils/focusNavigation.ts';
+    import { handleArrowNavigation, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
@@ -140,6 +140,10 @@
         const target = event.currentTarget;
         const range = selection.getRangeAt(0);
 
+        if (handleArrowNavigation(event, target)) {
+            return;
+        }
+
         const preRange = range.cloneRange();
         preRange.selectNodeContents(target);
         preRange.setEnd(range.startContainer, range.startOffset);
@@ -162,42 +166,6 @@
                         target.lastElementChild.remove();
                         event.preventDefault();
                     }
-                }
-                break;
-            }
-            case 'ArrowLeft': {
-                if (isAtStart) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'left');
-                }
-                break;
-            }
-            case 'ArrowUp': {
-                const caretRect = range.getBoundingClientRect();
-                const targetRect = target.getBoundingClientRect();
-                
-                // If the distance from the top edge is less than the height of the cursor we are on the first line
-                if (isAtStart || (caretRect.top >= 0 && (caretRect.top - targetRect.top) <= caretRect.height)) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'up');
-                }
-                break;
-            }
-            case 'ArrowRight': {
-                if (isAtEnd) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'right');
-                }
-                break;
-            }
-            case 'ArrowDown': {
-                const caretRect = range.getBoundingClientRect();
-                const targetRect = target.getBoundingClientRect();
-                
-                // If the distance from the bottom edge is less than the height of the cursor we are on the last line
-                if (isAtEnd || (caretRect.bottom > 0 && (targetRect.bottom - caretRect.bottom) <= caretRect.height)) {
-                    event.preventDefault();
-                    navigateToAdjacentComponent(target, 'down');
                 }
                 break;
             }
@@ -288,52 +256,9 @@
 
     let textDiv: HTMLSpanElement | null = $state(null);
 
-    function handleFocusStart() {
-        if (!textDiv) return;
-        textDiv.focus();
-        
-        // Move cursor to the start
-        const selection = getSelection(textDiv);
-        const range = document.createRange();
-        range.setStart(textDiv, 0);
-        range.collapse(true);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-    }
-
-    function handleFocusEnd() {
-        if (!textDiv) return;
-        textDiv.focus();
-        
-        // Move cursor to the end
-        const selection = getSelection(textDiv);
-        const range = document.createRange();
-        range.selectNodeContents(textDiv);
-        range.collapse(false);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-    }
-
     $effect(() => {
         if (!textDiv) return;
-
-        const onFocusStart = (e: Event) => {
-            e.preventDefault();
-            handleFocusStart();
-        };
-
-        const onFocusEnd = (e: Event) => {
-            e.preventDefault();
-            handleFocusEnd();
-        };
-
-        textDiv.addEventListener('scribe-focus-start', onFocusStart);
-        textDiv.addEventListener('scribe-focus-end', onFocusEnd);
-
-        return () => {
-            textDiv?.removeEventListener('scribe-focus-start', onFocusStart);
-            textDiv?.removeEventListener('scribe-focus-end', onFocusEnd);
-        };
+        return setupFocusListeners(textDiv);
     });
 
     /**

@@ -36,6 +36,7 @@
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
+	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
 
 	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange }: ScribeProps = $props();
 
@@ -220,11 +221,6 @@
 
 	let title = $derived(parseStringForContentEditable(documentState.title));
 
-	function handleTitleChange(event: Event & { currentTarget: EventTarget & HTMLDivElement; }) {
-        const target = event.target as HTMLDivElement;
-		console.log('New doc title value:', target.innerText);
-        editStore.setDocumentTitle(target.innerText);
-    }
 </script>
 
 <div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass}>
@@ -234,19 +230,7 @@
 		</Button>
 	{/if}
 	{#if documentState}
-		<div class="title-container">
-			{#key title}
-				<h1 class="document-title" contenteditable={mode === 'edit'} onblur={handleTitleChange}>
-					{#each title as line, index (index)}
-						{#if line === ''}
-							<br>
-						{:else}
-							{line}
-						{/if}
-					{/each}
-				</h1>
-			{/key}
-		</div>
+		<DocumentTitle isEditMode={mode === 'edit'} text={title} />
 		<div {style} bind:this={dataOrder} class="scribe-sections">
 			{#if !loading}
 				{#each sections as section (section.id)}
@@ -298,15 +282,6 @@
 	.scribe-document *::before,
 	.scribe-document *::after) {
 		box-sizing: border-box;
-	}
-
-	.title-container {
-		display: inline;
-	}
-
-	.document-title {
-		outline: none;
-        display: inline;
 	}
 
 	:global(.scribe-document h1) {

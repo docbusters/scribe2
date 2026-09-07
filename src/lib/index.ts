@@ -59,6 +59,14 @@ export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComp
 export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
 export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
+// FOCUS NAVIGATION
+export {
+    handleArrowNavigation,
+    setupFocusListeners,
+    navigateToAdjacentComponent
+} from './utils/focusNavigation.js';
+export type { FocusNavigationDetail } from './utils/focusNavigation.js';
+
 declare global {
     interface HTMLElementTagNameMap {
         'scribe-interpreter': ScribeInterpreterElement;
