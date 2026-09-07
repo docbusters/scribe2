@@ -340,51 +340,143 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /** Add a new component to a section. If componentId is null, the component will be appended to the end */
     addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false, overrideValue?: DataValue) {
+        const result = this.insertComponent(sectionId, componentId, componentType, {
+            mode: replaceComponent ? 'replace' : 'after',
+            overrideValue
+        });
+        return result ? result.newId : null;
+    }
+
+    /**
+     * Inserts a new component with support for positional placement (before, after, replace)
+     * and text component splitting (splitting a text component into textBefore + newComponent + textAfter).
+     * Returns an object with the new component ID and the ID of the text component immediately to its right (if any).
+     */
+    insertComponent(
+        sectionId: string,
+        componentId: string | null,
+        componentType: string,
+        options?: {
+            mode?: 'after' | 'before' | 'replace' | 'split';
+            splitData?: { textBefore: string; textAfter: string };
+            overrideValue?: DataValue;
+        }
+    ): { newId: string; rightTextId: string } | null {
+        const mode = options?.mode || 'after';
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
         if (!section) return null;
 
-        // Generate a new id and build the component
+        // If split mode is requested with valid split data and target component exists
+        if (mode === 'split' && options?.splitData && componentId) {
+            const entries = Object.entries(section.content);
+            const targetIndex = entries.findIndex(([key]) => key === componentId);
+            if (targetIndex !== -1) {
+                const [targetId, targetComp] = entries[targetIndex];
+
+                // 1. Update the existing text component with textBefore
+                const updatedTargetComp = {
+                    ...targetComp,
+                    value: { type: 'string', value: options.splitData.textBefore }
+                } as C;
+                entries[targetIndex] = [targetId, updatedTargetComp];
+
+                // 2. Create the newly inserted component
+                const newId = generateRandomId(componentType);
+                const emptyComponent = globalRegistry.getEmptyComponent(componentType);
+                const initialValue = globalRegistry.getInitialComponentValue(componentType);
+                const value = generateDefaultDataValue(emptyComponent.value, initialValue, componentType);
+                const newComponent = {
+                    ...emptyComponent,
+                    id: newId,
+                    value: options.overrideValue !== undefined ? options.overrideValue : value,
+                } as C;
+
+                // 3. Create the trailing text component with textAfter
+                const newTextId = generateRandomId('text');
+                const emptyTextComp = globalRegistry.getEmptyComponent('text');
+                const newTextComp = {
+                    ...emptyTextComp,
+                    id: newTextId,
+                    value: { type: 'string', value: options.splitData.textAfter }
+                } as C;
+
+                // 4. Splice both new components immediately after targetIndex
+                entries.splice(targetIndex + 1, 0, [newId, newComponent], [newTextId, newTextComp]);
+                section.content = Object.fromEntries(entries);
+
+                // 5. Track bindings
+                extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
+                extractBindingUsages(this.customBindingUsages, newTextId, newTextComp.value, true);
+
+                return { newId, rightTextId: newTextId };
+            }
+        }
+
+        // Build the new component
         const newId = generateRandomId(componentType);
         const emptyComponent = globalRegistry.getEmptyComponent(componentType);
         const initialValue = globalRegistry.getInitialComponentValue(componentType);
-
-        // Generate a default value based on the value type
         const value = generateDefaultDataValue(emptyComponent.value, initialValue, componentType);
-
         const newComponent = {
             ...emptyComponent,
             id: newId,
-            value: overrideValue !== undefined ? overrideValue : value,
+            value: options?.overrideValue !== undefined ? options.overrideValue : value,
         } as C;
 
-        // If no target component is specified, just append to the end
+        // If no target component is specified, append to the end
         if (!componentId) {
             section.content[newId] = newComponent;
             extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            const resultingId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            return { newId: resultingId, rightTextId: '' };
         }
 
-        // Reconstruct the section content object to preserve order and insert after or replace the target
         const entries = Object.entries(section.content);
         const targetIndex = entries.findIndex(([key]) => key === componentId);
 
         if (targetIndex !== -1) {
-            // Target is a top-level component in the section
-            if (replaceComponent) {
+            if (mode === 'replace') {
                 const [oldId, oldComponent] = entries[targetIndex];
                 extractBindingUsages(this.customBindingUsages, oldId, oldComponent.value, false);
                 entries.splice(targetIndex, 1, [newId, newComponent]);
+            } else if (mode === 'before') {
+                if (options?.splitData?.textAfter !== undefined) {
+                    const [targetId, targetComp] = entries[targetIndex];
+                    entries[targetIndex] = [targetId, {
+                        ...targetComp,
+                        value: { type: 'string', value: options.splitData.textAfter }
+                    } as C];
+                }
+                entries.splice(targetIndex, 0, [newId, newComponent]);
             } else {
+                if (options?.splitData?.textBefore !== undefined) {
+                    const [targetId, targetComp] = entries[targetIndex];
+                    entries[targetIndex] = [targetId, {
+                        ...targetComp,
+                        value: { type: 'string', value: options.splitData.textBefore }
+                    } as C];
+                }
                 entries.splice(targetIndex + 1, 0, [newId, newComponent]);
             }
             section.content = Object.fromEntries(entries);
             extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            const resultingNewId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+
+            // Find the first text component to the right of the newly inserted component
+            const updatedEntries = Object.entries(section.content);
+            const newIndex = updatedEntries.findIndex(([key]) => key === resultingNewId);
+            const rightTextEntry = newIndex !== -1
+                ? updatedEntries.slice(newIndex + 1).find(([, comp]) => comp.type === 'text')
+                : undefined;
+            const rightTextId = rightTextEntry ? rightTextEntry[0] : '';
+
+            return { newId: resultingNewId, rightTextId };
         } else {
             console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
             section.content[newId] = newComponent;
             extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            return this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            const resultingNewId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            return { newId: resultingNewId, rightTextId: '' };
         }
     }
 

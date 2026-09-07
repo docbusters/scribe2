@@ -3,7 +3,7 @@
 	import type { TextComponent } from '../../domain/components/DefaultComponents.ts';
 	import type { StringValue } from '../../domain/data/DataValue.ts';
 	import { editStore } from '../../stores/edit-store.svelte.ts';
-	import { toolbarStore } from '../../stores/toolbar-store.svelte.ts';
+	import { toolbarStore, type ToolbarInsertionMode, type ToolbarSplitData } from '../../stores/toolbar-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { handleArrowNavigation, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
@@ -171,17 +171,56 @@
             }
             case ' ': {
                 if (!event.ctrlKey) return;
+                event.preventDefault(); // Prevent adding an actual space character
 
-                // First blur the contenteditable to trigger to save the current text
-                target.blur();
+                // Do not blur the target here so that the DOM and selection remain intact if the user cancels with ESC
 
-                const isSpaceBefore = isAtStart || /\s$/.test(textBefore);
-                const isSpaceAfter = isAtEnd || /^\s/.test(textAfter);
+                // Capture formatted text fragments before and after the caret
+                const preFragment = preRange.cloneContents();
+                const postFragment = postRange.cloneContents();
 
-                // If the space is part of a word, do nothing special
-                if (!isSpaceBefore && !isSpaceAfter) {
-                    return;
+                let formattedBefore = '';
+                for (const child of Array.from(preFragment.childNodes)) {
+                    formattedBefore += parseDOM(child);
                 }
+
+                let formattedAfter = '';
+                for (const child of Array.from(postFragment.childNodes)) {
+                    formattedAfter += parseDOM(child);
+                }
+
+                const isActuallyEmpty = isEmpty || (textBefore.length === 0 && textAfter.length === 0);
+
+                let insertionMode: ToolbarInsertionMode;
+                let splitData: ToolbarSplitData | undefined = undefined;
+
+                if (isActuallyEmpty) {
+                    insertionMode = 'replace';
+                } else if (isAtStart) {
+                    insertionMode = 'before';
+                    splitData = {
+                        textBefore: '',
+                        textAfter: formattedAfter
+                    };
+                } else if (isAtEnd) {
+                    insertionMode = 'after';
+                    splitData = {
+                        textBefore: formattedBefore,
+                        textAfter: ''
+                    };
+                } else {
+                    insertionMode = 'split';
+                    splitData = {
+                        textBefore: formattedBefore,
+                        textAfter: formattedAfter
+                    };
+                }
+
+                // Record the exact cursor character offset for restoration if the user presses ESC
+                const caretOffset = preRange.toString().length;
+                const restoreFocus = () => {
+                    restoreSelection(target, caretOffset, caretOffset);
+                };
 
                 // Show the add component dropdown
                 let rect = range.getBoundingClientRect();
@@ -190,9 +229,19 @@
                 if (rect.x === 0 && rect.y === 0) {
                     rect = target.getBoundingClientRect();
                 }
-                toolbarStore.open(rect.x, rect.bottom, sectionId, componentData.id, isEmpty);
 
-                event.preventDefault(); // Prevent adding an actual space character
+                toolbarStore.open(
+                    rect.x, 
+                    rect.bottom, 
+                    sectionId, 
+                    componentData.id, 
+                    isActuallyEmpty,
+                    {
+                        insertionMode,
+                        splitData,
+                        restoreFocus
+                    }
+                );
                 break;
             }
         }
@@ -345,6 +394,7 @@
     <span 
         bind:this={textDiv}
         data-scribe-focusable="true"
+        data-component-id={componentData.id}
         role="textbox" 
         tabindex="0" 
         class="edit-text" 

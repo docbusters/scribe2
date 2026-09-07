@@ -28,7 +28,7 @@
     });
 </script>
 
-<div class="paragraph-section">
+<div class="paragraph-section" data-section-id={data.id}>
     {#each components as component, index (`${data.id}-${component.id}-${index}`)}
         {#if component.mode === 'block'}
             <div class="block-component-container">

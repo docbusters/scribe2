@@ -5,14 +5,80 @@
 	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
 	import ScrollArea from '../utilComponents/ScrollArea.svelte';
+	import { setCaretPosition } from '../../utils/focusNavigation.js';
 
     // We dont want to insert text components as they can be added by simply writing
     let components = $derived(Object.entries(globalRegistry.components || {}).filter(([key]) => key !== 'text'));
 
+    let wasEscapePressed = $state(false);
+
+    $effect(() => {
+        if (toolbarStore.isOpen) {
+            wasEscapePressed = false;
+        }
+    });
+
+    function handleEscapeKeydown() {
+        wasEscapePressed = true;
+    }
+
+    function handleCloseAutoFocus(event: Event) {
+        if (wasEscapePressed && toolbarStore.restoreFocus) {
+            event.preventDefault();
+            const restore = toolbarStore.restoreFocus;
+            toolbarStore.restoreFocus = null;
+            wasEscapePressed = false;
+            requestAnimationFrame(() => {
+                restore();
+            });
+        }
+    }
+
     function insertChildComponent(componentType: string) {
         if (!toolbarStore.sectionId) return;
-        editStore.addComponent(toolbarStore.sectionId, toolbarStore.componentId, componentType, toolbarStore.shouldReplaceComponent);
+
+        const sectionId = toolbarStore.sectionId;
+        const componentId = toolbarStore.componentId;
+        const mode = toolbarStore.insertionMode;
+        const splitData = toolbarStore.splitData || undefined;
+
+        // Clear restoreFocus so we don't refocus the previous text component on close
+        toolbarStore.restoreFocus = null;
+        wasEscapePressed = false;
+
+        const result = editStore.insertComponent(
+            sectionId, 
+            componentId, 
+            componentType, 
+            {
+                mode,
+                splitData,
+            }
+        );
         toolbarStore.close();
+
+        if (result && result.rightTextId !== undefined) {
+            // Allow Svelte to render and reconcile DOM changes before placing focus
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`)
+                        || document.querySelector('.paragraph-section');
+
+                    let targetEl: HTMLElement | null = null;
+                    if (result.rightTextId) {
+                        targetEl = document.querySelector(`[data-component-id="${result.rightTextId}"]`);
+                    }
+                    if (!targetEl && sectionEl) {
+                        targetEl = sectionEl.querySelector('.edit-text.is-empty') 
+                            || sectionEl.querySelector('.edit-text:last-of-type');
+                    }
+
+                    if (targetEl) {
+                        setCaretPosition(targetEl, { direction: 'right' });
+                    }
+                });
+            });
+        }
     }
 </script>
 
@@ -25,7 +91,14 @@
         </DropdownMenu.Trigger>
     </div>
 
-	<DropdownMenu.Content class="scribe-dropdown-content" side="bottom" align="start" collisionPadding={8}>
+	<DropdownMenu.Content 
+        class="scribe-dropdown-content" 
+        side="bottom" 
+        align="start" 
+        collisionPadding={8}
+        onEscapeKeydown={handleEscapeKeydown}
+        onCloseAutoFocus={handleCloseAutoFocus}
+    >
         <ScrollArea orientation="vertical" class="scribe-dropdown-scrollarea" viewportClasses="scribe-dropdown-viewport">
             <div class="dropdown-items-list">
                 {#each components as [componentType, component] (component.name)}
