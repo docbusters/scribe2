@@ -4,6 +4,7 @@
 	import { globalRegistry } from '../../stores/global-registry.svelte.js';
 	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
+	import ScrollArea from '../utilComponents/ScrollArea.svelte';
 
     // We dont want to insert text components as they can be added by simply writing
     let components = $derived(Object.entries(globalRegistry.components || {}).filter(([key]) => key !== 'text'));
@@ -24,21 +25,27 @@
         </DropdownMenu.Trigger>
     </div>
 
-	<DropdownMenu.Content class="scribe-dropdown-content" side="bottom" align="start">
-        {#each components as [componentType, component] (component.name)}
-            <DropdownMenu.Item class="scribe-dropdown-item" onclick={() => {
-                insertChildComponent(componentType);
-                toolbarStore.close();
-            }}>
-                <div class="dropdown-item-icon">
-                    {@html component.icon}
-                </div>
-                <div class="dropdown-item-content">
-                    {component.name}
-                    <span>{component.description}</span>
-                </div>
-            </DropdownMenu.Item>
-        {/each}
+	<DropdownMenu.Content class="scribe-dropdown-content" side="bottom" align="start" collisionPadding={8}>
+        <ScrollArea orientation="vertical" class="scribe-dropdown-scrollarea" viewportClasses="scribe-dropdown-viewport">
+            <div class="dropdown-items-list">
+                {#each components as [componentType, component] (component.name)}
+                    <DropdownMenu.Item class="scribe-dropdown-item" onfocus={(e) => {
+                        e.currentTarget?.scrollIntoView({ block: 'nearest' });
+                    }} onclick={() => {
+                        insertChildComponent(componentType);
+                        toolbarStore.close();
+                    }}>
+                        <div class="dropdown-item-icon">
+                            {@html component.icon}
+                        </div>
+                        <div class="dropdown-item-content">
+                            {component.name}
+                            <span>{component.description}</span>
+                        </div>
+                    </DropdownMenu.Item>
+                {/each}
+            </div>
+        </ScrollArea>
         <div class="help-container">Press ENTER to add a component</div>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
@@ -47,6 +54,29 @@
     .dropdown-trigger {
         -webkit-user-select: none;
         user-select: none;
+    }
+
+    :global(.scribe-dropdown-scrollarea) {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        overflow: hidden;
+        padding-right: 0.25rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    :global(.scribe-dropdown-viewport) {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+    }
+
+    .dropdown-items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-right: 0.5rem;
     }
 
     .dropdown-item-content {
@@ -77,6 +107,7 @@
     }
 
     .help-container {
+        flex-shrink: 0;
         margin: 0.5rem 0.25rem 0.25rem 0.5rem;
         font-size: var(--scribe-font-size-xs);
         color: var(--scribe-muted-foreground);

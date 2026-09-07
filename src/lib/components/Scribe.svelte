@@ -352,6 +352,7 @@
 
 	:global(.scribe-dropdown-content) {
         width: 229px;
+        max-height: min(var(--bits-dropdown-menu-content-available-height, 250px), 250px);
         padding: 0.375rem 0.25rem;
         background-color: var(--scribe-popover);
         border: 1px solid var(--scribe-border-color);
@@ -361,7 +362,8 @@
 		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		min-height: 0;
+		overflow: hidden;
     }
 
     :global(.scribe-dropdown-content:focus-visible) {
@@ -378,6 +380,7 @@
         user-select: none;
         outline: none !important;
         box-shadow: none !important;
+        scroll-margin: 0.25rem;
     }
 
     :global(.scribe-dropdown-item[data-highlighted]) {
