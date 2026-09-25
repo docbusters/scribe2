@@ -33,7 +33,7 @@
     const oninput = (event: Event & { currentTarget: EventTarget & HTMLInputElement; }) => {
         const val = event.currentTarget.value;
 
-        if (isNaN(Number(val))) {
+        if (val.trim() === '' || isNaN(Number(val))) {
             updateComponentValue({ type: 'string', value: val }, 'onchange');
         } else {
             updateComponentValue({ type: 'number', value: Number(val) }, 'onchange');
@@ -43,12 +43,12 @@
     const onblur = (event: Event & { currentTarget: EventTarget & HTMLInputElement; }) => {
         const val = event.currentTarget.value;
 
-        if (isNaN(Number(val))) {
+        if (val.trim() === '' || isNaN(Number(val))) {
             updateComponentValue({ type: 'string', value: val }, 'onblur');
         } else {
             updateComponentValue({ type: 'number', value: Number(val) }, 'onblur');
         }
-    }
+    };
 </script>
 
 <input 
