@@ -19,3 +19,10 @@ export interface InlineComponent<T extends string, V extends DataValue, P extend
 export interface BlockComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> extends BaseComponent<T, V, P> {
     mode: 'block';
 }
+
+/** Metadata attached to synthetic ghost placeholder components during editing */
+export interface GhostComponentMeta {
+    insertAfterId?: string | null;
+    insertBeforeId?: string | null;
+    isBetweenBlocks?: boolean;
+}

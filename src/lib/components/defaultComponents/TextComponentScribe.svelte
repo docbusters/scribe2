@@ -1,17 +1,19 @@
 <script lang="ts">
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
 	import type { TextComponent } from '../../domain/components/DefaultComponents.ts';
+	import type { GhostComponentMeta } from '../../domain/components/Component.ts';
 	import type { StringValue } from '../../domain/data/DataValue.ts';
 	import { editStore } from '../../stores/edit-store.svelte.ts';
 	import { toolbarStore, type ToolbarInsertionMode, type ToolbarSplitData } from '../../stores/toolbar-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
-    import { handleArrowNavigation, setupFocusListeners } from '../../utils/focusNavigation.ts';
+    import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
 
+    type GhostTextComponent = TextComponent & Partial<GhostComponentMeta>;
 
-    let { componentData, sectionId, mode }: ScribeComponentProps<TextComponent> = $props();
+    let { componentData, sectionId, mode }: ScribeComponentProps<GhostTextComponent> = $props();
 
     let value = $derived(parseStringForContentEditable(componentData.value.value));
     let isEmpty = $derived(componentData.value.value === '');
@@ -123,8 +125,20 @@
         
         // If the component is not found, we can assume it is a blank space
         if (!success) {
-            // We add a new text component with the value and remove the ghost component
-            const newId = editStore.addComponent(sectionId, null, 'text', false, newValue);
+            const insertBeforeId = componentData.insertBeforeId ?? null;
+            const insertAfterId = componentData.insertAfterId ?? null;
+
+            let newId: string | null;
+            if (insertBeforeId) {
+                const res = editStore.insertComponent(sectionId, insertBeforeId, 'text', {
+                    mode: 'before',
+                    overrideValue: newValue
+                });
+                newId = res?.newId ?? null;
+            } else {
+                newId = editStore.addComponent(sectionId, insertAfterId, 'text', false, newValue);
+            }
+
             if (typeof newId === 'string') {
                 // Clear the ghost component UI visually
                 target.innerText = '';
@@ -159,6 +173,18 @@
         const isAtEnd = textAfter.length === 0;
 
         switch (event.key) {
+            case 'Backspace': {
+                if (isAtStart && isAtEnd) {
+                    event.preventDefault();
+                    // Navigate to the previous focusable element
+                    navigateToAdjacentComponent(target, 'left');
+                    // Delete the component if it was a real persisted component in section.content
+                    if (componentData.id && !componentData.id.startsWith('__ghost')) {
+                        editStore.deleteComponent(sectionId, componentData.id);
+                    }
+                }
+                break;
+            }
             case 'Delete': {
                 if (isAtEnd) {
                     // Try to delete br at the end of the contenteditable, as contenteditable adds an extra <br>
@@ -194,8 +220,13 @@
                 let insertionMode: ToolbarInsertionMode;
                 let splitData: ToolbarSplitData | undefined = undefined;
 
+                const isGhost = componentData.id.startsWith('__ghost');
+                const targetComponentId = isGhost 
+                    ? (componentData.insertAfterId ?? componentData.insertBeforeId ?? null)
+                    : componentData.id;
+
                 if (isActuallyEmpty) {
-                    insertionMode = 'replace';
+                    insertionMode = isGhost ? (componentData.insertBeforeId ? 'before' : 'after') : 'replace';
                 } else if (isAtStart) {
                     insertionMode = 'before';
                     splitData = {
@@ -234,7 +265,7 @@
                     rect.x, 
                     rect.bottom, 
                     sectionId, 
-                    componentData.id, 
+                    targetComponentId, 
                     isActuallyEmpty,
                     {
                         insertionMode,
@@ -400,6 +431,8 @@
         class="edit-text" 
         class:scribe-animation-pulse={isEmpty && mode === 'edit'}
         class:is-empty={isEmpty && mode === 'edit'}
+        class:is-ghost={componentData.id.startsWith('__ghost') && mode === 'edit'}
+        class:is-between-blocks={componentData.isBetweenBlocks}
         data-placeholder="Press Ctrl + Space to add a component..."
         contenteditable={mode === 'edit'} 
         onblur={handleTextChange} 
@@ -434,6 +467,8 @@
         display: inline-block;
         min-width: 1ch;
         min-height: 1em;
+        vertical-align: middle;
+        cursor: text;
     }
 
     .edit-text.is-empty:focus::before {
@@ -441,6 +476,18 @@
         color: var(--scribe-muted-foreground);
         pointer-events: none;
         user-select: none;
+        cursor: text;
+    }
+
+    .edit-text.is-ghost {
+        cursor: text;
+    }
+
+    .edit-text.is-between-blocks {
+        width: 100%;
+        min-height: 1.75rem;
+        display: flex;
+        align-items: center;
         cursor: text;
     }
 

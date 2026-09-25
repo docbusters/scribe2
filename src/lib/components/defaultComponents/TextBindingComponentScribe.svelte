@@ -18,7 +18,9 @@
 
 <style>
     .scribe-text-binding {
-        padding: 0 0.25rem;
+        padding: 0em 0.5em;
+        margin: 0 0.5rem;
+        box-sizing: border-box;
     }
     
     .is-editing {
