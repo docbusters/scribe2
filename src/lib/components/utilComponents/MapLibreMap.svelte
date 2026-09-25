@@ -42,7 +42,7 @@
 		class: className,
 		location = $bindable(),
 		style = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-		markerColor = 'var(--scribe-primary)',
+		markerColor = 'var(--scribe-accent)',
 		hasGlobeBtn = false,
 		hasZoomBtn = false,
 		hasCurrentPosBtn = false,

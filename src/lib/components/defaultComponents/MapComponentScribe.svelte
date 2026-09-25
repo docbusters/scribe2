@@ -78,7 +78,7 @@
                 ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
                 : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'}
             hasSearchbar={config?.hasSearchbar}
-            markerColor={config?.markerColor}
+            markerColor={config?.markerColor || 'var(--scribe-accent, #2563eb)'}
             hasCurrentPosBtn={config?.hasCurrentPosBtn}
             hasGlobeBtn={config?.hasGlobeBtn}
             hasZoomBtn={config?.hasZoomBtn}

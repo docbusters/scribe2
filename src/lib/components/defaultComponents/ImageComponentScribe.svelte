@@ -187,7 +187,7 @@
     /* Resize handles */
     .resize-handle {
         position: absolute;
-        background-color: var(--scribe-primary);
+        background-color: var(--scribe-accent);
         border: 1px solid var(--scribe-doc-background);
         opacity: 0;
         transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;

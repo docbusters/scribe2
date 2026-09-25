@@ -18,6 +18,7 @@
 	/* Misc. variables */
 	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
 	--scribe-selection-color: oklch(0.6194 0.2085 255.62 / 25%); /* Color for text selection */
+	--scribe-accent: oklch(0.55 0.22 255.62); /* Accent blue color for interactive handles and indicators */
 	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
 	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
 	--scribe-popover: oklch(1 0 0);
@@ -91,6 +92,7 @@
 	/* Misc. variables */
 	--scribe-border-color: oklch(0.4568 0 0); /* Default border color for elements */
 	--scribe-selection-color: oklch(0.6792 0.1752 251.13 / 25%); /* Color for text selection */
+	--scribe-accent: oklch(0.62 0.22 255.62); /* Accent blue color for interactive handles and indicators */
 	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
 	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
 	--scribe-popover: oklch(0.205 0 0);
