@@ -37,6 +37,7 @@
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
+	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
 
 	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange }: ScribeProps = $props();
 
@@ -247,6 +248,7 @@
 	{/if}
 
 	{#if mode === 'edit'}
+		<BindingsFloatingPanel />
 		<ComponentToolbar />
 		<TextFormatToolbar />
 	{/if}

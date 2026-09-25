@@ -69,9 +69,22 @@
 <style>
     .scribe-text-input {
         padding: 0em 0.5em;
-        border: 1px solid var(--scribe-border-color);
-        border-radius: 0.5em;
-        min-width: 10rem;
+        border: 1px solid color-mix(in srgb, var(--scribe-border-color) 50%, transparent);
+        border-radius: var(--scribe-radius-md, 0.5em);
+        min-width: 2.5rem;
         margin: 0 0.5rem;
+        outline: none;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        box-sizing: border-box;
+    }
+
+    .scribe-text-input:hover {
+        border-color: color-mix(in srgb, var(--scribe-border-color) 40%, var(--scribe-primary));
+    }
+
+    .scribe-text-input:focus {
+        outline: none;
+        border-color: var(--scribe-primary);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--scribe-primary) 15%, transparent);
     }
 </style>

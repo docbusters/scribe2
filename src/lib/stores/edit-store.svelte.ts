@@ -593,6 +593,30 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         this.bindings[bindingId].type = initialValue.type;
         return true;
     }
+
+    /** Creates a new default binding with the given id and definition */
+    createBinding(id: string, definition: BindingsDefinition): boolean {
+        if (!id || this.bindings[id]) {
+            console.warn(`Binding with id "${id}" already exists or is invalid.`);
+            return false;
+        }
+
+        this.bindings[id] = definition;
+        bindingStore.addBinding(id, definition);
+        return true;
+    }
+
+    /** Deletes an existing default binding */
+    deleteBinding(bindingId: string): boolean {
+        if (!this.bindings[bindingId]) {
+            console.warn(`Binding with id "${bindingId}" does not exist.`);
+            return false;
+        }
+
+        delete this.bindings[bindingId];
+        bindingStore.removeBinding(bindingId);
+        return true;
+    }
 }
 
 export const editStore = new EditStore();

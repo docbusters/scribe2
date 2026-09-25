@@ -14,15 +14,25 @@
 	interface ComponentEditorValueProps {
 		parsedValueType: { type: DataValue['type']; bindingType?: string };
 		value: unknown;
-		componentType: string;
+		componentType?: string;
 		initialDataValue?: DataValue;
 		placeholder?: string;
 		isStrict?: boolean;
 	}
 
-	let { parsedValueType, value = $bindable(), componentType, initialDataValue, placeholder = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
+	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, placeholder = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
 
-	const componentInitialValue = $derived(initialDataValue ?? globalRegistry.getInitialComponentValue(componentType));
+	const componentInitialValue = $derived.by(() => {
+		if (initialDataValue) return initialDataValue;
+		if (componentType) {
+			try {
+				return globalRegistry.getInitialComponentValue(componentType);
+			} catch {
+				return undefined;
+			}
+		}
+		return undefined;
+	});
 
 	let lastInitializedValue = $state<unknown>();
 
@@ -75,7 +85,14 @@
 	let bindingOptions = $derived.by(() => {
 		if (parsedValueType?.type !== 'binding') return [];
 		const type = parsedValueType.bindingType;
-		const supportedTypes = globalRegistry.getComponentSupportedBindingValueTypes(componentType);
+		let supportedTypes = undefined;
+		if (componentType) {
+			try {
+				supportedTypes = globalRegistry.getComponentSupportedBindingValueTypes(componentType);
+			} catch {
+				supportedTypes = undefined;
+			}
+		}
 		if (type === 'default' || !type) {
 			return bindingStore.getBindingOptions(supportedTypes);
 		}
@@ -142,27 +159,33 @@
 		{#if Array.isArray(value)}
 			{#each value as _, index (index)}
 				<div class="array-container-item">
+					<div class="array-item-header">
+						<span class="array-item-badge">Item #{index + 1}</span>
+						<Button size="icon-sm" variant="ghost-destructive" title="Remove item" onclick={() => removeArrayItem(index)}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+						</Button>
+					</div>
 					<div class="array-item-content">
-						{#if componentInitialValue?.type === 'array' && componentInitialValue.value.length > 0}
-							{@const initialVal = componentInitialValue.value[0]}
-							{@const valType = { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined }}
-							<ComponentEditorValue  
-								parsedValueType={valType}
-								bind:value={(value as DataValue[])[index].value}
-								componentType={componentType}
-								initialDataValue={initialVal}
-								isStrict={false}
-							/>
+						{#if (componentInitialValue?.type === 'array' && componentInitialValue.value.length > 0) || (Array.isArray(value) && value.length > 0)}
+							{@const initialVal = (componentInitialValue?.type === 'array' && componentInitialValue.value.length > 0) ? componentInitialValue.value[0] : (value as DataValue[])[index]}
+							{@const valType = initialVal ? { type: initialVal.type, bindingType: initialVal.type === 'binding' ? initialVal.bindingType : undefined } : undefined}
+							{#if valType}
+								<ComponentEditorValue  
+									parsedValueType={valType}
+									bind:value={(value as DataValue[])[index].value}
+									componentType={componentType}
+									initialDataValue={initialVal}
+									isStrict={false}
+								/>
+							{/if}
 						{/if}
 					</div>
-					<Button size="icon-sm" variant="ghost-destructive" title="Remove item" onclick={() => removeArrayItem(index)}>
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-					</Button>
 				</div>
 			{/each}
 			<div class="array-actions">
 				<Button size="sm" variant="outline" class="array-add-btn" onclick={addArrayItem}>
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>				Add Item
+					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+					Add Item
 				</Button>
 			</div>
 		{/if}
@@ -180,34 +203,50 @@
 	.record-container {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
-		padding-left: 0.5rem;
-		border-left: 2px solid var(--scribe-border-color, #e2e8f0);
-		margin-top: 0.5rem;
-		transition: border-left-color 0.5s ease;
-	}
-	.record-container:hover {
-		border-left-color: var(--scribe-primary);
+		gap: 0.625rem;
+		width: 100%;
 	}
 	.array-container {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
-		margin-top: 0.5rem;
+		width: 100%;
 	}
 	.array-container-item {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		gap: 0.5rem;
+		padding: 0.75rem 0.875rem;
+		background-color: color-mix(in srgb, var(--scribe-muted) 40%, transparent);
+		border: 1px solid color-mix(in srgb, var(--scribe-border-color) 60%, transparent);
+		border-radius: var(--scribe-radius-lg);
+		transition: all 0.15s ease;
+		box-sizing: border-box;
+	}
+	.array-container-item:hover {
+		border-color: color-mix(in srgb, var(--scribe-border-color) 30%, var(--scribe-primary));
+		background-color: color-mix(in srgb, var(--scribe-muted) 60%, transparent);
+	}
+	.array-item-header {
+		display: flex;
 		align-items: center;
+		justify-content: space-between;
+		padding-bottom: 0.25rem;
+		border-bottom: 1px solid color-mix(in srgb, var(--scribe-border-color) 30%, transparent);
+	}
+	.array-item-badge {
+		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		color: var(--scribe-muted-foreground);
+		letter-spacing: 0.02em;
 	}
 	.array-item-content {
-		flex: 1;
-		min-width: 0;
+		width: 100%;
 	}
 	.array-actions {
 		display: flex;
-		justify-content: center;
+		justify-content: flex-start;
 		margin-top: 0.25rem;
 	}
 </style>

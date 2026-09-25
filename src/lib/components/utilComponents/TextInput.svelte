@@ -81,7 +81,7 @@
     max-height: 3.1875rem;
     position: relative;
     border: 1px solid var(--scribe-border-color);
-    background-color: var(--scribe-doc-background);
+    background-color: var(--scribe-popover);
     border-radius: var(--scribe-radius-md);
     transition: all 0.3s ease;
   }

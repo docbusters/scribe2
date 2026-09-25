@@ -37,7 +37,13 @@ class BindingStore {
                 ? { type: binding.type, value: binding.initialValue }
                 : generateDefaultDataValue(binding.type)
         ) as CollectionValue | PrimitiveValue;
-        this.data[id] = this.data[id] = primitiveValue;
+        this.data[id] = primitiveValue;
+    }
+
+    removeBinding(id: string) {
+        if (id in this.data) {
+            delete this.data[id];
+        }
     }
 
     getBindingOptions(supportedTypes?: Omit<DataValue['type'], 'binding'>[]) {
