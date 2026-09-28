@@ -282,9 +282,42 @@
 
     let isDirty = false;
 
+    function updateAvailableWidth() {
+        if (!textDiv || !isEmpty || mode !== 'edit') return;
+
+        // Temporarily reset CSS custom property to 0 so the element shrinks to its minimum size
+        // and sits at its natural inline position on the current line
+        textDiv.style.setProperty('--available-placeholder-width', '0px');
+
+        const container = textDiv.closest<HTMLElement>('.paragraph-section') 
+            || textDiv.closest<HTMLElement>('section') 
+            || textDiv.parentElement;
+
+        if (container) {
+            const containerRect = container.getBoundingClientRect();
+            const computed = window.getComputedStyle(container);
+            const paddingRight = parseFloat(computed.paddingRight) || 0;
+            const containerRight = containerRect.right - paddingRight;
+
+            const textRect = textDiv.getBoundingClientRect();
+            const available = containerRight - textRect.left - 4;
+
+            if (available < 40 && textRect.left > containerRect.left + 60) {
+                textDiv.style.setProperty('--available-placeholder-width', `${Math.max(0, containerRect.width - paddingRight - 8)}px`);
+            } else {
+                textDiv.style.setProperty('--available-placeholder-width', `${Math.max(0, Math.floor(available))}px`);
+            }
+        } else {
+            textDiv.style.removeProperty('--available-placeholder-width');
+        }
+    }
+
     function handleInput(event: Event) {
         const target = event.target as HTMLSpanElement;
         isEmpty = (target.textContent || '').length === 0;
+        if (isEmpty) {
+            updateAvailableWidth();
+        }
         isDirty = true;
     }
 
@@ -341,6 +374,21 @@
     $effect(() => {
         if (!textDiv) return;
         return setupFocusListeners(textDiv);
+    });
+
+    $effect(() => {
+        if (isEmpty && mode === 'edit' && textDiv) {
+            updateAvailableWidth();
+        }
+    });
+
+    $effect(() => {
+        if (!textDiv || mode !== 'edit') return;
+        const handleResize = () => {
+            if (isEmpty) updateAvailableWidth();
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     });
 
     /**
@@ -437,6 +485,7 @@
         class:is-between-blocks={componentData.isBetweenBlocks}
         data-placeholder={i18n.t('editor.insertComponentPlaceholder')}
         contenteditable={mode === 'edit'} 
+        onfocus={mode === 'edit' ? updateAvailableWidth : undefined}
         onblur={handleTextChange} 
         oninput={handleInput}
         onkeydown={handleKeyDown}
@@ -467,10 +516,14 @@
 
     .edit-text.is-empty {
         display: inline-block;
+        max-width: var(--available-placeholder-width, 100%);
         min-width: 1ch;
         min-height: 1em;
         vertical-align: middle;
         cursor: text;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .edit-text.is-empty:focus::before {
@@ -479,6 +532,10 @@
         pointer-events: none;
         user-select: none;
         cursor: text;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
     }
 
     .edit-text.is-ghost {
@@ -487,6 +544,7 @@
 
     .edit-text.is-between-blocks {
         width: 100%;
+        max-width: 100%;
         min-height: 1.75rem;
         display: flex;
         align-items: center;
