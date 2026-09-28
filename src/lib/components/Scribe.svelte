@@ -237,27 +237,29 @@
 </script>
 
 <div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass}>
-	{#if mode === 'edit'}
-		<Button size="icon" style="max-width: fit-content; margin-left: auto;" variant="outline" title="Print document (debugging)" onclick={() => console.log($state.snapshot(documentState))}>
-			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
-		</Button>
-	{/if}
-	{#if documentState}
-		<DocumentTitle isEditMode={mode === 'edit'} text={title} />
-		<div {style} bind:this={dataOrder} class="scribe-sections">
-			{#if !loading}
-				{#each sections as section (section.id)}
-					<Section data={section} {mode} {isDarkMode} />
-				{:else}
-					{#if mode === 'edit'}
-						<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null, i18n.t('sections.defaultTitle'))}>
-							{i18n.t('sections.addFirstSection')}
-						</Button>
-					{/if}
-				{/each}
-			{/if}
-		</div>
-	{/if}
+	<div class="scribe-document-content">
+		{#if mode === 'edit'}
+			<Button size="icon" style="max-width: fit-content; margin-left: auto;" variant="outline" title="Print document (debugging)" onclick={() => console.log($state.snapshot(documentState))}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
+			</Button>
+		{/if}
+		{#if documentState}
+			<DocumentTitle isEditMode={mode === 'edit'} text={title} />
+			<div {style} bind:this={dataOrder} class="scribe-sections">
+				{#if !loading}
+					{#each sections as section (section.id)}
+						<Section data={section} {mode} {isDarkMode} />
+					{:else}
+						{#if mode === 'edit'}
+							<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null, i18n.t('sections.defaultTitle'))}>
+								{i18n.t('sections.addFirstSection')}
+							</Button>
+						{/if}
+					{/each}
+				{/if}
+			</div>
+		{/if}
+	</div>
 
 	{#if mode === 'edit'}
 		<BindingsFloatingPanel />
@@ -278,9 +280,11 @@
 	}
 
 	.scribe-document {
+		position: relative;
 		width: 100%;
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		align-items: flex-start;
 		gap: 1.5rem;
 		box-sizing: border-box;
 		background-color: var(--scribe-doc-background);
@@ -290,6 +294,21 @@
         color: var(--scribe-doc-foreground);
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+	}
+
+	.scribe-document-content {
+		flex: 1 1 0%;
+		min-width: 0;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	@media (max-width: 768px) {
+		.scribe-document {
+			flex-direction: column;
+		}
 	}
 
 	:global(.scribe-document *,

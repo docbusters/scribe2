@@ -211,12 +211,20 @@
 
 <style>
 	.scribe-bindings-panel-root {
-		position: fixed;
-		top: 1.25rem;
-		right: 1.25rem;
-		z-index: 40;
+		position: sticky;
+		top: 1rem;
+		z-index: 20;
+		flex-shrink: 0;
 		font-family: var(--scribe-font-sans, system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
 		box-sizing: border-box;
+	}
+
+	@media (max-width: 768px) {
+		.scribe-bindings-panel-root {
+			position: relative;
+			top: 0;
+			width: 100%;
+		}
 	}
 
 	/* Collapsed chip */
@@ -282,6 +290,13 @@
 		backdrop-filter: blur(16px);
 		overflow: hidden;
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	@media (max-width: 768px) {
+		.scribe-bindings-panel {
+			width: 100%;
+			max-height: 500px;
+		}
 	}
 
 	/* Header */
