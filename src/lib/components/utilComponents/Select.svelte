@@ -74,8 +74,8 @@
   </Select.Root>
   {#if error}
     <div class="scribe-select-error-container">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <p class="scribe-select-error-text">{error}</p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="scribe-select-error-icon"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p class="scribe-select-error-text" style="color: var(--scribe-error-foreground, #dc2626) !important;">{error}</p>
     </div>
   {/if}
 </div>
@@ -224,18 +224,31 @@
     cursor: default;
   }
 
+  :global(.scribe-document .scribe-select-error-container),
   :global(.scribe-select-error-container) {
     display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    height: 1.25rem;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.25rem;
+    margin-top: 0.375rem;
     margin-left: 0.25rem;
     margin-right: 0.25rem;
-    color: var(--scribe-error);
+    color: var(--scribe-error-foreground, #dc2626) !important;
   }
 
+  :global(.scribe-document .scribe-select-error-icon),
+  :global(.scribe-select-error-icon) {
+    flex-shrink: 0;
+    color: var(--scribe-error-foreground, #dc2626) !important;
+  }
+
+  :global(.scribe-document .scribe-select-error-text),
+  :global(.scribe-document p.scribe-select-error-text),
   :global(.scribe-select-error-text) {
     font-size: 0.75rem;
     margin: 0;
+    color: var(--scribe-error-foreground, #dc2626) !important;
+    font-weight: 500;
+    line-height: 1.25;
   }
 </style>

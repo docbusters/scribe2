@@ -22,7 +22,7 @@ export const en: Translations = {
 		stringDesc: 'Static text value',
 		number: 'Number',
 		numberDesc: 'Numeric value',
-		boolean: 'Switch (Yes/No)',
+		boolean: 'Switch',
 		booleanDesc: 'Yes / No toggle',
 		array: 'List',
 		arrayDesc: 'Collection of items',
@@ -69,7 +69,7 @@ export const en: Translations = {
 	addBinding: {
 		title: 'New Variable',
 		nameLabel: 'Variable Name',
-		namePlaceholder: 'e.g. user_name',
+		namePlaceholder: 'Variable name',
 		typeLabel: 'Data type',
 		create: 'Create',
 		errorRequired: 'Variable name is required',

@@ -30,9 +30,11 @@
 
 <div data-testid={`container-${id}-input`} class="scribe-input-container {className}">
     <div class="scribe-input-wrapper {error ? 'error' : ''}">
-        <label for={id} class="scribe-input-label {value || isFocused ? 'active' : 'idle'}">
-            {placeholder}
-        </label>
+        {#if placeholder}
+            <label for={id} class="scribe-input-label {(value !== undefined && value !== null && value !== '') || isFocused ? 'active' : 'idle'}">
+                {placeholder}
+            </label>
+        {/if}
         <input
             {id}
             {...restProps}
@@ -44,7 +46,7 @@
             }}
             onfocus={() => isFocused = true}
             onblur={() => isFocused = false}
-            class="scribe-input {realType === 'password' ? 'has-password-toggle' : ''}"
+            class="scribe-input {realType === 'password' ? 'has-password-toggle' : ''} {!placeholder ? 'no-placeholder' : ''}"
         />
         {#if realType === 'password'}
             <Button size="icon" variant="ghost" class="scribe-input-password-toggle" onclick={togglePassword}>
@@ -63,8 +65,8 @@
     </div>
     {#if error}
         <div data-testid="input-error-container" class="scribe-input-error-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <p data-testid="input-error" class="scribe-input-error-text">{error}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="scribe-input-error-icon"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <p data-testid="input-error" class="scribe-input-error-text" style="color: var(--scribe-error-foreground, #dc2626) !important;">{error}</p>
         </div>
     {/if}
 </div>
@@ -74,42 +76,49 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .scribe-input-wrapper {
     min-height: 3.1875rem;
     max-height: 3.1875rem;
+    height: 3.1875rem;
     position: relative;
     border: 1px solid var(--scribe-border-color);
     background-color: var(--scribe-popover);
     border-radius: var(--scribe-radius-md);
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
   }
 
   .scribe-input-wrapper.error {
-    border-color: var(--scribe-error);
-    background-color: oklch(from var(--scribe-error-foreground) l c h / 5%);
+    border-color: var(--scribe-error-foreground, #dc2626) !important;
+    background-color: color-mix(in srgb, var(--scribe-error-foreground, #dc2626) 6%, var(--scribe-popover));
   }
 
   .scribe-input-label {
     color: var(--scribe-muted-foreground);
-    margin-bottom: 0.25rem;
     pointer-events: none;
     position: absolute;
     cursor: text;
     left: 0.5rem;
     user-select: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1;
+    z-index: 1;
   }
 
   .scribe-input-label.idle {
-    top: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 1rem;
   }
 
   .scribe-input-label.active {
-    top: 0.25rem;
+    top: 0.35rem;
+    transform: translateY(0);
     font-size: 0.75rem;
+    font-weight: 500;
   }
 
   .scribe-input {
@@ -118,15 +127,19 @@
     color: var(--scribe-doc-foreground) !important;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-top: 1.5rem;
-    padding-bottom: 0;
-    height: 3rem;
-    max-height: 3rem;
+    padding-top: 1.125rem;
+    padding-bottom: 0.125rem;
+    height: 100%;
     outline: none;
     border: none;
     background: transparent;
     width: 100%;
     box-sizing: border-box;
+  }
+
+  .scribe-input.no-placeholder {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .scribe-input.has-password-toggle {
@@ -136,7 +149,8 @@
   .scribe-input-password-toggle {
     position: absolute;
     right: 0.5rem;
-    top: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .scribe-input-eye {
@@ -168,18 +182,31 @@
     transform: rotate(90deg) scale(0);
   }
 
+  :global(.scribe-document .scribe-input-error-container),
   .scribe-input-error-container {
     display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    height: 1.25rem;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.25rem;
+    margin-top: 0.375rem;
     margin-left: 0.25rem;
     margin-right: 0.25rem;
-    color: var(--scribe-error);
+    color: var(--scribe-error-foreground, #dc2626) !important;
   }
 
+  :global(.scribe-document .scribe-input-error-icon),
+  .scribe-input-error-icon {
+    flex-shrink: 0;
+    color: var(--scribe-error-foreground, #dc2626) !important;
+  }
+
+  :global(.scribe-document .scribe-input-error-text),
+  :global(.scribe-document p.scribe-input-error-text),
   .scribe-input-error-text {
     font-size: 0.75rem;
     margin: 0;
+    color: var(--scribe-error-foreground, #dc2626) !important;
+    font-weight: 500;
+    line-height: 1.25;
   }
 </style>

@@ -22,7 +22,7 @@ export const es: Translations = {
 		stringDesc: 'Valor de texto fijo',
 		number: 'Número',
 		numberDesc: 'Valor numérico',
-		boolean: 'Interruptor (Sí/No)',
+		boolean: 'Interruptor',
 		booleanDesc: 'Activador Sí / No',
 		array: 'Lista',
 		arrayDesc: 'Colección de elementos',
@@ -69,7 +69,7 @@ export const es: Translations = {
 	addBinding: {
 		title: 'Nueva Variable',
 		nameLabel: 'Nombre de la variable',
-		namePlaceholder: 'ej. nombre_usuario',
+		namePlaceholder: 'Nombre de la variable',
 		typeLabel: 'Tipo de dato',
 		create: 'Crear',
 		errorRequired: 'El nombre de la variable es obligatorio',
