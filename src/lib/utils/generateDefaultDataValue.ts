@@ -1,12 +1,13 @@
+import type { BindingsDefinition } from "../domain/Document.js";
 import type { DataValue } from "../domain/data/DataValue.js";
 import { editStore } from "../stores/edit-store.svelte.js";
 import { generateRandomId } from "./generateRandomId.js";
 
 /**
- * Generates a default date value given a type. If specified, it will use the initialValue to generate the default value, but if the type of the initialValue does not match the specified type, it will throw an error.
+ * Generates a default data value given a type. If specified, it will use the initialValue to generate the default value, but if the type of the initialValue does not match the specified type, it will throw an error.
  */
 export function generateDefaultDataValue(type: DataValue['type'], initialValue?: DataValue, componentType?: string): DataValue {
-    if (initialValue && initialValue.type !== type) {
+    if (initialValue && type !== 'binding' && initialValue.type !== type) {
         throw new Error(`Initial value type (${initialValue.type}) does not match the specified type (${type})`);
     }
     switch (type) {
@@ -48,10 +49,26 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
         }
         case 'binding': {
             // In this case we need to add a new binding
-            const bindingId = editStore.addBinding({
-                type: 'empty',
-                initialValue: undefined,
-            }, componentType);
+            let bindingDef: BindingsDefinition;
+
+            if (initialValue && initialValue.type !== 'binding') {
+                bindingDef = {
+                    type: initialValue.type,
+                    initialValue: initialValue.value,
+                } as BindingsDefinition;
+            } else if (componentType === 'text-input') {
+                bindingDef = {
+                    type: 'string',
+                    initialValue: '',
+                };
+            } else {
+                bindingDef = {
+                    type: 'empty',
+                    initialValue: undefined,
+                };
+            }
+
+            const bindingId = editStore.addBinding(bindingDef, componentType);
             return {
                 type: 'binding',
                 bindingType: 'default',

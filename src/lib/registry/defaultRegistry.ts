@@ -56,6 +56,10 @@ export function getDefaultRegistry(i18n?: I18nService): ComponentRegistry {
             mode: 'inline',
             value: 'binding',
         },
+        initialValue: {
+            type: 'string',
+            value: '',
+        },
         valueTypes: ['binding'],
         supportedBindingValueTypes: ['empty', 'string', 'number'],
         options: [
