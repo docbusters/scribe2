@@ -88,10 +88,11 @@ class CustomBindingsStore {
         this.triggers = {};
     }
 
-    getBindingsList(): { type: string; name: string }[] {
+    getBindingsList(): { type: string; name: string; description?: string }[] {
         return Object.entries(this.definitions).map(([type, def]) => ({
             type,
-            name: def.name || type
+            name: def.name || type,
+            description: def.description
         }));
     }
 

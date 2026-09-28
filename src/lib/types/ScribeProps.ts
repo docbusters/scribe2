@@ -30,6 +30,8 @@ export interface CustomBindingSubscribable {
 export interface CustomBinding {
     type: string;
     name: string;
+    /** Optional description displayed in value selectors and cards */
+    description?: string;
     /** Returns the available ids and their labels for the editor */
     getAvailableIds: () => { id: string; label: string; type: string }[];
     /** Returns the static value or a subscribable value object */

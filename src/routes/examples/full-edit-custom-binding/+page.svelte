@@ -17,6 +17,7 @@
 	const customBinding: CustomBinding = {
 		type: 'custom-binding',
 		name: 'Custom Binding',
+		description: 'Sample external data source with asynchronous loading',
 		getAvailableIds: () => {
 			return Object.entries(bindingData).map(([id, value]) => ({ id, label: id, type: value.type }));
 		},
@@ -35,6 +36,7 @@
 	const liveClockBinding: CustomBinding = {
 		type: 'live-clock',
 		name: 'Live clock',
+		description: 'Dynamic real-time clock updating every second',
 		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],
 		getData: () => {
 			return {

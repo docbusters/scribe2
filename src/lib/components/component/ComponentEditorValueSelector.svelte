@@ -52,7 +52,7 @@
 							bindingType: cb.type,
 							label: cb.name,
 							category: 'binding',
-							description: i18n.t('types.bindingCustomDesc')
+							description: cb.description || i18n.t('types.bindingCustomDesc')
 						});
 					}
 				}

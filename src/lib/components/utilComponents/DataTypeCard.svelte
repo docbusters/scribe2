@@ -24,6 +24,7 @@
 	type="button"
 	class="source-card"
 	class:selected
+	title={description ? `${label} - ${description}` : label}
 	{onclick}
 >
 	<div class="source-card-icon-wrap" class:is-binding={category === 'binding'}>
@@ -51,9 +52,9 @@
 	</div>
 
 	<div class="source-card-text">
-		<span class="source-card-label">{label}</span>
+		<span class="source-card-label" title={label}>{label}</span>
 		{#if description}
-			<span class="source-card-desc">{description}</span>
+			<span class="source-card-desc" title={description}>{description}</span>
 		{/if}
 	</div>
 
