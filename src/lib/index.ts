@@ -2,6 +2,7 @@ import type { ScribeProps, CustomBinding } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.js';
 import type { EmptyContentProps } from './types/EmptyContentProps.js';
+import type { BindingsPanelProps } from './types/BindingsPanelProps.js';
 import type { Component } from 'svelte';
 import type { Document, BindingsDefinition } from './domain/Document.js';
 import type { CustomBindingUsages } from './utils/bindingUsages.js';
@@ -79,6 +80,7 @@ declare global {
         'scribe-interpreter': ScribeInterpreterElement;
         'scribe-component-renderer': HTMLElement & ComponentRendererProps;
         'scribe-empty-content': HTMLElement & EmptyContentProps;
+        'scribe-bindings-panel': HTMLElement & BindingsPanelProps;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -87,6 +89,7 @@ declare global {
             'scribe-interpreter': ScribeProps;
             'scribe-component-renderer': ComponentRendererProps;
             'scribe-empty-content': EmptyContentProps;
+            'scribe-bindings-panel': BindingsPanelProps;
         }
     }
 
@@ -108,6 +111,13 @@ declare global {
                 [key: string]: any;
             };
             'scribe-empty-content': EmptyContentProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                [key: string]: any;
+            };
+            'scribe-bindings-panel': BindingsPanelProps & {
                 id?: string;
                 class?: string;
                 style?: string;

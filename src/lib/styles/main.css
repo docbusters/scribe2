@@ -4,12 +4,12 @@
    application's global styles (like Tailwind preflight).
    ========================================================================== */
 
-scribe-interpreter {
+scribe-interpreter, scribe-bindings-panel {
     display: block;
     width: 100%;
 }
 
-.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer {
+.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-bindings-panel {
     /* Base typography and coloring to stop inheritance from host body */
     color: var(--scribe-doc-foreground);
     font-family: var(--scribe-font-sans);

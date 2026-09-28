@@ -34,7 +34,8 @@ export default defineConfig({
 			dynamicCompileOptions({ filename }) {
 				if (filename.includes('Scribe.svelte') || 
 					filename.includes('EmptyContent.svelte') || 
-					filename.includes('ComponentRenderer.svelte')) {
+					filename.includes('ComponentRenderer.svelte') ||
+					filename.includes('BindingsFloatingPanel.svelte')) {
 					return {
 						customElement: true
 					};

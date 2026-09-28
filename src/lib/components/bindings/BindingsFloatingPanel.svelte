@@ -1,3 +1,18 @@
+<svelte:options
+	customElement={{
+		tag: 'scribe-bindings-panel',
+		shadow: 'none',
+		props: {
+			class: { type: 'String' },
+			style: { type: 'String' },
+			floating: { type: 'Boolean' },
+			isExpanded: { type: 'Boolean' },
+			collapsible: { type: 'Boolean' },
+			lang: { type: 'String' }
+		}
+	}}
+/>
+
 <script lang="ts">
 	import { bindingStore } from '$lib/stores/binding-store.svelte.js';
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
