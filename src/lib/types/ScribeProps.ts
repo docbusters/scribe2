@@ -19,6 +19,8 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
     /** Current language / locale for the interface ('en' or 'es'). Defaults to 'en'. */
     lang?: 'en' | 'es';
+    /** Whether to display the built-in floating variables/bindings panel in edit mode. Defaults to true. */
+    showBindingsPanel?: boolean;
 }
 
 export interface CustomBindingSubscribable {

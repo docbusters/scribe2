@@ -5,10 +5,25 @@
 	import BindingItemCard from './BindingItemCard.svelte';
 	import AddBindingDialog from './AddBindingDialog.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import type { BindingsPanelProps } from '$lib/types/BindingsPanelProps.js';
+
+	let {
+		class: className = '',
+		style = '',
+		floating = false,
+		isExpanded = $bindable(true),
+		collapsible = true,
+		lang
+	}: BindingsPanelProps = $props();
 
 	const i18n = getI18n();
 
-	let isExpanded = $state(true);
+	$effect(() => {
+		if (lang) {
+			i18n.setLanguage(lang);
+		}
+	});
+
 	let searchQuery = $state('');
 	let isAddModalOpen = $state(false);
 
@@ -37,8 +52,8 @@
 	}
 </script>
 
-<div class="scribe-bindings-panel-root">
-	{#if !isExpanded}
+<div class="scribe-bindings-panel-root {floating ? 'is-floating' : ''} {className}" {style}>
+	{#if collapsible && !isExpanded}
 		<button
 			type="button"
 			class="scribe-bindings-collapsed-chip"
@@ -112,26 +127,28 @@
 						</svg>
 					</button>
 
-					<button
-						type="button"
-						class="header-btn"
-						title={i18n.t('bindingsPanel.collapseTooltip')}
-						onclick={() => (isExpanded = false)}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="15"
-							height="15"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
+					{#if collapsible}
+						<button
+							type="button"
+							class="header-btn"
+							title={i18n.t('bindingsPanel.collapseTooltip')}
+							onclick={() => (isExpanded = false)}
 						>
-							<path d="m9 18 6-6-6-6" />
-						</svg>
-					</button>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="15"
+								height="15"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="m9 18 6-6-6-6" />
+							</svg>
+						</button>
+					{/if}
 				</div>
 			</header>
 
@@ -211,20 +228,24 @@
 
 <style>
 	.scribe-bindings-panel-root {
-		position: sticky;
-		top: 1rem;
-		z-index: 20;
-		flex-shrink: 0;
 		font-family: var(--scribe-font-sans, system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
 		box-sizing: border-box;
 	}
 
-	@media (max-width: 768px) {
-		.scribe-bindings-panel-root {
-			position: relative;
-			top: 0;
-			width: 100%;
-		}
+	.scribe-bindings-panel-root.is-floating {
+		position: fixed;
+		top: 1.25rem;
+		right: 1.25rem;
+		z-index: 40;
+	}
+
+	.scribe-bindings-panel-root:not(.is-floating) {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	/* Collapsed chip */
@@ -292,11 +313,12 @@
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	@media (max-width: 768px) {
-		.scribe-bindings-panel {
-			width: 100%;
-			max-height: 500px;
-		}
+	.scribe-bindings-panel-root:not(.is-floating) .scribe-bindings-panel {
+		width: 100%;
+		height: 100%;
+		max-height: 100%;
+		min-height: 0;
+		flex: 1 1 auto;
 	}
 
 	/* Header */

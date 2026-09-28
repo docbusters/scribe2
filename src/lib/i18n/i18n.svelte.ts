@@ -1,4 +1,4 @@
-import { getContext, setContext } from 'svelte';
+import { setContext } from 'svelte';
 import type { SupportedLanguage, Translations } from './types.js';
 import { en } from './locales/en.js';
 import { es } from './locales/es.js';
@@ -50,20 +50,19 @@ export class I18nService {
 	};
 }
 
-export const defaultI18n = new I18nService('en');
+export const i18n = new I18nService('en');
+export const defaultI18n = i18n;
 
 export function setI18n(lang: SupportedLanguage = 'en'): I18nService {
-	const service = new I18nService(lang);
-	setContext(I18N_CONTEXT_KEY, service);
-	return service;
+	i18n.setLanguage(lang);
+	try {
+		setContext(I18N_CONTEXT_KEY, i18n);
+	} catch {
+		// Ignore if outside component initialization
+	}
+	return i18n;
 }
 
 export function getI18n(): I18nService {
-	try {
-		const service = getContext<I18nService>(I18N_CONTEXT_KEY);
-		if (service) return service;
-	} catch {
-		// Context not available, fallback to default
-	}
-	return defaultI18n;
+	return i18n;
 }

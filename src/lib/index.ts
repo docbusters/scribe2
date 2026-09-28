@@ -21,6 +21,10 @@ export interface ScribeConstructor {
 
 export const Scribe = ScribeComponent as unknown as ScribeConstructor;
 export { defaultRegistry, getDefaultRegistry } from './registry/defaultRegistry.js';
+import BindingsFloatingPanelSvelte from './components/bindings/BindingsFloatingPanel.svelte';
+export const BindingsFloatingPanel = BindingsFloatingPanelSvelte;
+export const BindingsPanel = BindingsFloatingPanelSvelte;
+export type { BindingsPanelProps } from './types/BindingsPanelProps.js';
 
 // TYPES
 export type { ScribeProps, CustomBinding, CustomBindingSubscribable, ScribeMode, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
