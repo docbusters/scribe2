@@ -1,4 +1,4 @@
-import type { BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode, UpdateType } from "$lib/types/ScribeProps.js";
+import type { BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionDelete, BindingDefinitionUpdate, CustomBindingValueUpdate, ScribeMode, UpdateType } from "$lib/types/ScribeProps.js";
 import { generateDefaultDataValue } from "$lib/utils/generateDefaultDataValue.js";
 import { stringifyDataValue } from "$lib/utils/stringifyDataValue.js";
 import { truncateString } from "$lib/utils/truncateString.js";
@@ -9,17 +9,36 @@ import { editStore } from "./edit-store.svelte.js";
 
 class BindingStore {
     data: Record<BindingValue['value'], CollectionValue | PrimitiveValue> = $state({});
-    private listeners: Set<(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void> = new Set();
+    private listeners: Set<(event: CustomEvent<BindingChangeEventDetail>) => void> = new Set();
 
-    subscribeToChanges(listener: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void) {
+    subscribeToChanges(listener: (event: CustomEvent<BindingChangeEventDetail>) => void) {
         this.listeners.add(listener);
         return () => {
             this.listeners.delete(listener);
         };
     }
 
-    private emitChange(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) {
+    private emitChange(event: CustomEvent<BindingChangeEventDetail>) {
         this.listeners.forEach(listener => listener(event));
+    }
+
+    notifyBindingCreated(id: string, definition: BindingsDefinition) {
+        this.emitChange(new CustomEvent<BindingDefinitionCreate>('binding_create', {
+            detail: {
+                type: 'binding_create',
+                id,
+                definition
+            }
+        }));
+    }
+
+    notifyBindingDeleted(id: string) {
+        this.emitChange(new CustomEvent<BindingDefinitionDelete>('binding_delete', {
+            detail: {
+                type: 'binding_delete',
+                id
+            }
+        }));
     }
 
     initialize(bindings: Record<string, BindingsDefinition>) {

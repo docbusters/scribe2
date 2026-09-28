@@ -4,7 +4,7 @@
 	import { fullExampleBindings, fullExampleDocument } from '$lib/examples/fullExample.js';
 	import type { Document } from '$lib/domain/Document.js';
 	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
-	import type { BindingDefinitionUpdate, CustomBinding, CustomBindingValueUpdate, ScribeProps } from '$lib/types/ScribeProps.js';
+	import type { BindingChangeEventDetail, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
 
 
 	// BASIC CUSTOM BINDING EXAMPLE
@@ -109,7 +109,7 @@
 		'live-clock': liveClockBinding,
 	}
 
-	function handleBindingChange(event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) {
+	function handleBindingChange(event: CustomEvent<BindingChangeEventDetail>) {
 		const { type, id } = event.detail;
 
 		if (type === 'value_update') {

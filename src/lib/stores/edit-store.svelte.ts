@@ -571,6 +571,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         // Also initialize the binding value in the data store
         bindingStore.addBinding(newId, definition);
+        bindingStore.notifyBindingCreated(newId, definition);
 
         return newId;
     }
@@ -603,6 +604,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         this.bindings[id] = definition;
         bindingStore.addBinding(id, definition);
+        bindingStore.notifyBindingCreated(id, definition);
         return true;
     }
 
@@ -615,6 +617,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         delete this.bindings[bindingId];
         bindingStore.removeBinding(bindingId);
+        bindingStore.notifyBindingDeleted(bindingId);
         return true;
     }
 }

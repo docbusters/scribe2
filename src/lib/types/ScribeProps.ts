@@ -16,7 +16,7 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     registry?: ComponentRegistry<C>;
     customBindings?: Record<string, CustomBinding>;
     ondocumentchange?: (event: CustomEvent<Document<C>>) => void;
-    onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
+    onbindingchange?: (event: CustomEvent<BindingChangeEventDetail>) => void;
     /** Current language / locale for the interface ('en' or 'es'). Defaults to 'en'. */
     lang?: 'en' | 'es';
     /** Whether to display the built-in floating variables/bindings panel in edit mode. Defaults to true. */
@@ -47,13 +47,26 @@ export interface CustomBinding {
  */
 export type UpdateType = 'onchange' | 'onblur';
 
+/** A new binding definition has been created */
+export interface BindingDefinitionCreate {
+    type: 'binding_create';
+    id: string;
+    definition: BindingsDefinition;
+}
+
 /** A binding definition has been updated, most likely its initial value */
 export interface BindingDefinitionUpdate {
     type: 'binding_update';
     updateType: UpdateType;
     id: string;
     definition: BindingsDefinition;
-} 
+}
+
+/** A binding definition has been deleted */
+export interface BindingDefinitionDelete {
+    type: 'binding_delete';
+    id: string;
+}
 
 /** A custom binding value has been updated */
 export interface CustomBindingValueUpdate {
@@ -63,3 +76,9 @@ export interface CustomBindingValueUpdate {
     id: string;
     value: PrimitiveValue | CollectionValue;
 }
+
+export type BindingChangeEventDetail =
+    | CustomBindingValueUpdate
+    | BindingDefinitionUpdate
+    | BindingDefinitionCreate
+    | BindingDefinitionDelete;
