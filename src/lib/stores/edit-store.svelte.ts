@@ -45,12 +45,12 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     }
 
     /** Adds a new section below the specified section */
-    addSectionBelow(sectionId: string | null) {
+    addSectionBelow(sectionId: string | null, title?: string) {
         const newSectionId = generateRandomId("section");
         const newSection = {
             id: newSectionId,
             type: "paragraph-section",
-            title: "New Section",
+            title,
             content: {}
         } as Document<C>["sections"][string];
 

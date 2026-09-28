@@ -6,6 +6,10 @@
 	import { DropdownMenu } from 'bits-ui';
 	import ScrollArea from '../utilComponents/ScrollArea.svelte';
 	import { setCaretPosition } from '../../utils/focusNavigation.js';
+	import { getI18n } from '../../i18n/i18n.svelte.js';
+
+    const i18n = getI18n();
+
 
     // We dont want to insert text components as they can be added by simply writing
     let components = $derived(Object.entries(globalRegistry.components || {}).filter(([key]) => key !== 'text'));
@@ -119,7 +123,7 @@
                 {/each}
             </div>
         </ScrollArea>
-        <div class="help-container">Press ENTER to add a component</div>
+        <div class="help-container">{i18n.t('componentToolbar.pressEnter')}</div>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 

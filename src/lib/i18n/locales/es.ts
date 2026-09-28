@@ -93,5 +93,66 @@ export const es: Translations = {
 		duplicate: 'Duplicar componente',
 		delete: 'Eliminar componente',
 		setValue: 'Asignar valor'
+	},
+	sections: {
+		defaultTitle: 'Nueva sección',
+		addFirstSection: 'Añadir primera sección',
+		addBelow: 'Añadir sección debajo',
+		duplicate: 'Duplicar sección',
+		delete: 'Eliminar sección'
+	},
+	editor: {
+		insertComponentPlaceholder: 'Presiona Ctrl + Espacio para añadir un componente...'
+	},
+	componentToolbar: {
+		pressEnter: 'Presiona ENTER para añadir'
+	},
+	components: {
+		'text-binding': {
+			name: 'Texto Vinculado',
+			description: 'Texto que se puede vincular a una variable'
+		},
+		text: {
+			name: 'Texto',
+			description: 'Tan simple como parece'
+		},
+		'text-input': {
+			name: 'Entrada de texto',
+			description: 'Permite introducir texto'
+		},
+		image: {
+			name: 'Imagen',
+			description: 'Muestra imágenes en línea'
+		},
+		latex: {
+			name: 'LaTeX',
+			description: 'Renderiza fórmulas matemáticas en LaTeX'
+		},
+		table: {
+			name: 'Tabla',
+			description: 'Crea tablas para organizar tu contenido'
+		},
+		map: {
+			name: 'Mapa',
+			description: 'Crea mapas interactivos'
+		},
+		chart: {
+			name: 'Gráfico',
+			description: 'Crea gráficos para visualizar datos'
+		}
+	},
+	errors: {
+		componentError: 'Error del componente',
+		tableConfigMissing: 'El componente de tabla no tiene configuración',
+		latexUnrecognised: 'Expresión LaTeX no reconocida',
+		latexEmpty: 'Introduce una expresión LaTeX',
+		imageLoadError: 'Error al cargar la imagen',
+		imageEmpty: 'Introduce la URL de una imagen',
+		chartMissingData: 'El componente de gráfico no tiene configuración o datos',
+		chartMissingXAxis: 'Falta el eje X',
+		chartMissingXAxisDesc: 'Por favor, configura el eje X en los ajustes del gráfico.',
+		chartNoSeries: 'No hay series definidas',
+		chartNoSeriesDesc: 'Añade al menos una serie de datos para visualizar el gráfico.'
 	}
 };
+

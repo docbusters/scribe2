@@ -93,5 +93,66 @@ export const en: Translations = {
 		duplicate: 'Duplicate component',
 		delete: 'Delete component',
 		setValue: 'Set value'
+	},
+	sections: {
+		defaultTitle: 'New Section',
+		addFirstSection: 'Add first section',
+		addBelow: 'Add section below',
+		duplicate: 'Duplicate section',
+		delete: 'Delete section'
+	},
+	editor: {
+		insertComponentPlaceholder: 'Press Ctrl + Space to add a component...'
+	},
+	componentToolbar: {
+		pressEnter: 'Press ENTER to add'
+	},
+	components: {
+		'text-binding': {
+			name: 'Text Binding',
+			description: 'Text that can be binded'
+		},
+		text: {
+			name: 'Text',
+			description: 'As simple as it gets'
+		},
+		'text-input': {
+			name: 'Text Input',
+			description: 'Used to input text'
+		},
+		image: {
+			name: 'Image',
+			description: 'Display online images'
+		},
+		latex: {
+			name: 'LaTeX',
+			description: 'Render LaTeX formulas'
+		},
+		table: {
+			name: 'Table',
+			description: 'Create tables to organize your content'
+		},
+		map: {
+			name: 'Map',
+			description: 'Create interactive maps'
+		},
+		chart: {
+			name: 'Chart',
+			description: 'Create charts to visualize your data'
+		}
+	},
+	errors: {
+		componentError: 'Component Error',
+		tableConfigMissing: 'Table component is missing configuration',
+		latexUnrecognised: 'Unrecognised LaTeX expression',
+		latexEmpty: 'Set a LaTeX expression',
+		imageLoadError: 'Image failed to load',
+		imageEmpty: 'Set an image URL',
+		chartMissingData: 'Chart component is missing configuration or data',
+		chartMissingXAxis: 'Missing X-Axis',
+		chartMissingXAxisDesc: 'Please configure the X-axis in the chart settings.',
+		chartNoSeries: 'No Series Defined',
+		chartNoSeriesDesc: 'Add at least one data series to visualize the chart.'
 	}
 };
+

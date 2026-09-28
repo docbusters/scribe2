@@ -10,10 +10,12 @@
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
+	import { getI18n } from '../../i18n/i18n.svelte.js';
 
     type GhostTextComponent = TextComponent & Partial<GhostComponentMeta>;
 
     let { componentData, sectionId, mode }: ScribeComponentProps<GhostTextComponent> = $props();
+    const i18n = getI18n();
 
     let value = $derived(parseStringForContentEditable(componentData.value.value));
     let isEmpty = $derived(componentData.value.value === '');
@@ -433,7 +435,7 @@
         class:is-empty={isEmpty && mode === 'edit'}
         class:is-ghost={componentData.id.startsWith('__ghost') && mode === 'edit'}
         class:is-between-blocks={componentData.isBetweenBlocks}
-        data-placeholder="Press Ctrl + Space to add a component..."
+        data-placeholder={i18n.t('editor.insertComponentPlaceholder')}
         contenteditable={mode === 'edit'} 
         onblur={handleTextChange} 
         oninput={handleInput}

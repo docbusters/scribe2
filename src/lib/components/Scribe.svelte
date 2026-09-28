@@ -23,7 +23,7 @@
 	import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 	import type { BaseComponent } from '../domain/components/Component.js';
 	import type { DataValue } from '../domain/data/DataValue.js';
-	import { defaultRegistry } from '../registry/defaultRegistry.js';
+	import { getDefaultRegistry } from '../registry/defaultRegistry.js';
 	import Section from './sections/Section.svelte';
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { bindingStore } from '../stores/binding-store.svelte.ts';
@@ -131,8 +131,10 @@
 
 	// Initialize the global registry with the default components and any custom components provided via props
 	$effect.pre(() => {
+		// Track lang to refresh component translations when language changes
+		void lang;
 		globalRegistry.initialize({
-			...defaultRegistry,
+			...getDefaultRegistry(i18n),
 			...(registry || {})
 		} as ComponentRegistry<C>);
 	});
@@ -248,8 +250,8 @@
 					<Section data={section} {mode} {isDarkMode} />
 				{:else}
 					{#if mode === 'edit'}
-						<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null)}>
-							Add first section
+						<Button style="max-width: fit-content;" variant="outline" onclick={() => editStore.addSectionBelow(null, i18n.t('sections.defaultTitle'))}>
+							{i18n.t('sections.addFirstSection')}
 						</Button>
 					{/if}
 				{/each}

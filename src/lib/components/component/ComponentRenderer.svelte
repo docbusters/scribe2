@@ -25,8 +25,10 @@
 	import ComponentEditor from "./ComponentEditor.svelte";
 	import Skeleton from "../utilComponents/Skeleton.svelte";
 	import EmptyContent from "../utilComponents/EmptyContent.svelte";
+	import { getI18n } from "$lib/i18n/i18n.svelte.js";
 
     let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
+    const i18n = getI18n();
 
 	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
 	let resolvedValue = $derived.by(() => {
@@ -136,7 +138,7 @@
 					</div>
 				{/if}
 				<EmptyContent 
-					message="Component Error" 
+					message={i18n.t('errors.componentError')} 
 					description={error.message} 
 					icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-triangle-alert&quot;><path d=&quot;m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3&quot;/><path d=&quot;M12 9v4&quot;/><path d=&quot;M12 17h.01&quot;/></svg>" 
 					isError={true} 

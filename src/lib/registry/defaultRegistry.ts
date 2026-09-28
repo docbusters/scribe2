@@ -14,14 +14,16 @@ import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBi
 import ChartComponentScribe from '$lib/components/defaultComponents/ChartComponentScribe.svelte';
 import ChartEditorDataConfig from '$lib/components/componentOptions/chart/ChartEditorDataConfig.svelte';
 import { mount, unmount } from 'svelte';
+import type { I18nService } from '../i18n/i18n.svelte.js';
 
 export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
-/** Contains default component implementations */
-export const defaultRegistry: ComponentRegistry = {
+/** Returns default component implementations localized if i18n is provided */
+export function getDefaultRegistry(i18n?: I18nService): ComponentRegistry {
+    return {
     'text-binding': {
-        name: 'Text Binding',
-        description: 'Text that can be binded',
+        name: i18n ? i18n.t('components.text-binding.name') : 'Text Binding',
+        description: i18n ? i18n.t('components.text-binding.description') : 'Text that can be binded',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text-icon lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<TextBindingComponent>>(TextBindingComponentScribe),
         empty: {
@@ -33,8 +35,8 @@ export const defaultRegistry: ComponentRegistry = {
         supportedBindingValueTypes: ['empty', 'string', 'number', 'boolean', 'date'],
     },
     'text': {
-        name: 'Text',
-        description: 'As simple as it gets',
+        name: i18n ? i18n.t('components.text.name') : 'Text',
+        description: i18n ? i18n.t('components.text.description') : 'As simple as it gets',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-case-sensitive-icon lucide-case-sensitive"><path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16"/><path d="M22 9v7"/><path d="M3.304 13h6.392"/><circle cx="18.5" cy="12.5" r="3.5"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<TextComponent>>(TextComponentScribe),
         empty: {
@@ -45,8 +47,8 @@ export const defaultRegistry: ComponentRegistry = {
         valueTypes: ['empty', 'string'],
     },
     'text-input': {
-        name: 'Text Input',
-        description: 'Used to input text',
+        name: i18n ? i18n.t('components.text-input.name') : 'Text Input',
+        description: i18n ? i18n.t('components.text-input.description') : 'Used to input text',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-cursor-input-icon lucide-text-cursor-input"><path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"/><path d="M9 6v12"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<TextInputComponent>>(TextInputComponentScribe),
         empty: {
@@ -76,8 +78,8 @@ export const defaultRegistry: ComponentRegistry = {
         ],
     },
     'image': {
-        name: 'Image',
-        description: 'Display online images',
+        name: i18n ? i18n.t('components.image.name') : 'Image',
+        description: i18n ? i18n.t('components.image.description') : 'Display online images',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-icon lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<ImageComponent>>(ImageComponentScribe),
         empty: {
@@ -176,8 +178,8 @@ export const defaultRegistry: ComponentRegistry = {
         supportedBindingValueTypes: ['empty', 'string'],
     },
     'latex': {
-        name: 'LaTeX',
-        description: 'Render LaTeX formulas',
+        name: i18n ? i18n.t('components.latex.name') : 'LaTeX',
+        description: i18n ? i18n.t('components.latex.description') : 'Render LaTeX formulas',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sigma-icon lucide-sigma"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<LatexComponent>>(LatexComponentScribe),
         empty: {
@@ -189,8 +191,8 @@ export const defaultRegistry: ComponentRegistry = {
         supportedBindingValueTypes: ['empty', 'string'],
     },
     'table': {
-        name: 'Table',
-        description: 'Create tables to organize your content',
+        name: i18n ? i18n.t('components.table.name') : 'Table',
+        description: i18n ? i18n.t('components.table.description') : 'Create tables to organize your content',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table2-icon lucide-table-2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<TableComponent>>(TableComponentScribe),
         empty: {
@@ -210,8 +212,8 @@ export const defaultRegistry: ComponentRegistry = {
         valueTypes: ['record'],
     },
     'map': {
-        name: 'Map',
-        description: 'Create interactive maps',
+        name: i18n ? i18n.t('components.map.name') : 'Map',
+        description: i18n ? i18n.t('components.map.description') : 'Create interactive maps',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-icon lucide-map"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<MapComponent>>(MapComponentScribe),
         empty: {
@@ -326,8 +328,8 @@ export const defaultRegistry: ComponentRegistry = {
         supportedBindingValueTypes: ['empty', 'record'],
     },
     'chart': {
-        name: 'Chart',
-        description: 'Create charts to visualize your data',
+        name: i18n ? i18n.t('components.chart.name') : 'Chart',
+        description: i18n ? i18n.t('components.chart.description') : 'Create charts to visualize your data',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column-icon lucide-chart-column"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
         ...createSvelte5Mount<ScribeComponentProps<ChartComponent>>(ChartComponentScribe),
         empty: {
@@ -453,4 +455,8 @@ export const defaultRegistry: ComponentRegistry = {
         valueTypes: ['array', 'binding'],
         supportedBindingValueTypes: ['array']
     },
-};
+    };
+}
+
+export const defaultRegistry: ComponentRegistry = getDefaultRegistry();
+

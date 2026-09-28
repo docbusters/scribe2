@@ -6,12 +6,14 @@
 	import { BarChart, LineChart, AreaChart, PieChart, Tooltip } from 'layerchart';
 	import { capitalizeStrings } from '$lib/utils/capitalizeStrings.js';
 	import { randomHexColor } from '$lib/utils/randomHexColor.js';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	let {
 		componentData,
 		resolvedValue,
 		updateComponentConfig
 	}: ScribeComponentProps<ChartComponent> = $props();
+	const i18n = getI18n();
 
 	const config = $derived(componentData.config);
 
@@ -88,14 +90,14 @@
 	{#if config && chartData.length > 0}
 		{#if !xKey}
 			<EmptyContent
-				message="Missing X-Axis"
-				description="Please configure the X-axis in the chart settings."
+				message={i18n.t('errors.chartMissingXAxis')}
+				description={i18n.t('errors.chartMissingXAxisDesc')}
 				icon='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3"/><path d="M3 21h18"/><path d="M11 16l-4 4"/><path d="M15 12l-4 4"/></svg>' 
 			/>
 		{:else if activeSeries.length === 0}
 			<EmptyContent
-				message="No Series Defined"
-				description="Add at least one data series to visualize the chart."
+				message={i18n.t('errors.chartNoSeries')}
+				description={i18n.t('errors.chartNoSeriesDesc')}
 				icon='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>' 
 			/>
 		{:else}
@@ -270,7 +272,7 @@
 		{/if}
 	{:else}
 		<EmptyContent
-			message="Chart component is missing configuration or data"
+			message={i18n.t('errors.chartMissingData')}
 			icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-chart-column&quot;><path d=&quot;M3 3v16a2 2 0 0 0 2 2h16&quot;/><path d=&quot;M18 17V9&quot;/><path d=&quot;M13 17V5&quot;/><path d=&quot;M8 17v-3&quot;/></svg>"
 			isError
 		/>

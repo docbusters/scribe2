@@ -94,4 +94,65 @@ export interface Translations {
 		delete: string;
 		setValue: string;
 	};
+	sections: {
+		defaultTitle: string;
+		addFirstSection: string;
+		addBelow: string;
+		duplicate: string;
+		delete: string;
+	};
+	editor: {
+		insertComponentPlaceholder: string;
+	};
+	componentToolbar: {
+		pressEnter: string;
+	};
+	components: {
+		'text-binding': {
+			name: string;
+			description: string;
+		};
+		text: {
+			name: string;
+			description: string;
+		};
+		'text-input': {
+			name: string;
+			description: string;
+		};
+		image: {
+			name: string;
+			description: string;
+		};
+		latex: {
+			name: string;
+			description: string;
+		};
+		table: {
+			name: string;
+			description: string;
+		};
+		map: {
+			name: string;
+			description: string;
+		};
+		chart: {
+			name: string;
+			description: string;
+		};
+	};
+	errors: {
+		componentError: string;
+		tableConfigMissing: string;
+		latexUnrecognised: string;
+		latexEmpty: string;
+		imageLoadError: string;
+		imageEmpty: string;
+		chartMissingData: string;
+		chartMissingXAxis: string;
+		chartMissingXAxisDesc: string;
+		chartNoSeries: string;
+		chartNoSeriesDesc: string;
+	};
 }
+
