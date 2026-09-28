@@ -7,7 +7,7 @@ import type { Document, BindingsDefinition } from './domain/Document.js';
 import type { CustomBindingUsages } from './utils/bindingUsages.js';
 
 // COMPONENTS
-export interface ScribeInterpreterElement<C extends BaseComponent<string, DataValue> = never> extends HTMLElement, Omit<ScribeProps<C>, 'style' | 'id' | 'class'> {
+export interface ScribeInterpreterElement<C extends BaseComponent<string, DataValue> = never> extends HTMLElement, Omit<ScribeProps<C>, 'style' | 'id' | 'class' | 'lang'> {
     getCustomBindingUsages(): CustomBindingUsages;
     refreshDocument(newDocument: Document<C>): void;
     refreshBindings(newBindings: Record<string, BindingsDefinition>): void;
@@ -24,6 +24,9 @@ export { defaultRegistry } from './registry/defaultRegistry.js';
 
 // TYPES
 export type { ScribeProps, CustomBinding, CustomBindingSubscribable, ScribeMode, BindingDefinitionUpdate, CustomBindingValueUpdate } from './types/ScribeProps.js';
+
+// i18n
+export * from './i18n/index.js';
 
 // DOCUMENT STRUCTURE
 export type { Document, BindingsDefinition } from './domain/Document.js';

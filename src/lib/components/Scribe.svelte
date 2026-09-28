@@ -13,6 +13,7 @@
 			ondocumentchange: { type: 'Object' },
 			onbindingchange: { type: 'Object' },
 			customBindings: { type: 'Object' },
+			lang: { type: 'String' },
 		}
 	}}
 />
@@ -38,8 +39,17 @@
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
+	import { setI18n } from '../i18n/i18n.svelte.js';
 
-	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en' }: ScribeProps = $props();
+
+	// svelte-ignore state_referenced_locally
+	const i18n = setI18n(lang);
+
+	// Detect language changes
+	$effect(() => {
+		i18n.setLanguage(lang);
+	});
 
 	// We clone document and bindings to completely isolate Scribe from external reactivity
 	// They are kept in state so they can be refreshed externally via exposed methods

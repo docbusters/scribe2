@@ -3,6 +3,7 @@
 	import Button from '../utilComponents/Button.svelte';
 	import ComponentEditorValue from '../component/ComponentEditorValue.svelte';
 	import type { DataValue } from '$lib/domain/data/DataValue.js';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	interface BindingComplexEditorDialogProps {
 		open: boolean;
@@ -19,6 +20,8 @@
 		initialValue,
 		onsave
 	}: BindingComplexEditorDialogProps = $props();
+
+	const i18n = getI18n();
 
 	let draftValue = $state<unknown>(null);
 
@@ -54,7 +57,7 @@
 	}
 </script>
 
-<Dialog bind:open title={`Configure Binding: ${bindingId}`}>
+<Dialog bind:open title={i18n.t('bindingComplex.title', { id: bindingId })}>
 	<div class="value-selector-container">
 		<div class="config-section">
 			<div class="section-header">
@@ -75,9 +78,9 @@
 						<polyline points="3.27 6.96 12 12.01 20.73 6.96" />
 						<line x1="12" y1="22.08" x2="12" y2="12" />
 					</svg>
-					<h5>Value Configuration</h5>
+					<h5>{i18n.t('valueSelector.configTitle')}</h5>
 				</div>
-				<p class="section-desc">Configure the elements and parameters for binding "{bindingId}"</p>
+				<p class="section-desc">{i18n.t('bindingComplex.desc', { id: bindingId })}</p>
 			</div>
 
 			<div class="value-input-card">
@@ -93,8 +96,8 @@
 	</div>
 
 	{#snippet footer()}
-		<Button variant="ghost" onclick={handleCancel}>Cancel</Button>
-		<Button onclick={handleSave}>Apply Changes</Button>
+		<Button variant="ghost" onclick={handleCancel}>{i18n.t('common.cancel')}</Button>
+		<Button onclick={handleSave}>{i18n.t('common.apply')}</Button>
 	{/snippet}
 </Dialog>
 

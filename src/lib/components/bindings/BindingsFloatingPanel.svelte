@@ -4,6 +4,9 @@
 	import ScrollArea from '../utilComponents/ScrollArea.svelte';
 	import BindingItemCard from './BindingItemCard.svelte';
 	import AddBindingDialog from './AddBindingDialog.svelte';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+
+	const i18n = getI18n();
 
 	let isExpanded = $state(true);
 	let searchQuery = $state('');
@@ -40,7 +43,7 @@
 			type="button"
 			class="scribe-bindings-collapsed-chip"
 			onclick={() => (isExpanded = true)}
-			title="Expand Bindings Manager"
+			title={i18n.t('bindingsPanel.expandTooltip')}
 		>
 			<div class="chip-icon-wrapper">
 				<svg
@@ -58,7 +61,7 @@
 					<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 				</svg>
 			</div>
-			<span class="chip-label">Bindings</span>
+			<span class="chip-label">{i18n.t('bindingsPanel.title')}</span>
 			<span class="chip-badge">{bindingsList.length}</span>
 		</button>
 	{:else}
@@ -82,7 +85,7 @@
 							<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 						</svg>
 					</div>
-					<h3 class="panel-title">Bindings</h3>
+					<h3 class="panel-title">{i18n.t('bindingsPanel.title')}</h3>
 					<span class="panel-count-badge">{bindingsList.length}</span>
 				</div>
 
@@ -90,7 +93,7 @@
 					<button
 						type="button"
 						class="header-btn"
-						title="Add new binding"
+						title={i18n.t('bindingsPanel.newVariable')}
 						onclick={() => (isAddModalOpen = true)}
 					>
 						<svg
@@ -112,7 +115,7 @@
 					<button
 						type="button"
 						class="header-btn"
-						title="Minimize panel"
+						title={i18n.t('bindingsPanel.collapseTooltip')}
 						onclick={() => (isExpanded = false)}
 					>
 						<svg
@@ -153,7 +156,7 @@
 					<input
 						type="text"
 						class="search-field"
-						placeholder="Filter bindings..."
+						placeholder={i18n.t('bindingsPanel.filterPlaceholder')}
 						bind:value={searchQuery}
 					/>
 					{#if searchQuery}
@@ -161,7 +164,7 @@
 							type="button"
 							class="clear-btn"
 							onclick={() => (searchQuery = '')}
-							title="Clear search"
+							title={i18n.t('bindingSelector.clearSearch')}
 						>
 							✕
 						</button>
@@ -179,9 +182,9 @@
 					{#if filteredBindings.length === 0}
 						<div class="empty-state">
 							{#if searchQuery}
-								No bindings found for "{searchQuery}"
+								{i18n.t('bindingsPanel.noFilterResults', { query: searchQuery })}
 							{:else}
-								No document bindings yet
+								{i18n.t('bindingsPanel.noBindings')}
 							{/if}
 						</div>
 					{:else}

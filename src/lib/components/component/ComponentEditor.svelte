@@ -5,6 +5,7 @@
     import { mount, unmount } from "svelte";
 	import type { DataValue } from "$lib/domain/data/DataValue.js";
 	import type { ComponentConfig } from "$lib/domain/components/Component.js";
+	import { getI18n } from "$lib/i18n/i18n.svelte.js";
 
     interface ComponentEditorProps extends HTMLAttributes<HTMLDivElement> {
         componentType: string;
@@ -19,6 +20,18 @@
     }
 
     let { componentType, isBinding, componentValue, componentConfig, sectionId, componentId, disabled = false, class: className, options = defaultComponentOptions, disabledOptions,  ...restProps }: ComponentEditorProps = $props();
+
+	const i18n = getI18n();
+
+	function getOptionName(opt: BaseComponentEditOptions): string {
+		const map: Record<string, string> = {
+			add: i18n.t('toolbar.add'),
+			duplicate: i18n.t('toolbar.duplicate'),
+			delete: i18n.t('toolbar.delete'),
+			setValue: i18n.t('toolbar.setValue')
+		};
+		return map[opt.type] || opt.name;
+	}
 
     let containerElement = $state<HTMLElement | null>(null);
 
@@ -39,6 +52,7 @@
 
             const baseOption = option as BaseComponentEditOptions;
             if (baseOption.props) {
+				const optName = getOptionName(baseOption);
                 // If a custom render function is provided, use it to render the option
                 if (baseOption.render) {
                     const cleanup = baseOption.render(containerElement!, {
@@ -47,7 +61,7 @@
                         sectionId,
                         componentId,
                         disabled: disabled || disabledOptions.includes(baseOption.type),
-                        name: baseOption.name,
+                        name: optName,
                         onclick: baseOption.props.onclick,
                         icon: baseOption.props.icon,
                         isBinding,
@@ -64,7 +78,7 @@
                             sectionId,
                             componentId,
                             disabled: disabled || disabledOptions.includes(baseOption.type),
-                            name: baseOption.name,
+                            name: optName,
                             onclick: (e) => baseOption.props!.onclick?.({ event: e, sectionId, componentId }),
                             icon: baseOption.props.icon,
                             isSelected: baseOption.isSelected ? baseOption.isSelected({ value: componentValue, config: componentConfig }) : false

@@ -8,8 +8,10 @@
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
+	import ComponentEditorBindingSelector from './ComponentEditorBindingSelector.svelte';
 	import Button from '../utilComponents/Button.svelte';
 	import { capitalizeStrings } from '$lib/utils/capitalizeStrings.js';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	interface ComponentEditorValueProps {
 		parsedValueType: { type: DataValue['type']; bindingType?: string };
@@ -21,6 +23,8 @@
 	}
 
 	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, placeholder = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
+
+	const i18n = getI18n();
 
 	const componentInitialValue = $derived.by(() => {
 		if (initialDataValue) return initialDataValue;
@@ -132,8 +136,8 @@
 		value={String(value ?? '')}
 		onValueChange={(v) => value = (v === 'true')}
 		items={[
-			{ value: 'true', label: 'True' },
-			{ value: 'false', label: 'False' }
+			{ value: 'true', label: i18n.t('common.true') },
+			{ value: 'false', label: i18n.t('common.false') }
 		]}
 	/>
 {:else if parsedValueType?.type === 'record'}
@@ -160,8 +164,8 @@
 			{#each value as _, index (index)}
 				<div class="array-container-item">
 					<div class="array-item-header">
-						<span class="array-item-badge">Item #{index + 1}</span>
-						<Button size="icon-sm" variant="ghost-destructive" title="Remove item" onclick={() => removeArrayItem(index)}>
+						<span class="array-item-badge">{i18n.t('common.itemIndex', { index: index + 1 })}</span>
+						<Button size="icon-sm" variant="ghost-destructive" title={i18n.t('common.removeItem')} onclick={() => removeArrayItem(index)}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 						</Button>
 					</div>
@@ -185,17 +189,16 @@
 			<div class="array-actions">
 				<Button size="sm" variant="outline" class="array-add-btn" onclick={addArrayItem}>
 					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-					Add Item
+					{i18n.t('common.addItem')}
 				</Button>
 			</div>
 		{/if}
 	</div>
 {:else if parsedValueType?.type === 'binding'}
-	<Select
-		placeholder="Binding ID"
-		type="single"
+	<ComponentEditorBindingSelector
+		bindingType={parsedValueType.bindingType || 'default'}
+		{componentType}
 		bind:value={value as string}
-		items={bindingOptions}
 	/>
 {/if}
 

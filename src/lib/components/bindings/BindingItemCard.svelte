@@ -5,6 +5,7 @@
 	import BindingSimpleInput from './BindingSimpleInput.svelte';
 	import BindingComplexPreview from './BindingComplexPreview.svelte';
 	import BindingComplexEditorDialog from './BindingComplexEditorDialog.svelte';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	interface Props {
 		id: string;
@@ -14,6 +15,21 @@
 	}
 
 	let { id, type, value, ondelete }: Props = $props();
+
+	const i18n = getI18n();
+
+	function getTypeLabel(t: string): string {
+		const map: Record<string, string> = {
+			string: i18n.t('types.string'),
+			number: i18n.t('types.number'),
+			boolean: i18n.t('types.boolean'),
+			array: i18n.t('types.array'),
+			record: i18n.t('types.record'),
+			date: i18n.t('types.date'),
+			empty: i18n.t('types.empty')
+		};
+		return map[t] || t;
+	}
 
 	let isComplexModalOpen = $state(false);
 	let isConfirmingDelete = $state(false);
@@ -56,12 +72,12 @@
 	<div class="row-header">
 		<div class="meta-left">
 			<span class="binding-name" title={id}>{id}</span>
-			<span class="type-pill pill-{type}">{type}</span>
+			<span class="type-pill pill-{type}">{getTypeLabel(type)}</span>
 		</div>
 		<button
 			type="button"
 			class="delete-btn"
-			title="Delete binding"
+			title={i18n.t('bindingsPanel.deleteTooltip')}
 			onclick={handleDeleteClick}
 		>
 			<svg
@@ -84,12 +100,12 @@
 
 	{#if isConfirmingDelete}
 		<div class="delete-warning-box">
-			<span class="warning-text">Delete binding?</span>
+			<span class="warning-text">{i18n.t('bindingsPanel.deleteConfirm')}</span>
 			<div class="warning-actions">
 				<button
 					type="button"
 					class="btn-confirm"
-					title="Confirm delete"
+					title={i18n.t('bindingsPanel.confirm')}
 					onclick={confirmDelete}
 				>
 					<svg
@@ -109,7 +125,7 @@
 				<button
 					type="button"
 					class="btn-cancel"
-					title="Cancel"
+					title={i18n.t('common.cancel')}
 					onclick={cancelDelete}
 				>
 					<svg

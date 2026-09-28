@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { UpdateType } from '$lib/types/ScribeProps.js';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	interface Props {
 		type: 'string' | 'number' | 'boolean' | 'date';
@@ -8,6 +9,7 @@
 	}
 
 	let { type, value, onupdate }: Props = $props();
+	const i18n = getI18n();
 
 	function formatDateForInput(val: unknown): string {
 		if (!val) return '';
@@ -43,7 +45,7 @@
 			value={(value as string) ?? ''}
 			oninput={(e) => onupdate(e.currentTarget.value, 'onchange')}
 			onblur={(e) => onupdate(e.currentTarget.value, 'onblur')}
-			placeholder="Enter text..."
+			placeholder={i18n.t('common.textPlaceholder')}
 		/>
 	{:else if type === 'number'}
 		<input
@@ -61,14 +63,14 @@
 				class="bool-option {value === true ? 'is-selected' : ''}"
 				onclick={() => onupdate(true, 'onblur')}
 			>
-				True
+				{i18n.t('common.true')}
 			</button>
 			<button
 				type="button"
 				class="bool-option {value === false ? 'is-selected' : ''}"
 				onclick={() => onupdate(false, 'onblur')}
 			>
-				False
+				{i18n.t('common.false')}
 			</button>
 		</div>
 	{:else if type === 'date'}

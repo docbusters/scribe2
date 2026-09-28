@@ -17,6 +17,8 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     customBindings?: Record<string, CustomBinding>;
     ondocumentchange?: (event: CustomEvent<Document<C>>) => void;
     onbindingchange?: (event: CustomEvent<CustomBindingValueUpdate | BindingDefinitionUpdate>) => void;
+    /** Current language / locale for the interface ('en' or 'es'). Defaults to 'en'. */
+    lang?: 'en' | 'es';
 }
 
 export interface CustomBindingSubscribable {

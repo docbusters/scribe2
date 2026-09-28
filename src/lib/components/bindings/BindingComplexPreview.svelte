@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+
 	interface BindingComplexPreviewProps {
 		type: string;
 		value: unknown;
@@ -7,29 +9,36 @@
 
 	let { type, value, onedit }: BindingComplexPreviewProps = $props();
 
+	const i18n = getI18n();
+
 	let previewSummary = $derived.by(() => {
 		if (type === 'array') {
 			if (Array.isArray(value)) {
-				return `${value.length} ${value.length === 1 ? 'item' : 'items'}`;
+				const count = value.length;
+				return count === 1
+					? i18n.t('bindingComplex.itemCountOne', { count })
+					: i18n.t('bindingComplex.itemCountMany', { count });
 			}
-			return '0 items';
+			return i18n.t('bindingComplex.emptyList');
 		}
 		if (type === 'record') {
 			if (value && typeof value === 'object') {
 				const count = Object.keys(value).length;
-				return `${count} ${count === 1 ? 'field' : 'fields'}`;
+				return count === 1
+					? i18n.t('bindingComplex.fieldCountOne', { count })
+					: i18n.t('bindingComplex.fieldCountMany', { count });
 			}
-			return '0 fields';
+			return i18n.t('bindingComplex.emptyGroup');
 		}
 		if (type === 'component') {
 			const compType = (value as { type?: string })?.type;
-			return compType || 'Component';
+			return compType || i18n.t('bindingComplex.componentDefault');
 		}
-		return 'Complex data';
+		return i18n.t('bindingComplex.editElements');
 	});
 </script>
 
-<button type="button" class="complex-trigger" onclick={onedit} title="Click to edit complex value">
+<button type="button" class="complex-trigger" onclick={onedit} title={i18n.t('bindingComplex.editElements')}>
 	<span class="trigger-summary">
 		<span class="trigger-dot"></span>
 		<span class="summary-text">{previewSummary}</span>
