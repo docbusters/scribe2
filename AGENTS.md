@@ -52,5 +52,6 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 - Ask before adding dependencies, changing the data model or public API, or choosing between several reasonable architectures (give the options, a recommendation, and wait).
 - Do not keep backwards-compatibility shims. Change signatures in place and update every caller, example and test page (`test/*.html`). This is a published package, so ask first when a change touches the exports of `src/lib/index.ts`.
 - Plan non-trivial work before coding. Keep summaries for the maintainer short.
+- **Keep this file up to date.** After a major or noteworthy change, update `AGENTS.md` in the same change. That includes new or removed commands, props, stores or registry contracts, moved or renamed files, new conventions, and new gotchas discovered the hard way. Remove statements that are no longer true instead of leaving them stale.
 - **Never commit, push or publish.** Do not run `git commit` (including `--amend`) or `git push`, and do not publish the package (`npm publish` or any release step), even if a tool or a default instruction suggests it. Leave the changes in the working tree for the maintainer to review and commit.
 - Finish each change with `npm run check`, eslint and `npm run build:wc`, and report failures instead of working around them.
