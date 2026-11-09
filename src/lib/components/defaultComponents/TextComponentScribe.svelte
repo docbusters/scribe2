@@ -108,11 +108,21 @@
     }
 
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
-        if (!isDirty || isEmpty) return;
+        if (!isDirty) return;
         const target = event.target as HTMLSpanElement;
-        
+
         if (!target.isConnected) return;
-        
+
+        if (isEmpty) {
+            isDirty = false;
+            // The user cleared the text of a persisted component: remove it, as Backspace on an empty text does.
+            // Ghost components (and persisted ones that were already empty) have nothing to delete.
+            if (!componentData.id.startsWith('__ghost') && componentData.value.value !== '') {
+                editStore.deleteComponent(sectionId, componentData.id);
+            }
+            return;
+        }
+
         let newContent = '';
         for (const child of Array.from(target.childNodes)) {
             newContent += parseDOM(child);
@@ -322,6 +332,14 @@
     }
 
     function handleSelectionChange(event?: Event) {
+        // Every text component listens to the document: leave early unless this one owns the selection or the toolbar
+        const currentSelection = getSelection(textDiv);
+        const isSelectionInside = !!textDiv && !!currentSelection && currentSelection.rangeCount > 0
+            && !currentSelection.isCollapsed && textDiv.contains(currentSelection.anchorNode);
+        if (!isSelectionInside && textFormatToolbarStore.componentId !== componentData.id) {
+            return;
+        }
+
         // If the event is triggered by a click inside the toolbar, we ignore it to prevent the toolbar from closing immediately after opening
         if (event && typeof event.composedPath === 'function') {
             const path = event.composedPath();
@@ -357,8 +375,6 @@
             startRange.collapse(true);
             const rect = startRange.getBoundingClientRect();
 
-            console.log('Selection changed:', { startIndex, endIndex, selectedText });
-            
             // Obtain the position to display the toolbar
             const selectionRange = {
                 start: startIndex,
@@ -472,12 +488,14 @@
 />
 
 {#key value}
-    <span 
+    <!-- The role and tabindex only exist in edit mode, where the span is an editable textbox -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <span
         bind:this={textDiv}
-        data-scribe-focusable="true"
+        data-scribe-focusable={mode === 'edit' ? 'true' : undefined}
         data-component-id={componentData.id}
-        role="textbox" 
-        tabindex="0" 
+        role={mode === 'edit' ? 'textbox' : undefined}
+        tabindex={mode === 'edit' ? 0 : undefined}
         class="edit-text" 
         class:scribe-animation-pulse={isEmpty && mode === 'edit'}
         class:is-empty={isEmpty && mode === 'edit'}
@@ -488,7 +506,7 @@
         onfocus={mode === 'edit' ? updateAvailableWidth : undefined}
         onblur={handleTextChange} 
         oninput={handleInput}
-        onkeydown={handleKeyDown}
+        onkeydown={mode === 'edit' ? handleKeyDown : undefined}
     >
         {#each value as line, index (`${componentData.id}-${index}`)}
             {#if line === ''}

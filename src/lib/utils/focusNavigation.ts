@@ -1,63 +1,114 @@
+import { getSelection } from './selection.js';
+
 export interface FocusNavigationDetail {
     direction: 'up' | 'down' | 'left' | 'right';
     x?: number;
     y?: number;
 }
 
+type TextField = HTMLInputElement | HTMLTextAreaElement;
+
+function isTextField(element: HTMLElement): element is TextField {
+    return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement;
+}
+
+/** Lazily created canvas context shared by all text measurements */
+let measureContext: CanvasRenderingContext2D | null | undefined;
+
+function getMeasureContext(): CanvasRenderingContext2D | null {
+    if (measureContext === undefined) {
+        measureContext = document.createElement('canvas').getContext('2d');
+    }
+    return measureContext;
+}
+
+/**
+ * Returns the metrics needed to measure text inside an input: the horizontal offset where the
+ * text starts (relative to the viewport) and the canvas font matching the input's computed style.
+ */
+function getInputTextMetrics(input: TextField): { textLeft: number; font: string } {
+    const rect = input.getBoundingClientRect();
+    const style = window.getComputedStyle(input);
+    const paddingLeft = parseFloat(style.paddingLeft) || 0;
+    const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+    return {
+        textLeft: rect.left + paddingLeft + borderLeft,
+        font: `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+    };
+}
+
 /**
  * Calculates the horizontal caret coordinate in pixels inside an input or textarea
  * using canvas text measurement.
  */
-function getInputCaretX(input: HTMLInputElement | HTMLTextAreaElement): number {
-    const rect = input.getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(input);
-    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-    const borderLeft = parseFloat(computedStyle.borderLeftWidth) || 0;
-    const font = `${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return rect.left + paddingLeft + borderLeft;
+function getInputCaretX(input: TextField): number {
+    const { textLeft, font } = getInputTextMetrics(input);
+    const ctx = getMeasureContext();
+    if (!ctx) return textLeft;
     ctx.font = font;
 
     const selStart = input.selectionStart ?? input.value.length;
-    const textUpToCaret = input.value.substring(0, selStart);
-    const measuredWidth = ctx.measureText(textUpToCaret).width;
+    const measuredWidth = ctx.measureText(input.value.substring(0, selStart)).width;
 
-    return rect.left + paddingLeft + borderLeft + measuredWidth - input.scrollLeft;
+    return textLeft + measuredWidth - input.scrollLeft;
 }
 
 /**
  * Finds the character index in an input or textarea that is closest to targetX.
+ * The width of a text prefix grows with its length, so a binary search is enough.
  */
-function getInputIndexFromX(input: HTMLInputElement | HTMLTextAreaElement, targetX: number): number {
-    const rect = input.getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(input);
-    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-    const borderLeft = parseFloat(computedStyle.borderLeftWidth) || 0;
-    const clickX = targetX - (rect.left + paddingLeft + borderLeft) + input.scrollLeft;
+function getInputIndexFromX(input: TextField, targetX: number): number {
+    const { textLeft, font } = getInputTextMetrics(input);
+    const clickX = targetX - textLeft + input.scrollLeft;
 
     if (clickX <= 0) return 0;
 
-    const font = `${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = getMeasureContext();
     if (!ctx) return input.value.length;
     ctx.font = font;
 
     const text = input.value;
-    let bestIndex = text.length;
-    let minDiff = Infinity;
+    const widthUpTo = (index: number) => ctx.measureText(text.substring(0, index)).width;
 
-    for (let i = 0; i <= text.length; i++) {
-        const width = ctx.measureText(text.substring(0, i)).width;
-        const diff = Math.abs(width - clickX);
-        if (diff < minDiff) {
-            minDiff = diff;
-            bestIndex = i;
+    // Find the first index whose prefix is at least as wide as the click position
+    let low = 0;
+    let high = text.length;
+    while (low < high) {
+        const mid = (low + high) >> 1;
+        if (widthUpTo(mid) < clickX) {
+            low = mid + 1;
+        } else {
+            high = mid;
         }
     }
-    return bestIndex;
+
+    if (low === 0) return 0;
+    return Math.abs(widthUpTo(low - 1) - clickX) <= Math.abs(widthUpTo(low) - clickX) ? low - 1 : low;
+}
+
+/**
+ * Returns the node that bounds the focus navigation of an element: the Scribe document that
+ * contains it, so several editors in the same page never navigate into each other.
+ */
+function getFocusScope(element: HTMLElement): ParentNode {
+    return element.closest('.scribe-document') ?? (element.getRootNode() as Document | ShadowRoot);
+}
+
+/** Whether the element can currently receive a caret (ignores read only content in view mode) */
+function isNavigable(element: HTMLElement): boolean {
+    if (isTextField(element)) {
+        return !element.disabled && !element.readOnly;
+    }
+    return element.isContentEditable;
+}
+
+/** Whether the user has a non collapsed (range) selection inside the element */
+function hasRangeSelection(element: HTMLElement): boolean {
+    if (isTextField(element)) {
+        return element.selectionStart !== element.selectionEnd;
+    }
+    const selection = getSelection(element);
+    return !!selection && selection.rangeCount > 0 && !selection.isCollapsed;
 }
 
 /**
@@ -65,7 +116,7 @@ function getInputIndexFromX(input: HTMLInputElement | HTMLTextAreaElement, targe
  */
 export function getCaretCoordinates(element: HTMLElement): { x: number; top: number; bottom: number; y: number } {
     const rect = element.getBoundingClientRect();
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    if (isTextField(element)) {
         const x = getInputCaretX(element);
         return {
             x,
@@ -75,8 +126,7 @@ export function getCaretCoordinates(element: HTMLElement): { x: number; top: num
         };
     }
 
-    const rootNode = element.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
+    const selection = getSelection(element);
     if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         let rangeRect = range.getBoundingClientRect();
@@ -108,11 +158,10 @@ export function getCaretCoordinates(element: HTMLElement): { x: number; top: num
  * Checks whether the selection in the element is at the start.
  */
 export function isAtStart(element: HTMLElement): boolean {
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    if (isTextField(element)) {
         return element.selectionStart === 0 && element.selectionEnd === 0;
     }
-    const rootNode = element.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
+    const selection = getSelection(element);
     if (!selection || selection.rangeCount === 0) return true;
     const range = selection.getRangeAt(0);
     const preRange = range.cloneRange();
@@ -125,11 +174,10 @@ export function isAtStart(element: HTMLElement): boolean {
  * Checks whether the selection in the element is at the end.
  */
 export function isAtEnd(element: HTMLElement): boolean {
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    if (isTextField(element)) {
         return element.selectionStart === element.value.length && element.selectionEnd === element.value.length;
     }
-    const rootNode = element.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
+    const selection = getSelection(element);
     if (!selection || selection.rangeCount === 0) return true;
     const range = selection.getRangeAt(0);
     const postRange = range.cloneRange();
@@ -138,18 +186,10 @@ export function isAtEnd(element: HTMLElement): boolean {
     return postRange.toString().length === 0;
 }
 
-/**
- * Checks whether the caret is on the first visual line of the element.
- */
-export function isAtFirstLine(element: HTMLElement): boolean {
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-        return true;
-    }
-    if (isAtStart(element)) return true;
-
-    const rootNode = element.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
-    if (!selection || selection.rangeCount === 0) return true;
+/** Returns the bounding rect of the current selection range, falling back to its first client rect */
+function getSelectionRect(element: HTMLElement): DOMRect | null {
+    const selection = getSelection(element);
+    if (!selection || selection.rangeCount === 0) return null;
 
     const range = selection.getRangeAt(0);
     let caretRect = range.getBoundingClientRect();
@@ -157,7 +197,20 @@ export function isAtFirstLine(element: HTMLElement): boolean {
         const clientRects = range.getClientRects();
         if (clientRects.length > 0) caretRect = clientRects[0];
     }
-    if (caretRect.height === 0 || caretRect.top === 0) return true;
+    return caretRect;
+}
+
+/**
+ * Checks whether the caret is on the first visual line of the element.
+ */
+export function isAtFirstLine(element: HTMLElement): boolean {
+    if (isTextField(element)) {
+        return true;
+    }
+    if (isAtStart(element)) return true;
+
+    const caretRect = getSelectionRect(element);
+    if (!caretRect || caretRect.height === 0 || caretRect.top === 0) return true;
 
     const elRect = element.getBoundingClientRect();
     const style = window.getComputedStyle(element);
@@ -171,22 +224,13 @@ export function isAtFirstLine(element: HTMLElement): boolean {
  * Checks whether the caret is on the last visual line of the element.
  */
 export function isAtLastLine(element: HTMLElement): boolean {
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    if (isTextField(element)) {
         return true;
     }
     if (isAtEnd(element)) return true;
 
-    const rootNode = element.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
-    if (!selection || selection.rangeCount === 0) return true;
-
-    const range = selection.getRangeAt(0);
-    let caretRect = range.getBoundingClientRect();
-    if (caretRect.height === 0) {
-        const clientRects = range.getClientRects();
-        if (clientRects.length > 0) caretRect = clientRects[0];
-    }
-    if (caretRect.height === 0 || caretRect.bottom === 0) return true;
+    const caretRect = getSelectionRect(element);
+    if (!caretRect || caretRect.height === 0 || caretRect.bottom === 0) return true;
 
     const elRect = element.getBoundingClientRect();
     const style = window.getComputedStyle(element);
@@ -196,15 +240,20 @@ export function isAtLastLine(element: HTMLElement): boolean {
     return ((elRect.bottom - paddingBottom) - caretRect.bottom) < lineHeight * 0.9;
 }
 
+interface LineRect {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+    height: number;
+    width: number;
+}
+
 /**
  * Gets the relevant line box for an element at targetX in the specified direction.
  * For multi-line inline elements, selects the line box covering targetX.
  */
-function getRelevantRect(
-    element: HTMLElement,
-    targetX: number,
-    direction: 'up' | 'down'
-): { top: number; bottom: number; left: number; right: number; height: number; width: number } {
+function getRelevantRect(element: HTMLElement, targetX: number, direction: 'up' | 'down'): LineRect {
     const clientRects = Array.from(element.getClientRects());
     if (clientRects.length <= 1) {
         return element.getBoundingClientRect();
@@ -214,28 +263,24 @@ function getRelevantRect(
     const coveringRects = clientRects.filter(r => targetX >= r.left - 4 && targetX <= r.right + 4);
     const candidateList = coveringRects.length > 0 ? coveringRects : clientRects;
 
-    if (direction === 'down') {
-        let topMost = candidateList[0];
-        for (let i = 1; i < candidateList.length; i++) {
-            if (candidateList[i].top < topMost.top) {
-                topMost = candidateList[i];
-            }
+    // Entering from above uses the top-most line, entering from below uses the bottom-most one
+    let selected = candidateList[0];
+    for (let i = 1; i < candidateList.length; i++) {
+        const rect = candidateList[i];
+        if (direction === 'down' ? rect.top < selected.top : rect.bottom > selected.bottom) {
+            selected = rect;
         }
-        return topMost;
-    } else {
-        let bottomMost = candidateList[0];
-        for (let i = 1; i < candidateList.length; i++) {
-            if (candidateList[i].bottom > bottomMost.bottom) {
-                bottomMost = candidateList[i];
-            }
-        }
-        return bottomMost;
     }
+    return selected;
 }
 
 /**
- * Checks whether the element has another visual line in the given direction
- * that covers the current horizontal coordinate (caretX).
+ * Checks whether the element has another visual line in the given direction that the browser
+ * can reach from the current caret position.
+ *
+ * Lines that are shorter than the caret's horizontal coordinate are still reachable: the browser
+ * clamps the caret to the end of the line. Only lines that start to the right of the caret are
+ * considered unreachable, since the caret would have to leave the element to get there.
  */
 export function canMoveVerticallyWithinElement(
     element: HTMLElement,
@@ -244,7 +289,7 @@ export function canMoveVerticallyWithinElement(
     caretTop: number,
     caretBottom: number
 ): boolean {
-    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+    if (isTextField(element)) {
         return false;
     }
 
@@ -254,48 +299,21 @@ export function canMoveVerticallyWithinElement(
     }
 
     const caretLineCenter = (caretTop + caretBottom) / 2;
+    const sign = direction === 'down' ? 1 : -1;
 
-    if (direction === 'down') {
-        const linesBelow = clientRects.filter(r => {
-            const rCenter = (r.top + r.bottom) / 2;
-            return rCenter - caretLineCenter >= 10;
-        });
+    // Closest line (vertically) that lies in the requested direction
+    let closestLine: DOMRect | null = null;
+    let minDy = Infinity;
 
-        if (linesBelow.length === 0) return false;
-
-        let closestLine = linesBelow[0];
-        let minDy = (closestLine.top + closestLine.bottom) / 2 - caretLineCenter;
-
-        for (let i = 1; i < linesBelow.length; i++) {
-            const dy = (linesBelow[i].top + linesBelow[i].bottom) / 2 - caretLineCenter;
-            if (dy < minDy) {
-                minDy = dy;
-                closestLine = linesBelow[i];
-            }
+    for (const rect of clientRects) {
+        const dy = sign * ((rect.top + rect.bottom) / 2 - caretLineCenter);
+        if (dy >= 10 && dy < minDy) {
+            minDy = dy;
+            closestLine = rect;
         }
-
-        return caretX >= closestLine.left - 4 && caretX <= closestLine.right + 4;
-    } else {
-        const linesAbove = clientRects.filter(r => {
-            const rCenter = (r.top + r.bottom) / 2;
-            return caretLineCenter - rCenter >= 10;
-        });
-
-        if (linesAbove.length === 0) return false;
-
-        let closestLine = linesAbove[0];
-        let minDy = caretLineCenter - (closestLine.top + closestLine.bottom) / 2;
-
-        for (let i = 1; i < linesAbove.length; i++) {
-            const dy = caretLineCenter - (linesAbove[i].top + linesAbove[i].bottom) / 2;
-            if (dy < minDy) {
-                minDy = dy;
-                closestLine = linesAbove[i];
-            }
-        }
-
-        return caretX >= closestLine.left - 4 && caretX <= closestLine.right + 4;
     }
+
+    return closestLine !== null && caretX >= closestLine.left - 4;
 }
 
 /**
@@ -311,7 +329,7 @@ export function setCaretPosition(
 ): void {
     targetElement.focus();
 
-    if (targetElement instanceof HTMLInputElement || targetElement instanceof HTMLTextAreaElement) {
+    if (isTextField(targetElement)) {
         if (options.direction === 'left') {
             targetElement.setSelectionRange(targetElement.value.length, targetElement.value.length);
         } else if (options.direction === 'right') {
@@ -327,8 +345,7 @@ export function setCaretPosition(
         return;
     }
 
-    const rootNode = targetElement.getRootNode() as Document | ShadowRoot;
-    const selection = ('getSelection' in rootNode) ? (rootNode as Document).getSelection() : window.getSelection();
+    const selection = getSelection(targetElement);
     if (!selection) return;
 
     if (options.direction === 'left') {
@@ -414,77 +431,98 @@ export function setupFocusListeners(element: HTMLElement): () => void {
 
 /**
  * Handles arrow key navigation on keydown event.
- * Returns true if navigation was executed (and event was prevented), false otherwise.
+ * Returns true if the focus was moved to another component (the event is then prevented),
+ * false otherwise, in which case the browser keeps its default behaviour.
  */
 export function handleArrowNavigation(event: KeyboardEvent, element: HTMLElement): boolean {
+    // Modified arrows (selection extension, word/line jumps) and IME composition belong to the browser
+    if (event.defaultPrevented || event.isComposing || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
+        return false;
+    }
+    // With a range selected the arrows must only collapse it
+    if (hasRangeSelection(element)) {
+        return false;
+    }
+
+    let moved = false;
+
     switch (event.key) {
         case 'ArrowLeft': {
             if (isAtStart(element)) {
-                event.preventDefault();
-                return navigateToAdjacentComponent(element, 'left');
+                moved = navigateToAdjacentComponent(element, 'left');
             }
             break;
         }
         case 'ArrowRight': {
             if (isAtEnd(element)) {
-                event.preventDefault();
-                return navigateToAdjacentComponent(element, 'right');
+                moved = navigateToAdjacentComponent(element, 'right');
             }
             break;
         }
         case 'ArrowUp': {
             const caret = getCaretCoordinates(element);
-            const canMoveUp = canMoveVerticallyWithinElement(element, 'up', caret.x, caret.top, caret.bottom);
-            if (!canMoveUp || isAtFirstLine(element)) {
-                event.preventDefault();
-                return navigateToAdjacentComponent(element, 'up');
+            const staysInside = canMoveVerticallyWithinElement(element, 'up', caret.x, caret.top, caret.bottom)
+                && !isAtFirstLine(element);
+            if (!staysInside) {
+                moved = navigateToAdjacentComponent(element, 'up');
             }
             break;
         }
         case 'ArrowDown': {
             const caret = getCaretCoordinates(element);
-            const canMoveDown = canMoveVerticallyWithinElement(element, 'down', caret.x, caret.top, caret.bottom);
-            if (!canMoveDown || isAtLastLine(element)) {
-                event.preventDefault();
-                return navigateToAdjacentComponent(element, 'down');
+            const staysInside = canMoveVerticallyWithinElement(element, 'down', caret.x, caret.top, caret.bottom)
+                && !isAtLastLine(element);
+            if (!staysInside) {
+                moved = navigateToAdjacentComponent(element, 'down');
             }
             break;
         }
     }
-    return false;
+
+    // The focus has already moved, so the default action would be applied to the new target
+    if (moved) {
+        event.preventDefault();
+    }
+    return moved;
+}
+
+/** Dispatches the cancelable focus event to the target and falls back to placing the caret directly */
+function focusTarget(targetElement: HTMLElement, eventName: string, detail: FocusNavigationDetail): void {
+    const event = new CustomEvent(eventName, {
+        detail,
+        cancelable: true,
+        bubbles: false
+    });
+
+    // A listener (see setupFocusListeners) cancels the event when it already placed the caret
+    const eventWasCanceled = !targetElement.dispatchEvent(event);
+    if (!eventWasCanceled) {
+        setCaretPosition(targetElement, detail);
+    }
 }
 
 export function navigateToAdjacentComponent(
     currentElement: HTMLElement,
     direction: 'up' | 'down' | 'left' | 'right'
 ): boolean {
-    const rootNode = currentElement.getRootNode() as Document | ShadowRoot;
-    const focusableElements = Array.from(
-        rootNode.querySelectorAll('[data-scribe-focusable]')
-    ) as HTMLElement[];
+    const focusableElements = (
+        Array.from(getFocusScope(currentElement).querySelectorAll('[data-scribe-focusable]')) as HTMLElement[]
+    ).filter(isNavigable);
 
     const currentIndex = focusableElements.indexOf(currentElement);
     if (currentIndex === -1) return false;
 
     // For Left and Right directions, use linear DOM flow order
     if (direction === 'left' || direction === 'right') {
-        const step = direction === 'right' ? 1 : -1;
-        const nextIndex = currentIndex + step;
-        if (nextIndex >= 0 && nextIndex < focusableElements.length) {
-            const targetElement = focusableElements[nextIndex];
-            const eventName = direction === 'right' ? 'scribe-focus-start' : 'scribe-focus-end';
-            const detail: FocusNavigationDetail = { direction };
-            const event = new CustomEvent(eventName, { 
-                detail,
-                cancelable: true,
-                bubbles: false
-            });
-            const eventWasCanceled = !targetElement.dispatchEvent(event);
-            if (eventWasCanceled) return true;
-            setCaretPosition(targetElement, detail);
-            return true;
-        }
-        return false;
+        const nextIndex = currentIndex + (direction === 'right' ? 1 : -1);
+        if (nextIndex < 0 || nextIndex >= focusableElements.length) return false;
+
+        focusTarget(
+            focusableElements[nextIndex],
+            direction === 'right' ? 'scribe-focus-start' : 'scribe-focus-end',
+            { direction }
+        );
+        return true;
     }
 
     // For Up and Down, find the closest geometric candidate on another line
@@ -494,11 +532,14 @@ export function navigateToAdjacentComponent(
     const currentLineBottom = caret.bottom;
     const currentLineCenter = caret.y;
 
-    // Filter candidates strictly above or below the current visual line
-    const candidates = focusableElements.filter(el => {
-        if (el === currentElement) return false;
+    // Measure each candidate once, keeping only those strictly above or below the current visual line
+    const scoredCandidates: { el: HTMLElement; score: number }[] = [];
+
+    for (const el of focusableElements) {
+        if (el === currentElement) continue;
+
         const rect = getRelevantRect(el, currentX, direction);
-        if (rect.width === 0 || rect.height === 0) return false; // Ignore invisible elements
+        if (rect.width === 0 || rect.height === 0) continue; // Ignore invisible elements
 
         const candidateCenter = (rect.top + rect.bottom) / 2;
         const dyCenter = candidateCenter - currentLineCenter;
@@ -511,23 +552,14 @@ export function navigateToAdjacentComponent(
         const minHeight = Math.min(rect.height, currentLineBottom - currentLineTop);
 
         const isSameLine = Math.abs(dyCenter) < 12 && (minHeight > 0 && verticalOverlap / minHeight > 0.5);
-        if (isSameLine) {
-            return false;
-        }
+        if (isSameLine) continue;
 
-        if (direction === 'up') {
+        const isInDirection = direction === 'up'
             // Must be distinctly above the current line
-            return dyCenter <= -12 && rect.top < currentLineTop - 4 && rect.bottom <= currentLineBottom;
-        } else {
+            ? dyCenter <= -12 && rect.top < currentLineTop - 4 && rect.bottom <= currentLineBottom
             // Must be distinctly below the current line
-            return dyCenter >= 12 && rect.bottom > currentLineBottom + 4 && rect.top >= currentLineTop;
-        }
-    });
-
-    // Score candidates based on vertical distance to the line followed by horizontal offset
-    const scoredCandidates = candidates.map(el => {
-        const rect = getRelevantRect(el, currentX, direction);
-        const candidateCenter = (rect.top + rect.bottom) / 2;
+            : dyCenter >= 12 && rect.bottom > currentLineBottom + 4 && rect.top >= currentLineTop;
+        if (!isInDirection) continue;
 
         let dx = 0;
         if (currentX < rect.left) {
@@ -536,41 +568,25 @@ export function navigateToAdjacentComponent(
             dx = currentX - rect.right;
         }
 
-        const verticalDist = direction === 'up'
-            ? Math.max(0, currentLineCenter - candidateCenter)
-            : Math.max(0, candidateCenter - currentLineCenter);
+        const verticalDist = Math.abs(dyCenter);
 
         // Prioritize the nearest line vertically, then horizontal proximity
-        const score = verticalDist * 100 + dx;
+        scoredCandidates.push({ el, score: verticalDist * 100 + dx });
+    }
 
-        return { el, score };
-    }).sort((a, b) => a.score - b.score);
+    // Focus the closest geometric candidate. Do NOT fall back to horizontal DOM neighbors
+    // when navigating vertically!
+    if (scoredCandidates.length === 0) return false;
+    const best = scoredCandidates.reduce((a, b) => (b.score < a.score ? b : a));
 
-    // Try to focus the closest geometric candidate
-    for (const candidate of scoredCandidates) {
-        const targetElement = candidate.el;
-        const eventName = direction === 'down' ? 'scribe-focus-start' : 'scribe-focus-end';
-        const detail: FocusNavigationDetail = {
+    focusTarget(
+        best.el,
+        direction === 'down' ? 'scribe-focus-start' : 'scribe-focus-end',
+        {
             direction,
             x: currentX,
             y: direction === 'down' ? currentLineBottom : currentLineTop
-        };
-        const event = new CustomEvent(eventName, { 
-            detail,
-            cancelable: true,
-            bubbles: false
-        });
-
-        const eventWasCanceled = !targetElement.dispatchEvent(event);
-        if (eventWasCanceled) {
-            return true;
         }
-
-        setCaretPosition(targetElement, detail);
-        return true;
-    }
-
-    // Do NOT fall back to horizontal DOM neighbors when navigating vertically!
-    return false;
+    );
+    return true;
 }
-

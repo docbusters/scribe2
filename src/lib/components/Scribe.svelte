@@ -117,14 +117,12 @@
 
 	// Initialize binding stores
 	$effect.pre(() => {
-		console.log('Initializing bindings with:', $state.snapshot(initialBindings));
 		if (initialBindings) {
 			bindingStore.initialize(initialBindings);
 		}
 	});
 
 	$effect.pre(() => {
-		console.log('Initializing custom bindings with:', $state.snapshot(initialCustomBindings));
 		if (initialCustomBindings) {
 			customBindingsStore.initialize(initialCustomBindings);
 		}
@@ -184,7 +182,7 @@
 		const instance = Sortable.create(dataOrder, {
             sort: true,
             direction: 'vertical',
-            handle: '#edit-handle',
+            handle: '.edit-handle',
 			animation: 200,
             ghostClass: 'sortable-ghost',
 			dragClass: 'sortable-drag',

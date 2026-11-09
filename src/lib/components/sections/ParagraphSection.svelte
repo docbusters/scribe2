@@ -105,21 +105,25 @@
         return result;
     });
 
-    function handleParagraphClick(event: MouseEvent) {
-        if (mode !== 'edit' || !sectionContainer) return;
+    /**
+     * Moves the caret to the editable text closest to the pointer position.
+     * Returns true when the focus was moved (the native pointer behaviour should then be prevented).
+     */
+    function focusClosestText(event: MouseEvent): boolean {
+        if (mode !== 'edit' || !sectionContainer) return false;
 
         const target = event.target as HTMLElement | null;
-        if (!target) return;
+        if (!target) return false;
 
         // Ignore clicks directly on interactive components or their inner controls
         if (target.closest('input, textarea, button, [contenteditable="true"], .component-editor, .scribe-dropdown-content')) {
-            return;
+            return false;
         }
 
         // Ignore clicks inside block components unless clicking on the container gap
         const blockContainer = target.closest('.block-component-container');
         if (blockContainer && blockContainer.contains(target) && target !== blockContainer) {
-            return;
+            return false;
         }
 
         // If clicked on an inline container that has an editable text, directly focus that text
@@ -129,7 +133,7 @@
             if (editInside) {
                 editInside.focus();
                 setCaretPosition(editInside, { direction: 'right' });
-                return;
+                return true;
             }
         }
 
@@ -139,7 +143,7 @@
         const focusables = Array.from(
             sectionContainer.querySelectorAll<HTMLElement>('.edit-text[data-scribe-focusable="true"]')
         );
-        if (focusables.length === 0) return;
+        if (focusables.length === 0) return false;
 
         // 1. Check if the click falls on the visual line of focusable elements, finding the closest horizontally
         let candidateOnLine: HTMLElement | null = null;
@@ -170,7 +174,7 @@
             } else {
                 setCaretPosition(candidateOnLine, { direction: 'left', x: clickX });
             }
-            return;
+            return true;
         }
 
         // 2. If click is between blocks or in a vertical void, find the closest focusable vertically
@@ -188,38 +192,32 @@
         }
 
         const targetEl = bestCandidate || focusables[focusables.length - 1];
-        if (targetEl) {
-            targetEl.focus();
-            if (targetEl.classList.contains('is-ghost') || targetEl.classList.contains('is-empty')) {
-                setCaretPosition(targetEl, { direction: 'right' });
-            } else {
-                setCaretPosition(targetEl, { direction: 'left', x: clickX });
-            }
+        targetEl.focus();
+        if (targetEl.classList.contains('is-ghost') || targetEl.classList.contains('is-empty')) {
+            setCaretPosition(targetEl, { direction: 'right' });
+        } else {
+            setCaretPosition(targetEl, { direction: 'left', x: clickX });
         }
+        return true;
     }
 
     function handleParagraphPointerDown(event: PointerEvent) {
-        if (mode !== 'edit' || !sectionContainer) return;
-        const target = event.target as HTMLElement | null;
-        if (!target) return;
-        if (target.closest('input, textarea, button, [contenteditable="true"], .component-editor, .scribe-dropdown-content')) {
-            return;
+        // Only prevent the native behaviour (focus, selection) when the caret was actually moved here,
+        // so interactive block components such as maps or image resizers keep working
+        if (focusClosestText(event)) {
+            event.preventDefault();
         }
-        event.preventDefault();
-        handleParagraphClick(event);
     }
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div 
-    class="paragraph-section" 
+<div
+    class="paragraph-section"
     data-section-id={data.id}
     bind:this={sectionContainer}
-    onclick={handleParagraphClick}
     onpointerdown={handleParagraphPointerDown}
 >
-    {#each components as component, index (`${data.id}-${component.id}-${index}`)}
+    {#each components as component (component.id)}
         {#if component.mode === 'block'}
             <div class="block-component-container">
                 <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />

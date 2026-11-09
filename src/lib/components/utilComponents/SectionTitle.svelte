@@ -30,10 +30,10 @@
 {#key text}
     <h2 
         bind:this={titleElement}
-        data-scribe-focusable="true"
-        contenteditable={isEditMode} 
-        onblur={handleTitleChange} 
-        onkeydown={handleKeyDown}
+        data-scribe-focusable={isEditMode ? 'true' : undefined}
+        contenteditable={isEditMode}
+        onblur={handleTitleChange}
+        onkeydown={isEditMode ? handleKeyDown : undefined}
         class="section-title"
     >
         {#each text as line, index (index)}

@@ -15,6 +15,7 @@
     let components = $derived(Object.entries(globalRegistry.components || {}).filter(([key]) => key !== 'text'));
 
     let wasEscapePressed = $state(false);
+    let anchorElement = $state<HTMLElement | null>(null);
 
     $effect(() => {
         if (toolbarStore.isOpen) {
@@ -39,7 +40,10 @@
     }
 
     function insertChildComponent(componentType: string) {
-        if (!toolbarStore.sectionId) return;
+        if (!toolbarStore.sectionId) {
+            toolbarStore.close();
+            return;
+        }
 
         const sectionId = toolbarStore.sectionId;
         const componentId = toolbarStore.componentId;
@@ -65,16 +69,20 @@
             // Allow Svelte to render and reconcile DOM changes before placing focus
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`)
-                        || document.querySelector('.paragraph-section');
+                    // Only search inside the Scribe instance that owns this toolbar
+                    const scope: ParentNode = anchorElement?.closest('.scribe-document') ?? document;
+                    const sectionEl = scope.querySelector(`[data-section-id="${sectionId}"]`)
+                        || scope.querySelector('.paragraph-section');
 
                     let targetEl: HTMLElement | null = null;
                     if (result.rightTextId) {
-                        targetEl = document.querySelector(`[data-component-id="${result.rightTextId}"]`);
+                        targetEl = scope.querySelector(`[data-component-id="${result.rightTextId}"]`);
                     }
                     if (!targetEl && sectionEl) {
-                        targetEl = sectionEl.querySelector('.edit-text.is-empty') 
-                            || sectionEl.querySelector('.edit-text:last-of-type');
+                        const sectionTexts = sectionEl.querySelectorAll<HTMLElement>('.edit-text');
+                        targetEl = sectionEl.querySelector<HTMLElement>('.edit-text.is-empty')
+                            || sectionTexts[sectionTexts.length - 1]
+                            || null;
                     }
 
                     if (targetEl) {
@@ -87,7 +95,7 @@
 </script>
 
 <DropdownMenu.Root bind:open={toolbarStore.isOpen}>
-	<div style="position: fixed; top: {toolbarStore.position.y}px; left: {toolbarStore.position.x}px; width: 0; height: 0; pointer-events: none;">
+	<div bind:this={anchorElement} style="position: fixed; top: {toolbarStore.position.y}px; left: {toolbarStore.position.x}px; width: 0; height: 0; pointer-events: none;">
         <DropdownMenu.Trigger tabindex={-1}>
             {#snippet child({props})}
                 <div class="dropdown-trigger" {...props}></div>
@@ -110,7 +118,6 @@
                         e.currentTarget?.scrollIntoView({ block: 'nearest' });
                     }} onclick={() => {
                         insertChildComponent(componentType);
-                        toolbarStore.close();
                     }}>
                         <div class="dropdown-item-icon">
                             {@html component.icon}

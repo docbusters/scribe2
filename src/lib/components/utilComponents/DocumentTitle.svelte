@@ -13,7 +13,6 @@
 
     function handleTitleChange(event: Event & { currentTarget: EventTarget & HTMLHeadingElement }) {
         const target = event.target as HTMLHeadingElement;
-        console.log('New doc title value:', target.innerText);
         editStore.setDocumentTitle(target.innerText);
     }
 
@@ -31,10 +30,10 @@
     {#key text}
         <h1 
             bind:this={titleElement}
-            data-scribe-focusable="true"
-            contenteditable={isEditMode} 
-            onblur={handleTitleChange} 
-            onkeydown={handleKeyDown}
+            data-scribe-focusable={isEditMode ? 'true' : undefined}
+            contenteditable={isEditMode}
+            onblur={handleTitleChange}
+            onkeydown={isEditMode ? handleKeyDown : undefined}
             class="document-title"
         >
             {#each text as line, index (index)}

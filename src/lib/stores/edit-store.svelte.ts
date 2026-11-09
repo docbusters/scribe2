@@ -197,55 +197,33 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         return null;
     }
 
-    /** Duplicates a component and assigns it a new ID. Also handles nested components that may be present in values */
-    private cloneComponent(comp: BaseComponent<string, DataValue, ComponentConfig | undefined>): BaseComponent<string, DataValue, ComponentConfig | undefined> {
-        const newCompId = generateRandomId(comp.type);
-        const clonedComponent = { ...comp, id: newCompId } as BaseComponent<string, DataValue, ComponentConfig | undefined>;
+    /** Assigns new IDs, in place, to every component nested at any depth inside a value */
+    private reassignNestedIds(value: DataValue) {
+        if (!value) return;
 
-        // Verify the component value as it may have nested components that also need new IDs
-        const value = {...clonedComponent.value};
         if (value.type === "component") {
             const nestedComp = value.value;
-            const newNestedCompId = generateRandomId(nestedComp.type);
-            value.value = {
-                ...nestedComp,
-                id: newNestedCompId
-            };
+            nestedComp.id = generateRandomId(nestedComp.type);
+            this.reassignNestedIds(nestedComp.value);
         } else if (value.type === "array") {
-            value.value = value.value.map(item => {
-                if (item.type === "component") {
-                    const nestedComp = item.value;
-                    const newNestedCompId = generateRandomId(nestedComp.type);
-                    return {
-                        ...item,
-                        value: {
-                            ...nestedComp,
-                            id: newNestedCompId
-                        }
-                    };
-                }
-                return item;
-            });
-        } else if (value.type === "record") {
-            const newRecord: Record<string, DataValue> = {};
-            for (const [key, item] of Object.entries(value.value)) {
-                if (item.type === "component") {
-                    const nestedComp = item.value;
-                    const newNestedCompId = generateRandomId(nestedComp.type);
-                    newRecord[key] = {
-                        ...item,
-                        value: {
-                            ...nestedComp,
-                            id: newNestedCompId
-                        }
-                    };
-                } else {
-                    newRecord[key] = item;
-                }
+            for (const item of value.value) {
+                this.reassignNestedIds(item);
             }
-            value.value = newRecord;
+        } else if (value.type === "record") {
+            for (const item of Object.values(value.value)) {
+                this.reassignNestedIds(item);
+            }
         }
+    }
 
+    /**
+     * Deep clones a component and assigns it a new ID, so the copy shares no state with the original.
+     * Components nested in its value also receive new IDs.
+     */
+    private cloneComponent(comp: BaseComponent<string, DataValue, ComponentConfig | undefined>): BaseComponent<string, DataValue, ComponentConfig | undefined> {
+        const clonedComponent = structuredClone($state.snapshot(comp)) as BaseComponent<string, DataValue, ComponentConfig | undefined>;
+        clonedComponent.id = generateRandomId(comp.type);
+        this.reassignNestedIds(clonedComponent.value);
         return clonedComponent;
     }
 
@@ -275,8 +253,6 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         // When setting a new custom binding we register the custom binding as being used
         extractBindingUsages(this.customBindingUsages, componentId, newValue, true);
 
-        console.log(`Updated component ${componentId} value:`, newValue);
-        
         return true;
     }
 
