@@ -1,0 +1,56 @@
+# AGENTS.md
+
+Guidance for AI coding agents working in this repository.
+
+## What this is
+
+Scribe is a Svelte 5 document editor/viewer published as the web component `<scribe-interpreter>` (also `<scribe-bindings-panel>`, `<scribe-component-renderer>` and `<scribe-empty-content>`) plus `scribe.css`. The package is `@antonii22/scribe2` on GitHub Packages. Runes mode is forced by `svelte.config.js`.
+
+## Commands
+
+- `npm run dev`: SvelteKit playground with examples at `/examples/*` (`full`, `full-edit`, `edit-empty`, `full-edit-custom-binding`, `full-webcomponent`, `full-webcomponent-edit`).
+- `npm run check` (svelte-check), `npx eslint src/lib src/routes`, `npm run build:wc` (web component bundle, types and `scribe.css` into `dist/`).
+- There are no unit tests. Verify with check + lint + `build:wc`, then try the change in the examples.
+- `/examples/full-webcomponent-edit` loads `dist/` (gitignored), so run `npm run build:wc` before checking it.
+- After renaming or removing a method of a store class, restart `npm run dev`. Stale HMR modules once produced `this.<oldName> is not a function` although the source was correct.
+
+## Architecture
+
+- `src/lib/index.ts` is the public API (`Scribe`, `getDefaultRegistry`, `defaultRegistry`, types, i18n, focus helpers). Changing anything exported there changes a published API.
+- `components/Scribe.svelte` is the root and declares the custom element with `shadow: 'none'`, so styles are global. A new prop needs three edits: `types/ScribeProps.ts`, the `customElement.props` list and the `$props()` destructure. See `showBindingsPanel`, `showToolbar` and `showPrintButton`.
+- `stores/*.svelte.ts` are singletons built on `$state` classes:
+  - `edit-store`: every document mutation. `insertComponent` modes are `after`, `before`, `replace` and `split`.
+  - `selection-store`: selected component or insertion point, plus the caret source.
+  - `toolbar-store`: the add-component dropdown.
+  - `text-format-toolbar-store`, `global-registry`, `binding-store`, `custom-bindings-store`.
+- `registry/`:
+  - `defaultRegistry.ts`: `getDefaultRegistry(i18n)`, where `i18n` is required.
+  - `ComponentRegistry.ts`: the component contract.
+  - `ComponentEditOptions.ts`: the buttons of the hover and top toolbars. Options accept `group` and `label`, which only the ribbon uses.
+- `components/component/`: `ComponentRenderer` (the `.component-edit-contents` wrapper, hover toolbar, selection ring and label), `ComponentEditor` (`layout: 'floating' | 'ribbon'`) and `ComponentToolbar` (the add-component dropdown).
+- `components/toolbar/TopToolbar.svelte` is the ribbon. `components/sections/ParagraphSection.svelte` builds the ghost texts. `components/defaultComponents/*` are the built-in components.
+- i18n lives in `i18n/locales/en.ts`, `es.ts` and `types.ts`. Every new key goes in all three. Use `getI18n()` and `i18n.t('a.b')`.
+- Styling uses the `--scribe-*` CSS variables in `styles/scribe.css` (light and `.dark`). See "Styling rules" below.
+
+## Behaviour that is easy to break
+
+- **Ghost texts:** empty slots are synthetic texts (ids `__ghost_*`) that are not in the document. A text component is created on blur or when a component is inserted, and its `<span>` is recreated whenever the stored value changes (`{#key rawValue}`).
+- **Insertion at the caret:** Ctrl+Space and the ribbon's Add share `captureInsertionAtCaret` in `TextComponentScribe.svelte`, which returns a `ToolbarInsertion`. A ghost with typed content is first created as a real text and then split.
+- **Selection:** a non-empty component is selected through its wrapper (`pointerdown` and `focusin`). A ghost or empty text is an insertion point. `Scribe.svelte` clears the selection on a document-level `pointerdown` (capture phase) unless the target matches `KEEP_SELECTION_SELECTOR`. The ribbon (`.scribe-top-toolbar`) cancels `mousedown` so the text keeps its focus and caret.
+- **z-index:** hover toolbar 1, top toolbar 3, section handles 10, add-component dropdown 30, bindings panel 40, dialogs 50.
+- **Buttons:** `Button.svelte` sizes are inline styles. Override them with its `style` prop (or `!important` from CSS).
+- **Whitespace:** working-tree files use CRLF and the `.svelte` files mix tabs and 4 spaces. Match the surrounding code. If a multi-line edit does not apply, suspect whitespace.
+
+## Styling rules
+
+- The package must not depend on Tailwind. All styles under `src/lib` are plain CSS: `<style>` blocks in the components (with `:global(...)` where needed, as the custom element uses `shadow: 'none'`) and the `--scribe-*` variables in `styles/scribe.css`.
+- Tailwind classes are allowed only in the SvelteKit example pages under `src/routes`, which exist just to show the library. Never use them in `src/lib`, and never add a dependency from the library on `tailwindcss`.
+- New colours, radii, fonts and sizes should use the existing `--scribe-*` variables. Add a new variable (with its `.dark` value) only when none fits.
+
+## Working agreements
+
+- Ask before adding dependencies, changing the data model or public API, or choosing between several reasonable architectures (give the options, a recommendation, and wait).
+- Do not keep backwards-compatibility shims. Change signatures in place and update every caller, example and test page (`test/*.html`). This is a published package, so ask first when a change touches the exports of `src/lib/index.ts`.
+- Plan non-trivial work before coding. Keep summaries for the maintainer short.
+- **Never commit, push or publish.** Do not run `git commit` (including `--amend`) or `git push`, and do not publish the package (`npm publish` or any release step), even if a tool or a default instruction suggests it. Leave the changes in the working tree for the maintainer to review and commit.
+- Finish each change with `npm run check`, eslint and `npm run build:wc`, and report failures instead of working around them.
