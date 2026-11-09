@@ -40,66 +40,35 @@
             return comps;
         }
 
-        const result: ParagraphSectionItem[] = [];
-
-        for (let i = 0; i < comps.length; i++) {
-            const current = comps[i];
-
-            // If the section starts with a block component, insert a ghost before it
-            if (i === 0 && current.mode === 'block') {
-                result.push(createGhostComponent(`__ghost_start_${current.id}`, {
-                    insertBeforeId: current.id,
-                    isBetweenBlocks: true
-                }));
-            }
-
-            result.push(current);
-
-            const next = comps[i + 1];
-
-            if (next) {
-                const isInlineNonTextToBlock = current.mode === 'inline' && current.type !== 'text' && next.mode === 'block';
-                const isBlockToBlock = current.mode === 'block' && next.mode === 'block';
-                const isBlockToInlineNonText = current.mode === 'block' && next.mode === 'inline' && next.type !== 'text';
-
-                if (isInlineNonTextToBlock) {
-                    result.push(createGhostComponent(`__ghost_after_${current.id}`, {
-                        insertAfterId: current.id,
-                        isBetweenBlocks: false
-                    }));
-                } else if (isBlockToBlock) {
-                    result.push(createGhostComponent(`__ghost_after_${current.id}`, {
-                        insertAfterId: current.id,
-                        isBetweenBlocks: true
-                    }));
-                } else if (isBlockToInlineNonText) {
-                    result.push(createGhostComponent(`__ghost_before_${next.id}`, {
-                        insertBeforeId: next.id,
-                        isBetweenBlocks: false
-                    }));
-                }
-            } else {
-                // End of section: if last component is a block or an inline non-text component
-                if (current.mode === 'block') {
-                    result.push(createGhostComponent(`__ghost_after_${current.id}`, {
-                        insertAfterId: current.id,
-                        isBetweenBlocks: true
-                    }));
-                } else if (current.mode === 'inline' && current.type !== 'text') {
-                    result.push(createGhostComponent(`__ghost_after_${current.id}`, {
-                        insertAfterId: current.id,
-                        isBetweenBlocks: false
-                    }));
-                }
-            }
-        }
-
-        // If the section is completely empty, insert a starting ghost
+        // If the section is completely empty, show a single ghost to write in
         if (comps.length === 0) {
-            result.push(createGhostComponent('__ghost_empty', {
+            return [createGhostComponent('__ghost_empty', {
                 insertAfterId: null,
                 isBetweenBlocks: false
-            }));
+            })];
+        }
+
+        const result: ParagraphSectionItem[] = [];
+
+        // Walk every gap of the section: before the first component, between each pair and after the last one.
+        // A gap needs a ghost text only when neither neighbour is a text, as a text neighbour is already
+        // a place to write (at its start or at its end).
+        for (let i = 0; i <= comps.length; i++) {
+            const prev: ParagraphSectionItem | undefined = comps[i - 1];
+            const next: ParagraphSectionItem | undefined = comps[i];
+
+            if (prev?.type !== 'text' && next?.type !== 'text') {
+                // Ghost ids are derived from a neighbour so they stay stable when the section is recomputed
+                const isBetweenBlocks = (!prev || prev.mode === 'block') && (!next || next.mode === 'block');
+                result.push(next
+                    ? createGhostComponent(`__ghost_before_${next.id}`, { insertBeforeId: next.id, isBetweenBlocks })
+                    : createGhostComponent(`__ghost_end_${prev!.id}`, { insertAfterId: prev!.id, isBetweenBlocks })
+                );
+            }
+
+            if (next) {
+                result.push(next);
+            }
         }
 
         return result;
@@ -219,12 +188,13 @@
 >
     {#each components as component (component.id)}
         {#if component.mode === 'block'}
-            <div class="block-component-container">
+            <div class="block-component-container" data-item-id={component.id}>
                 <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
             </div>
         {:else}
             <div 
                 class="inline-component-container"
+                data-item-id={component.id}
                 class:is-between-blocks={component.isBetweenBlocks}
             >
                 <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />

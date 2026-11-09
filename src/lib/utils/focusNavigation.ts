@@ -167,7 +167,8 @@ export function isAtStart(element: HTMLElement): boolean {
     const preRange = range.cloneRange();
     preRange.selectNodeContents(element);
     preRange.setEnd(range.startContainer, range.startOffset);
-    return preRange.toString().length === 0;
+    // A line break before the caret means there is a previous line, even without any text
+    return preRange.toString().length === 0 && !preRange.cloneContents().querySelector('br');
 }
 
 /**
@@ -183,7 +184,9 @@ export function isAtEnd(element: HTMLElement): boolean {
     const postRange = range.cloneRange();
     postRange.selectNodeContents(element);
     postRange.setStart(range.endContainer, range.endOffset);
-    return postRange.toString().length === 0;
+    // A single trailing <br> is only the filler browsers add after the last line, so more than one
+    // line break after the caret means there is a next line
+    return postRange.toString().length === 0 && postRange.cloneContents().querySelectorAll('br').length <= 1;
 }
 
 /** Returns the bounding rect of the current selection range, falling back to its first client rect */

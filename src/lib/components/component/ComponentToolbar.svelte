@@ -79,10 +79,18 @@
                         targetEl = scope.querySelector(`[data-component-id="${result.rightTextId}"]`);
                     }
                     if (!targetEl && sectionEl) {
-                        const sectionTexts = sectionEl.querySelectorAll<HTMLElement>('.edit-text');
-                        targetEl = sectionEl.querySelector<HTMLElement>('.edit-text.is-empty')
-                            || sectionTexts[sectionTexts.length - 1]
-                            || null;
+                        const sectionTexts = Array.from(sectionEl.querySelectorAll<HTMLElement>('.edit-text'));
+
+                        // Prefer the first text slot that follows the inserted component, as paragraph sections
+                        // always keep a text (real or ghost) on its right
+                        const insertedEl = sectionEl.querySelector(`[data-item-id="${result.newId}"]`);
+                        if (insertedEl) {
+                            targetEl = sectionTexts.find(text =>
+                                !!(insertedEl.compareDocumentPosition(text) & Node.DOCUMENT_POSITION_FOLLOWING)
+                            ) ?? null;
+                        }
+
+                        targetEl ??= sectionTexts[sectionTexts.length - 1] ?? null;
                     }
 
                     if (targetEl) {

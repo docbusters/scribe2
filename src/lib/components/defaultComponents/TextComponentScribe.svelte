@@ -187,7 +187,8 @@
 
         switch (event.key) {
             case 'Backspace': {
-                if (isAtStart && isAtEnd) {
+                // Line breaks count as content, so Backspace first removes them natively
+                if (isEditableEmpty(target)) {
                     event.preventDefault();
                     // Navigate to the previous focusable element
                     navigateToAdjacentComponent(target, 'left');
@@ -323,9 +324,17 @@
         }
     }
 
+    /**
+     * Whether an editable has no content. A single <br> is only the filler that browsers leave in an emptied
+     * editable, but two or more mean the user has inserted a line break, which is content even without text.
+     */
+    function isEditableEmpty(element: HTMLElement): boolean {
+        return (element.textContent ?? '').length === 0 && element.querySelectorAll('br').length <= 1;
+    }
+
     function handleInput(event: Event) {
         const target = event.target as HTMLSpanElement;
-        isEmpty = (target.textContent || '').length === 0;
+        isEmpty = isEditableEmpty(target);
         if (isEmpty) {
             updateAvailableWidth();
         }
@@ -504,6 +513,7 @@
         class:is-empty={isEmpty && mode === 'edit'}
         class:is-ghost={componentData.id.startsWith('__ghost') && mode === 'edit'}
         class:is-between-blocks={componentData.isBetweenBlocks}
+        class:is-inline-slot={!!componentData.insertBeforeId && !componentData.isBetweenBlocks && mode === 'edit'}
         data-placeholder={i18n.t('editor.insertComponentPlaceholder')}
         contenteditable={mode === 'edit'} 
         onfocus={mode === 'edit' ? updateAvailableWidth : undefined}
@@ -561,6 +571,20 @@
 
     .edit-text.is-ghost {
         cursor: text;
+    }
+
+    /* Unfocused inline ghosts only reserve a sliver of space, so the slots around inline components
+       add no visible gap. They keep a non zero width so keyboard navigation can still reach them.
+       Slots placed before another component keep that width even when focused, so the caret can
+       enter them without shifting the component that follows */
+    .edit-text.is-ghost.is-empty:not(:focus):not(.is-between-blocks),
+    .edit-text.is-inline-slot.is-empty {
+        min-width: 2px;
+    }
+
+    /* The placeholder of a slot before a component would push that component to the right */
+    .edit-text.is-inline-slot.is-empty:focus::before {
+        content: none;
     }
 
     .edit-text.is-between-blocks {
