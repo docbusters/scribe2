@@ -34,6 +34,7 @@
 	import Sortable from 'sortablejs';
 	import type { Document, BindingsDefinition } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
+	import { selectionStore } from '../stores/selection-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
@@ -88,6 +89,7 @@
 
 	export function refreshDocument(newDocument: Document<C>) {
 		initialDocument = newDocument ? structuredClone($state.snapshot(newDocument)) as Document<C> : newDocument;
+		selectionStore.clear();
 	}
 
 	export function refreshBindings(newBindings: Record<string, BindingsDefinition>) {
@@ -172,7 +174,34 @@
 	// Clean up custom bindings on destroy to avoid memory leaks
 	onDestroy(() => {
 		customBindingsStore.destroy();
+		selectionStore.clear();
 	});
+
+	// Selection is cleared when the selected component disappears (deleted, merged into another text...)
+	$effect(() => {
+		const selected = selectionStore.selected;
+		if (mode !== 'edit' || !selected) return;
+
+		const sectionExists = !!editStore.document?.sections[selected.sectionId];
+		if (!sectionExists || !editStore.getComponent(selected.sectionId, selected.componentId)) {
+			selectionStore.clear();
+		}
+	});
+
+	// Selectors of the areas that must keep the current selection when interacted with
+	const KEEP_SELECTION_SELECTOR = '.component-edit-contents, .scribe-portal-target, .scribe-dropdown-content, .scribe-top-toolbar';
+
+	/**
+	 * Clears the selection when the interaction happens outside any component or selection-preserving area.
+	 * The composed path is used instead of the event target, as the target is retargeted to the host element
+	 * when Scribe is embedded inside another shadow root.
+	 */
+	function handleClearSelection(event: Event) {
+		if (mode !== 'edit') return;
+		const keepSelection = event.composedPath().some(node => node instanceof Element && node.matches(KEEP_SELECTION_SELECTOR));
+		if (keepSelection) return;
+		selectionStore.clear();
+	}
 
 	// Sortable initialization
 	$effect(() => {
@@ -235,7 +264,11 @@
 
 </script>
 
-<div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass}>
+<!-- Pointerdown is listened to on the whole document, so clicking anywhere outside the components clears the selection.
+     It is handled in the capture phase, so the selection is cleared before inner handlers (such as focusing the closest text) can select a component -->
+<svelte:document onpointerdowncapture={handleClearSelection} />
+
+<div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleClearSelection}>
 	{#if mode === 'edit'}
 		<Button size="icon" style="max-width: fit-content; margin-left: auto;" variant="outline" title="Print document (debugging)" onclick={() => console.log($state.snapshot(documentState))}>
 			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>

@@ -179,7 +179,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     }
 
     /** Finds a component within a section. This method will also find nested components */
-    private findComponent(sectionId: string, componentId: string) {
+    getComponent(sectionId: string, componentId: string) {
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
         if (!section) return null;
 
@@ -228,13 +228,13 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     }
 
     getComponentValue(sectionId: string, componentId: string) {
-        const component = this.findComponent(sectionId, componentId);
+        const component = this.getComponent(sectionId, componentId);
         if (!component) return null;
         return component.value;
     }
 
     setComponentValue(sectionId: string, componentId: string, newValue: DataValue) {
-        const component = this.findComponent(sectionId, componentId);
+        const component = this.getComponent(sectionId, componentId);
         if (!component) return false;
 
         // Verify if the new value is supported
@@ -257,13 +257,13 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     }
 
     getComponentConfig(sectionId: string, componentId: string) {
-        const component = this.findComponent(sectionId, componentId);
+        const component = this.getComponent(sectionId, componentId);
         if (!component) return null;
         return component.config;
     }
 
     setComponentConfig(sectionId: string, componentId: string, newConfig: ComponentConfig) {
-        const component = this.findComponent(sectionId, componentId);
+        const component = this.getComponent(sectionId, componentId);
         if (!component) return false;
         component.config = newConfig;
         return true;
@@ -273,7 +273,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
     duplicateComponent(sectionId: string, componentId: string) {
         const section = this.findSection(sectionId) as ParagraphSection<C> | null;
         if (!section) return false;
-        const componentToDuplicate = this.findComponent(sectionId, componentId);
+        const componentToDuplicate = this.getComponent(sectionId, componentId);
         if (!componentToDuplicate) return false;
 
         const dupComp = this.cloneComponent(componentToDuplicate);

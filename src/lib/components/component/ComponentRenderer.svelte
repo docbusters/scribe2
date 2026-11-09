@@ -16,6 +16,7 @@
 	import type { CollectionValue, DataValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
 	import { bindingStore } from "$lib/stores/binding-store.svelte.js";
 	import { editStore } from "$lib/stores/edit-store.svelte.js";
+	import { selectionStore } from "$lib/stores/selection-store.svelte.js";
 	import { globalRegistry } from "$lib/stores/global-registry.svelte.js";
 	import type { ComponentRendererProps } from "$lib/types/CustomRendererProps.js";
 	import type { UpdateType } from "$lib/types/ScribeProps.js";
@@ -93,6 +94,24 @@
 		editStore.setComponentConfig(sectionId, componentData.id, newConfig);
 	}
 
+	/**
+	 * Selects this component when the event comes from it. Nested components are handled by their own renderer,
+	 * so only the innermost wrapper reacts. The event is never prevented or stopped, so the component keeps
+	 * its native behaviour (caret placement, dragging, resizing...).
+	 */
+	function handleSelect(event: Event) {
+		if (mode !== 'edit') return;
+		const target = event.target as Element | null;
+		if (target?.closest('.component-edit-contents') !== event.currentTarget) return;
+		selectionStore.select(sectionId, componentData.id);
+	}
+
+	// Text components are selected too, but they show no indicator as their caret already marks them
+	let isSelected = $derived(mode === 'edit' && componentData.type !== 'text' && selectionStore.isSelected(sectionId, componentData.id));
+
+	// The registry names are already localized, as the registry is built with the i18n instance
+	let componentName = $derived(globalRegistry.components[componentData.type]?.name ?? componentData.type);
+
 	type AgnosticActionProps = ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>;
 
 	const mountComponent: Action<HTMLElement, AgnosticActionProps> = (node, props) => {
@@ -120,10 +139,14 @@
 	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 			{@const options = globalRegistry.getComponentOptions(componentData.type)}
-			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				<div class="component-editor" contenteditable="false">
 					<ComponentEditor isBinding={resolvedValuePromise.isBinding} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
+				{#if isSelected}
+					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
+				{/if}
 				<div style="display: contents;" use:mountComponent={{ componentData,  sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 			</div>
 		{:else}
@@ -131,11 +154,15 @@
 		{/if}
 	{:catch error}
 		{@const options = globalRegistry.getComponentOptions(componentData.type)}
-			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'}>
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 					<div class="component-editor" contenteditable="false">
 						<ComponentEditor isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 					</div>
+				{/if}
+				{#if isSelected}
+					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
 				<EmptyContent 
 					message={i18n.t('errors.componentError')} 
@@ -160,13 +187,67 @@
 		display: inline;
 	}
 	
+	/* The horizontal margin matches the reach of the selection ring and halo, so they never cover the adjacent
+	   text and selecting a component does not reflow the line */
 	.component-edit-contents.is-inline-block {
 		display: inline-block;
+		margin-inline: 6px;
 	}
 
 	.component-edit-contents.is-block {
 		display: flex;
 		width: 100%;
+	}
+
+	/* Selection: a tinted background, an accent ring with a soft halo and a name label. None of it affects the
+	   layout, and it stays visible when the pointer leaves the component */
+	.component-edit-contents.is-selected {
+		background-color: color-mix(in srgb, var(--scribe-accent) 6%, transparent);
+		border-radius: var(--scribe-radius-sm);
+	}
+
+	/* The ring is a pseudo-element placed outside the component, so it never touches the component's own border */
+	.component-edit-contents.is-selected::after {
+		content: '';
+		position: absolute;
+		inset: -3px;
+		border: 2px solid var(--scribe-accent);
+		border-radius: calc(var(--scribe-radius-sm) + 3px);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--scribe-accent) 18%, transparent);
+		pointer-events: none;
+		z-index: 1;
+		animation: scribe-selection-in 150ms ease-out;
+	}
+
+	/* Tab attached to the top edge of the ring, set back from the rounded corner */
+	.component-selection-label {
+		position: absolute;
+		top: -3px;
+		right: calc(var(--scribe-radius-sm) + 0.25rem);
+		transform: translateY(-100%);
+		z-index: 1;
+		padding: 0.125rem 0.5rem;
+		background-color: var(--scribe-accent);
+		color: white;
+		font-size: var(--scribe-font-size-xs);
+		font-weight: var(--scribe-font-weight-semibold);
+		line-height: 1.25;
+		white-space: nowrap;
+		border-radius: var(--scribe-radius-sm) var(--scribe-radius-sm) 0 0;
+		pointer-events: none;
+		user-select: none;
+		animation: scribe-selection-in 150ms ease-out;
+		transition: opacity 0.2s ease;
+	}
+
+	/* Narrow inline-block components can be narrower than the hover toolbar, so the label gives way to it */
+	.component-edit-contents.is-inline-block:hover > .component-selection-label {
+		opacity: 0;
+	}
+
+	@keyframes scribe-selection-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 
 	/* The is-line-hovered class is toggled by the paragraph when the pointer is over the blank space of a row */
