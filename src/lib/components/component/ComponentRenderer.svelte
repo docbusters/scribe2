@@ -169,12 +169,15 @@
 		width: 100%;
 	}
 
-	.component-edit-contents:hover {
+	/* The is-line-hovered class is toggled by the paragraph when the pointer is over the blank space of a row */
+	.component-edit-contents:hover,
+	.component-edit-contents:global(.is-line-hovered) {
 		background-color: var(--scribe-selection-color) !important;
 		border-radius: var(--scribe-radius-sm);
 	}
 
-	.component-edit-contents:hover > .component-editor {
+	.component-edit-contents:hover > .component-editor,
+	.component-edit-contents:global(.is-line-hovered) > .component-editor {
 		opacity: 1;
 		pointer-events: auto;
 	}

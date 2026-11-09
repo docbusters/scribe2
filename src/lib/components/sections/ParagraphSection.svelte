@@ -5,7 +5,8 @@
 	import type { ParagraphSection } from '../../domain/Section.js';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
-	import { setCaretPosition } from '../../utils/focusNavigation.ts';
+	import { setCaretFromPoint, setCaretPosition } from '../../utils/focusNavigation.ts';
+	import { untrack } from 'svelte';
 	
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;
@@ -16,6 +17,7 @@
     let { data, mode, isDarkMode }: ParagraphSectionProps = $props();
 
     let sectionContainer: HTMLElement | null = $state(null);
+    let wrapperElement: HTMLElement | null = $state(null);
 
     type ParagraphSectionItem = (DefaultComponents | C) & Partial<GhostComponentMeta>;
 
@@ -31,7 +33,7 @@
             insertAfterId: options?.insertAfterId ?? null,
             insertBeforeId: options?.insertBeforeId ?? null,
             isBetweenBlocks: options?.isBetweenBlocks ?? false
-        } as unknown as ParagraphSectionItem;
+        } as ParagraphSectionItem;
     }
 
     let components = $derived.by(() => {
@@ -141,7 +143,7 @@
             if (candidateOnLine.classList.contains('is-ghost') || candidateOnLine.classList.contains('is-empty')) {
                 setCaretPosition(candidateOnLine, { direction: 'right' });
             } else {
-                setCaretPosition(candidateOnLine, { direction: 'left', x: clickX });
+                setCaretFromPoint(candidateOnLine, clickX, clickY);
             }
             return true;
         }
@@ -165,9 +167,120 @@
         if (targetEl.classList.contains('is-ghost') || targetEl.classList.contains('is-empty')) {
             setCaretPosition(targetEl, { direction: 'right' });
         } else {
-            setCaretPosition(targetEl, { direction: 'left', x: clickX });
+            setCaretFromPoint(targetEl, clickX, clickY);
         }
         return true;
+    }
+
+    /* * HOVER HIGHLIGHT * */
+
+    /** A rectangle relative to the paragraph section */
+    interface RowExtension {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+    }
+
+    let hoverExtensions = $state<RowExtension[]>([]);
+    let isHoverVisible = $state(false);
+    let hoveredTextEl: HTMLElement | null = null;
+
+    /**
+     * Returns the blank space at the right of every row of a text that continues on the next row, up to the
+     * right edge of the paragraph. Without it that space is not highlighted, as the row only holds a line break.
+     */
+    function getRowExtensions(textEl: HTMLElement): RowExtension[] {
+        if (!sectionContainer || !wrapperElement) return [];
+
+        // Coordinates are relative to the wrapper, which has the same box as the paragraph
+        const containerRect = wrapperElement.getBoundingClientRect();
+        const paddingRight = parseFloat(window.getComputedStyle(sectionContainer).paddingRight) || 0;
+        const rightEdge = containerRect.right - paddingRight;
+
+        const rects = Array.from(textEl.getClientRects());
+        const extensions: RowExtension[] = [];
+
+        // The last rect is where the text ends, so only the previous rows are extended
+        for (let i = 0; i < rects.length - 1; i++) {
+            const rect = rects[i];
+            const width = rightEdge - rect.right;
+            if (width <= 1) continue;
+            extensions.push({
+                left: rect.right - containerRect.left,
+                top: rect.top - containerRect.top,
+                width,
+                height: rect.height
+            });
+        }
+        return extensions;
+    }
+
+    function setHoveredText(textEl: HTMLElement | null) {
+        if (hoveredTextEl !== textEl) {
+            hoveredTextEl?.closest('.component-edit-contents')?.classList.remove('is-line-hovered');
+            textEl?.closest('.component-edit-contents')?.classList.add('is-line-hovered');
+            hoveredTextEl = textEl;
+        }
+
+        isHoverVisible = !!textEl;
+
+        // When the hover ends the last extensions are kept, so the layer can fade out where it was
+        if (!textEl) return;
+
+        // The rows depend on the layout, so they are measured again every time instead of being cached
+        const next = getRowExtensions(textEl);
+        const current = untrack(() => hoverExtensions);
+
+        // Skip the assignment when nothing changed, so a pointer moving inside a text does not re-render
+        const isSame = next.length === current.length && next.every((ext, i) =>
+            ext.left === current[i].left && ext.top === current[i].top
+            && ext.width === current[i].width && ext.height === current[i].height
+        );
+        if (!isSame) {
+            hoverExtensions = next;
+        }
+    }
+
+    /** Finds the text the pointer is over, either directly or through the blank space of one of its rows */
+    function resolveHoveredText(event: PointerEvent): HTMLElement | null {
+        const target = event.target as HTMLElement | null;
+        if (!target || !sectionContainer || !wrapperElement) return null;
+
+        const inlineContainer = target.closest<HTMLElement>('.inline-component-container');
+        if (inlineContainer) {
+            const id = inlineContainer.dataset.itemId ?? '';
+            return inlineContainer.querySelector<HTMLElement>(
+                `.edit-text[data-component-id="${CSS.escape(id)}"]:not(.is-empty)`
+            );
+        }
+
+        if (target !== sectionContainer) return null;
+
+        const containerRect = wrapperElement.getBoundingClientRect();
+        const x = event.clientX - containerRect.left;
+        const y = event.clientY - containerRect.top;
+
+        const texts = sectionContainer.querySelectorAll<HTMLElement>('.edit-text[data-component-id]:not(.is-empty)');
+        for (const text of texts) {
+            const isOverExtension = getRowExtensions(text).some(ext =>
+                x >= ext.left && x <= ext.left + ext.width && y >= ext.top && y <= ext.top + ext.height
+            );
+            if (isOverExtension) return text;
+        }
+        return null;
+    }
+
+    function handleParagraphPointerMove(event: PointerEvent) {
+        setHoveredText(resolveHoveredText(event));
+    }
+
+    function handleParagraphInput() {
+        // Typing can change the rows of the hovered text, so its extensions are measured again once the DOM settles
+        if (!hoveredTextEl) return;
+        requestAnimationFrame(() => {
+            if (hoveredTextEl) setHoveredText(hoveredTextEl);
+        });
     }
 
     function handleParagraphPointerDown(event: PointerEvent) {
@@ -180,30 +293,72 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-    class="paragraph-section"
-    data-section-id={data.id}
-    bind:this={sectionContainer}
-    onpointerdown={handleParagraphPointerDown}
->
-    {#each components as component (component.id)}
-        {#if component.mode === 'block'}
-            <div class="block-component-container" data-item-id={component.id}>
-                <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
-            </div>
-        {:else}
-            <div 
-                class="inline-component-container"
-                data-item-id={component.id}
-                class:is-between-blocks={component.isBetweenBlocks}
-            >
-                <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
-            </div>
-        {/if}
-    {/each}
+<div class="paragraph-section-wrapper" bind:this={wrapperElement}>
+    <!-- The hover layer is a sibling of the paragraph, so it never takes part in the paragraph's line layout -->
+    {#if mode === 'edit'}
+        <div class="line-hover-layer" class:is-visible={isHoverVisible} aria-hidden="true">
+            {#each hoverExtensions as extension, index (index)}
+                <div
+                    class="line-hover-extension"
+                    style="left: {extension.left}px; top: {extension.top}px; width: {extension.width}px; height: {extension.height}px;"
+                ></div>
+            {/each}
+        </div>
+    {/if}
+    <div
+        class="paragraph-section"
+        data-section-id={data.id}
+        bind:this={sectionContainer}
+        onpointerdown={handleParagraphPointerDown}
+        onpointermove={mode === 'edit' ? handleParagraphPointerMove : undefined}
+        onpointerleave={mode === 'edit' ? () => setHoveredText(null) : undefined}
+        oninput={mode === 'edit' ? handleParagraphInput : undefined}
+    >
+        {#each components as component (component.id)}
+            {#if component.mode === 'block'}
+                <div class="block-component-container" data-item-id={component.id}>
+                    <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
+                </div>
+            {:else}
+                <div
+                    class="inline-component-container"
+                    data-item-id={component.id}
+                    class:is-between-blocks={component.isBetweenBlocks}
+                >
+                    <ComponentRenderer componentData={component} sectionId={data.id} {mode} {isDarkMode} />
+                </div>
+            {/if}
+        {/each}
+    </div>
 </div>
 
 <style>
+    .paragraph-section-wrapper {
+        position: relative;
+    }
+
+    /* The fade uses the same duration and easing as the background of .component-edit-contents in
+       ComponentRenderer.svelte, so the text and the blank space of its rows appear and fade together */
+    .line-hover-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .line-hover-layer.is-visible {
+        opacity: 1;
+    }
+
+    /* Highlights the blank space of a row that only holds a line break, like the hover of the text itself */
+    .line-hover-extension {
+        position: absolute;
+        background-color: var(--scribe-selection-color);
+        border-top-right-radius: var(--scribe-radius-sm);
+        border-bottom-right-radius: var(--scribe-radius-sm);
+    }
+
     .block-component-container {
         display: flex;
         width: 100%;

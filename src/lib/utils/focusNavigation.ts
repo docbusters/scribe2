@@ -319,6 +319,79 @@ export function canMoveVerticallyWithinElement(
     return closestLine !== null && caretX >= closestLine.left - 4;
 }
 
+interface LegacyCaretRangeDocument {
+    caretRangeFromPoint?: (x: number, y: number) => Range | null;
+}
+
+/** Returns the collapsed range under the given viewport point, using whichever API the browser supports */
+function getCaretRangeAtPoint(doc: Document, x: number, y: number): Range | null {
+    if (typeof doc.caretPositionFromPoint === 'function') {
+        const pos = doc.caretPositionFromPoint(x, y);
+        if (!pos) return null;
+
+        const range = doc.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+        return range;
+    }
+
+    // Older browsers only implement the legacy API. It is declared in a standalone interface, as the lib
+    // typings mark it as deprecated and would flag any access through Document
+    const legacyDoc = doc as unknown as LegacyCaretRangeDocument;
+    return legacyDoc.caretRangeFromPoint?.(x, y) ?? null;
+}
+
+/**
+ * Places the caret in a contenteditable at the given viewport point, as a native click would.
+ * When the point falls on a visual line that has no text under it (for example a line that only holds
+ * a line break), the caret goes to the start of the element for its first line and to the end otherwise.
+ */
+export function setCaretFromPoint(element: HTMLElement, x: number, y: number): void {
+    element.focus();
+
+    const selection = getSelection(element);
+    if (!selection) return;
+
+    const rects = Array.from(element.getClientRects());
+    if (rects.length > 0) {
+        // The line under the point, or else the one vertically closest to it
+        let lineIndex = 0;
+        let minDistance = Infinity;
+        rects.forEach((rect, index) => {
+            const distance = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0;
+            if (distance < minDistance) {
+                minDistance = distance;
+                lineIndex = index;
+            }
+        });
+
+        const line = rects[lineIndex];
+        // A point above the first reported line belongs to a leading line that has no box of its own
+        const isAboveFirstLine = lineIndex === 0 && y < line.top - 2;
+        const range = isAboveFirstLine ? null : getCaretRangeAtPoint(
+            element.ownerDocument || document,
+            Math.max(line.left + 1, Math.min(line.right - 1, x)),
+            (line.top + line.bottom) / 2
+        );
+
+        if (range && element.contains(range.startContainer)) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+            return;
+        }
+
+        const fallback = document.createRange();
+        fallback.selectNodeContents(element);
+        // collapse(true) goes to the start of the element, collapse(false) to its end
+        fallback.collapse(lineIndex === 0);
+        selection.removeAllRanges();
+        selection.addRange(fallback);
+        return;
+    }
+
+    setCaretPosition(element, { direction: 'left' });
+}
+
 /**
  * Sets the caret position in the target element based on direction and horizontal coordinate.
  */
@@ -376,23 +449,7 @@ export function setCaretPosition(
         const clampedX = Math.max(targetRect.left + 2, Math.min(targetRect.right - 2, options.x));
         const targetY = (targetRect.top + targetRect.bottom) / 2;
 
-        const doc = targetElement.ownerDocument || document;
-        let range: Range | null = null;
-
-        const docWithLegacyRange = doc as Document & {
-            caretRangeFromPoint?: (x: number, y: number) => Range | null;
-        };
-
-        if (docWithLegacyRange.caretRangeFromPoint) {
-            range = docWithLegacyRange.caretRangeFromPoint(clampedX, targetY);
-        } else if ('caretPositionFromPoint' in doc && typeof doc.caretPositionFromPoint === 'function') {
-            const pos = doc.caretPositionFromPoint(clampedX, targetY);
-            if (pos) {
-                range = doc.createRange();
-                range.setStart(pos.offsetNode, pos.offset);
-                range.collapse(true);
-            }
-        }
+        const range = getCaretRangeAtPoint(targetElement.ownerDocument || document, clampedX, targetY);
 
         if (range && targetElement.contains(range.startContainer)) {
             selection.removeAllRanges();
