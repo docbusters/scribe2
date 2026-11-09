@@ -103,7 +103,7 @@
 		if (mode !== 'edit') return;
 		const target = event.target as Element | null;
 		if (target?.closest('.component-edit-contents') !== event.currentTarget) return;
-		selectionStore.select(sectionId, componentData.id);
+		selectionStore.select(sectionId, componentData.id, $state.snapshot(disabledOptions));
 	}
 
 	// Text components are selected too, but they show no indicator as their caret already marks them
@@ -142,7 +142,7 @@
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				<div class="component-editor" contenteditable="false">
-					<ComponentEditor isBinding={resolvedValuePromise.isBinding} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+					<ComponentEditor layout="floating" isBinding={resolvedValuePromise.isBinding} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 				</div>
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
@@ -158,7 +158,7 @@
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 					<div class="component-editor" contenteditable="false">
-						<ComponentEditor isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
+						<ComponentEditor layout="floating" isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
 					</div>
 				{/if}
 				{#if isSelected}

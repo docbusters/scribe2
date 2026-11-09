@@ -2,13 +2,15 @@ import ComponentEditorValueSelector from "$lib/components/component/ComponentEdi
 import type { ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
 import { editStore } from "$lib/stores/edit-store.svelte.js";
-import { toolbarStore } from "$lib/stores/toolbar-store.svelte.js";
+import { toolbarStore, type ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
 import { mount, unmount } from "svelte";
 
 export interface ComponentEditOnClick {
     event: MouseEvent;
     sectionId: string;
     componentId: string;
+    /** Set only when the caret is in a text, so a component can be inserted exactly at the caret */
+    insertion?: ToolbarInsertion;
 }
 
 export interface ComponentEditProps {
@@ -21,6 +23,8 @@ export interface ComponentEditProps {
     name: string;
     onclick?: (data: ComponentEditOnClick) => void;
     icon?: string;
+    /** Short text for the option. When present the option is meant to be drawn as a large button (icon over text) */
+    label?: string;
     isSelected: boolean;
 }
 
@@ -29,6 +33,10 @@ export type ComponentEditOptions = BaseComponentEditOptions | SeparatorEditOptio
 export interface BaseComponentEditOptions {
     type: string;
     name: string;
+    /** Only used by the top toolbar. Short text for the option: when present it is drawn as a large button (icon over text), otherwise as a small icon button */
+    label?: string;
+    /** Only used by the top toolbar. Title of the group the option belongs to. Options sharing a group are drawn together, even when they are not consecutive */
+    group?: string;
     /** Function to determine if the option is selected. If not provided, the option will not be considered selected. */
     isSelected?: (data: { value: DataValue; config: ComponentConfig | undefined }) => boolean;
     /** Framework-agnostic render function to render custom HTML/elements. Can return a cleanup function */
@@ -44,15 +52,31 @@ export interface SeparatorEditOption {
     type: 'separator';
 }
 
+/** Space in pixels between a ribbon group and the dropdown opened below it */
+const RIBBON_DROPDOWN_GAP = 4;
+
 export const addComponentOption: ComponentEditOptions = {
     type: 'add',
     name: 'Add component',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
         onclick: (data: ComponentEditOnClick) => {
-            const { event, sectionId, componentId } = data;
-            const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-            toolbarStore.open(rect.left, rect.bottom, sectionId, componentId, false);
+            const { event, sectionId, componentId, insertion } = data;
+            const button = event.currentTarget as HTMLElement;
+            const rect = button.getBoundingClientRect();
+
+            // In the ribbon the dropdown opens below the whole group (its title included), not just below the button
+            const groupRect = button.closest('.component-editor-group')?.getBoundingClientRect();
+            const bottom = groupRect ? groupRect.bottom + RIBBON_DROPDOWN_GAP : rect.bottom;
+
+            // With the caret in a text the component is inserted exactly there
+            if (insertion) {
+                toolbarStore.openForInsertion(rect.left, bottom, sectionId, insertion);
+                return;
+            }
+
+            // An empty componentId means appending at the end of the section
+            toolbarStore.open(rect.left, bottom, sectionId, componentId || null, false);
         }
     },
 };

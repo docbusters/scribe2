@@ -138,5 +138,5 @@
 	</div>
 
 	<!-- Editor Scribe usando nuestro documento inyectado -->
-	<Scribe document={documentWithBindings} bindings={fullExampleBindings} {customBindings} onbindingchange={handleBindingChange} class="max-w-[70vw]" mode="edit" />
+	<Scribe document={documentWithBindings} bindings={fullExampleBindings} {customBindings} onbindingchange={handleBindingChange} class="max-w-[70vw]" mode="edit" showPrintButton />
 </div>

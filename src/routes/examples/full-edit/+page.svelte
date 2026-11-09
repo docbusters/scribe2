@@ -14,6 +14,8 @@
 		bindings={fullExampleBindings}
 		class="max-w-[70vw]"
 		mode="edit"
+		showToolbar
+		showPrintButton
 		lang={currentLang}
 	/>
 </div>

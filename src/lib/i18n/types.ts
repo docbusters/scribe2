@@ -93,6 +93,10 @@ export interface Translations {
 		duplicate: string;
 		delete: string;
 		setValue: string;
+		addLabel: string;
+		duplicateLabel: string;
+		deleteLabel: string;
+		setValueLabel: string;
 	};
 	sections: {
 		defaultTitle: string;
@@ -106,6 +110,19 @@ export interface Translations {
 	};
 	componentToolbar: {
 		pressEnter: string;
+	};
+	topToolbar: {
+		groups: {
+			component: string;
+			data: string;
+			alignment: string;
+			fit: string;
+			controls: string;
+			layout: string;
+			chartType: string;
+			options: string;
+		};
+		configureLabel: string;
 	};
 	components: {
 		'text-binding': {

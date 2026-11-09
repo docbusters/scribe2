@@ -17,5 +17,5 @@
 </script>
 
 <div class="flex w-full py-10 border-box justify-center">
-	<Scribe {document} class="max-w-[70vw]" mode="edit" />
+	<Scribe {document} class="max-w-[70vw]" mode="edit" showToolbar showPrintButton />
 </div>

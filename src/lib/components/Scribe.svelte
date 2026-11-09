@@ -15,6 +15,8 @@
 			customBindings: { type: 'Object' },
 			lang: { type: 'String' },
 			showBindingsPanel: { type: 'Boolean' },
+			showToolbar: { type: 'Boolean' },
+			showPrintButton: { type: 'Boolean' },
 		}
 	}}
 />
@@ -39,11 +41,12 @@
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
+	import TopToolbar from './toolbar/TopToolbar.svelte';
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
 	import { setI18n } from '../i18n/i18n.svelte.js';
 
-	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showToolbar = false, showPrintButton = false }: ScribeProps = $props();
 
 	// svelte-ignore state_referenced_locally
 	const i18n = setI18n(lang);
@@ -177,19 +180,22 @@
 		selectionStore.clear();
 	});
 
-	// Selection is cleared when the selected component disappears (deleted, merged into another text...)
+	// Selection is cleared when what it refers to disappears (component deleted, merged into another text...)
 	$effect(() => {
 		const selected = selectionStore.selected;
 		if (mode !== 'edit' || !selected) return;
 
 		const sectionExists = !!editStore.document?.sections[selected.sectionId];
-		if (!sectionExists || !editStore.getComponent(selected.sectionId, selected.componentId)) {
+		// An insertion point holds the caret of a ghost or an empty text, so there is no component to look up
+		if (!sectionExists || (selected.kind === 'component' && !editStore.getComponent(selected.sectionId, selected.componentId))) {
 			selectionStore.clear();
 		}
 	});
 
-	// Selectors of the areas that must keep the current selection when interacted with
-	const KEEP_SELECTION_SELECTOR = '.component-edit-contents, .scribe-portal-target, .scribe-dropdown-content, .scribe-top-toolbar';
+	// Selectors of the areas that must keep the current selection when interacted with.
+	// Inside a paragraph the selection is replaced by the text that receives the focus (a component or an insertion point),
+	// so the interaction does not need to clear it first
+	const KEEP_SELECTION_SELECTOR = '.component-edit-contents, .paragraph-section, .scribe-portal-target, .scribe-dropdown-content, .scribe-top-toolbar';
 
 	/**
 	 * Clears the selection when the interaction happens outside any component or selection-preserving area.
@@ -269,7 +275,10 @@
 <svelte:document onpointerdowncapture={handleClearSelection} />
 
 <div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleClearSelection}>
-	{#if mode === 'edit'}
+	{#if mode === 'edit' && showToolbar}
+		<TopToolbar />
+	{/if}
+	{#if mode === 'edit' && showPrintButton}
 		<Button size="icon" style="max-width: fit-content; margin-left: auto;" variant="outline" title="Print document (debugging)" onclick={() => console.log($state.snapshot(documentState))}>
 			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
 		</Button>
@@ -383,7 +392,8 @@
         border-radius: var(--scribe-radius-xl);
         box-shadow: var(--scribe-shadow-md); /* shadow-popover */
         outline: none;
-		z-index: 1;
+		/* Above the top toolbar, the section handles and the component editors, but below the bindings panel and dialogs */
+		z-index: 30;
 		display: flex;
 		flex-direction: column;
 		min-height: 0;

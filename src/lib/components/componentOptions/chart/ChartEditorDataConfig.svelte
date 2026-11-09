@@ -13,7 +13,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
     import { randomHexColor } from '$lib/utils/randomHexColor.js';
 
-    let { name, icon, sectionId, disabled, componentId, componentValue, isSelected, isBinding }: ComponentEditProps = $props();
+    let { name, icon, label, sectionId, disabled, componentId, componentValue, isSelected, isBinding }: ComponentEditProps = $props();
 
     let open = $state(false);
 
@@ -134,6 +134,7 @@
 <ComponentEditorButton
     {icon}
     {name}
+    {label}
     {isSelected}
     {disabled}
     onclick={() => {

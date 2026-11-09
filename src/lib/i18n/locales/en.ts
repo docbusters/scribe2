@@ -92,7 +92,11 @@ export const en: Translations = {
 		add: 'Add component',
 		duplicate: 'Duplicate component',
 		delete: 'Delete component',
-		setValue: 'Set value'
+		setValue: 'Set value',
+		addLabel: 'Add',
+		duplicateLabel: 'Duplicate',
+		deleteLabel: 'Delete',
+		setValueLabel: 'Value'
 	},
 	sections: {
 		defaultTitle: 'New Section',
@@ -106,6 +110,19 @@ export const en: Translations = {
 	},
 	componentToolbar: {
 		pressEnter: 'Press ENTER to add'
+	},
+	topToolbar: {
+		groups: {
+			component: 'Component',
+			data: 'Data',
+			alignment: 'Alignment',
+			fit: 'Fit',
+			controls: 'Controls',
+			layout: 'Layout',
+			chartType: 'Chart type',
+			options: 'Options'
+		},
+		configureLabel: 'Configure'
 	},
 	components: {
 		'text-binding': {

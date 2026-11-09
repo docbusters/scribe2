@@ -21,6 +21,10 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     lang?: 'en' | 'es';
     /** Whether to display the built-in floating variables/bindings panel in edit mode. Defaults to true. */
     showBindingsPanel?: boolean;
+    /** Whether to display the top toolbar in edit mode. It applies the component operations to the selected component. Defaults to false. */
+    showToolbar?: boolean;
+    /** Whether to display the button that prints the document to the console in edit mode. Defaults to false. */
+    showPrintButton?: boolean;
 }
 
 export interface CustomBindingSubscribable {

@@ -4,7 +4,8 @@
 	import type { GhostComponentMeta } from '../../domain/components/Component.ts';
 	import type { StringValue } from '../../domain/data/DataValue.ts';
 	import { editStore } from '../../stores/edit-store.svelte.ts';
-	import { toolbarStore, type ToolbarInsertionMode, type ToolbarSplitData } from '../../stores/toolbar-store.svelte.ts';
+	import { toolbarStore, type ToolbarInsertion, type ToolbarInsertionMode, type ToolbarSplitData } from '../../stores/toolbar-store.svelte.ts';
+	import { selectionStore } from '../../stores/selection-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
@@ -20,6 +21,24 @@
     let rawValue = $derived(componentData.value.value);
     let value = $derived(parseStringForContentEditable(rawValue));
     let isEmpty = $derived(rawValue === '');
+
+    // A ghost is a placeholder to write in, it is not part of the document until it has content
+    let isGhost = $derived(componentData.id.startsWith('__ghost'));
+
+    /**
+     * Where a component is inserted when this text is empty. A ghost is not part of the document, so it inserts relative
+     * to its neighbour (null when the section is empty), while an empty persisted text is replaced by the new component
+     */
+    let emptySlot = $derived.by(() => {
+        const insertionMode: ToolbarInsertionMode = isGhost ? (componentData.insertBeforeId ? 'before' : 'after') : 'replace';
+        const targetId = isGhost ? (componentData.insertAfterId ?? componentData.insertBeforeId ?? null) : componentData.id;
+        return { targetId, insertionMode };
+    });
+
+    /** A ghost or an empty text holds no component, so toolbars need to know the caret is in a place where a component can be inserted */
+    function selectInsertionPoint() {
+        selectionStore.selectInsertionPoint(sectionId, componentData.id);
+    }
 
     function parseTokens(text: string) {
         const tokens = [];
@@ -108,6 +127,24 @@
         return '';
     }
 
+    /**
+     * Creates a text component with the value of a ghost, next to the neighbour the ghost is placed by.
+     * Returns the id of the new text, or null if it could not be created
+     */
+    function createTextFromGhost(newValue: StringValue): string | null {
+        const insertBeforeId = componentData.insertBeforeId ?? null;
+        const insertAfterId = componentData.insertAfterId ?? null;
+
+        if (insertBeforeId) {
+            const res = editStore.insertComponent(sectionId, insertBeforeId, 'text', {
+                mode: 'before',
+                overrideValue: newValue
+            });
+            return res?.newId ?? null;
+        }
+        return editStore.addComponent(sectionId, insertAfterId, 'text', false, newValue);
+    }
+
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
         if (!isDirty) return;
         const target = event.target as HTMLSpanElement;
@@ -124,10 +161,7 @@
             return;
         }
 
-        let newContent = '';
-        for (const child of Array.from(target.childNodes)) {
-            newContent += parseDOM(child);
-        }
+        const newContent = readEditableContent(target);
 
         isDirty = false;
 
@@ -135,22 +169,10 @@
 
         const newValue: StringValue = { type: 'string', value: newContent };
         const success = editStore.setComponentValue(sectionId, componentData.id, newValue);
-        
+
         // If the component is not found, we can assume it is a blank space
         if (!success) {
-            const insertBeforeId = componentData.insertBeforeId ?? null;
-            const insertAfterId = componentData.insertAfterId ?? null;
-
-            let newId: string | null;
-            if (insertBeforeId) {
-                const res = editStore.insertComponent(sectionId, insertBeforeId, 'text', {
-                    mode: 'before',
-                    overrideValue: newValue
-                });
-                newId = res?.newId ?? null;
-            } else {
-                newId = editStore.addComponent(sectionId, insertAfterId, 'text', false, newValue);
-            }
+            const newId = createTextFromGhost(newValue);
 
             if (typeof newId === 'string') {
                 // Clear the ghost component UI visually
@@ -158,6 +180,119 @@
                 isEmpty = true;
             }
         }
+    }
+
+    /** Reads the content of an editable as the markdown string stored in the text component */
+    function readEditableContent(element: HTMLElement): string {
+        let content = '';
+        for (const child of Array.from(element.childNodes)) {
+            content += parseDOM(child);
+        }
+        return content;
+    }
+
+    /**
+     * Describes where a component would be inserted at the caret of this text, or null if the caret is not inside it.
+     * A ghost with typed content is not part of the document yet, so its text is created here to have a text to split.
+     */
+    function captureInsertionAtCaret(): { insertion: ToolbarInsertion; caretRect: DOMRect } | null {
+        const target = textDiv;
+        if (!target?.isConnected) return null;
+
+        const selection = getSelection(target);
+        if (!selection || selection.rangeCount === 0) return null;
+
+        const range = selection.getRangeAt(0);
+        if (!target.contains(range.startContainer)) return null;
+
+        const preRange = range.cloneRange();
+        preRange.selectNodeContents(target);
+        preRange.setEnd(range.startContainer, range.startOffset);
+        const textBefore = preRange.toString();
+
+        const postRange = range.cloneRange();
+        postRange.selectNodeContents(target);
+        postRange.setStart(range.endContainer, range.endOffset);
+        const textAfter = postRange.toString();
+
+        const isAtStart = textBefore.length === 0;
+        const isAtEnd = textAfter.length === 0;
+
+        // Capture formatted text fragments before and after the caret
+        let formattedBefore = '';
+        for (const child of Array.from(preRange.cloneContents().childNodes)) {
+            formattedBefore += parseDOM(child);
+        }
+
+        let formattedAfter = '';
+        for (const child of Array.from(postRange.cloneContents().childNodes)) {
+            formattedAfter += parseDOM(child);
+        }
+
+        const isActuallyEmpty = isEmpty || (isAtStart && isAtEnd);
+
+        // The position of the caret is measured now, as creating the text below replaces the element
+        let caretRect = range.getBoundingClientRect();
+
+        // If the element is empty the position is based on the element's bounding rect
+        if (caretRect.x === 0 && caretRect.y === 0) {
+            caretRect = target.getBoundingClientRect();
+        }
+
+        let targetId = emptySlot.targetId;
+        // Finds the element that holds the caret again, as it can be replaced when a ghost becomes a text component
+        let findCaretElement = (): HTMLElement | null => target;
+
+        if (isGhost && !isActuallyEmpty) {
+            const newId = createTextFromGhost({ type: 'string', value: readEditableContent(target) });
+            if (newId === null) return null;
+
+            // The text is already saved, so it must not be saved again when the element loses the focus
+            isDirty = false;
+            targetId = newId;
+
+            const scope: ParentNode = target.closest('.scribe-document') ?? document;
+            findCaretElement = () => scope.querySelector<HTMLElement>(`[data-component-id="${CSS.escape(newId)}"]`);
+        }
+
+        let insertionMode: ToolbarInsertionMode;
+        let splitData: ToolbarSplitData | undefined = undefined;
+
+        if (isActuallyEmpty) {
+            insertionMode = emptySlot.insertionMode;
+        } else if (isAtStart) {
+            insertionMode = 'before';
+            splitData = {
+                textBefore: '',
+                textAfter: formattedAfter
+            };
+        } else if (isAtEnd) {
+            insertionMode = 'after';
+            splitData = {
+                textBefore: formattedBefore,
+                textAfter: ''
+            };
+        } else {
+            insertionMode = 'split';
+            splitData = {
+                textBefore: formattedBefore,
+                textAfter: formattedAfter
+            };
+        }
+
+        // Record the exact cursor character offset for restoration if the user cancels the insertion
+        const caretOffset = textBefore.length;
+        const restoreFocus = () => {
+            const element = findCaretElement();
+            if (element) {
+                restoreSelection(element, caretOffset, caretOffset);
+            }
+        };
+
+        return {
+            insertion: { targetId, isEmpty: isActuallyEmpty, insertionMode, splitData, restoreFocus },
+            caretRect
+        };
     }
 
     function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) {
@@ -170,20 +305,6 @@
         if (handleArrowNavigation(event, target)) {
             return;
         }
-
-        const preRange = range.cloneRange();
-        preRange.selectNodeContents(target);
-        preRange.setEnd(range.startContainer, range.startOffset);
-        const textBefore = preRange.toString();
-
-        const postRange = range.cloneRange();
-        postRange.selectNodeContents(target);
-        postRange.setStart(range.endContainer, range.endOffset);
-        
-        const textAfter = postRange.toString();
-
-        const isAtStart = textBefore.length === 0;
-        const isAtEnd = textAfter.length === 0;
 
         switch (event.key) {
             case 'Backspace': {
@@ -200,7 +321,11 @@
                 break;
             }
             case 'Delete': {
-                if (isAtEnd) {
+                const postRange = range.cloneRange();
+                postRange.selectNodeContents(target);
+                postRange.setStart(range.endContainer, range.endOffset);
+
+                if (postRange.toString().length === 0) {
                     // Try to delete br at the end of the contenteditable, as contenteditable adds an extra <br>
                     if (target.lastElementChild?.tagName === 'BR') {
                         target.lastElementChild.remove();
@@ -214,79 +339,11 @@
                 event.preventDefault(); // Prevent adding an actual space character
 
                 // Do not blur the target here so that the DOM and selection remain intact if the user cancels with ESC
-
-                // Capture formatted text fragments before and after the caret
-                const preFragment = preRange.cloneContents();
-                const postFragment = postRange.cloneContents();
-
-                let formattedBefore = '';
-                for (const child of Array.from(preFragment.childNodes)) {
-                    formattedBefore += parseDOM(child);
-                }
-
-                let formattedAfter = '';
-                for (const child of Array.from(postFragment.childNodes)) {
-                    formattedAfter += parseDOM(child);
-                }
-
-                const isActuallyEmpty = isEmpty || (textBefore.length === 0 && textAfter.length === 0);
-
-                let insertionMode: ToolbarInsertionMode;
-                let splitData: ToolbarSplitData | undefined = undefined;
-
-                const isGhost = componentData.id.startsWith('__ghost');
-                const targetComponentId = isGhost 
-                    ? (componentData.insertAfterId ?? componentData.insertBeforeId ?? null)
-                    : componentData.id;
-
-                if (isActuallyEmpty) {
-                    insertionMode = isGhost ? (componentData.insertBeforeId ? 'before' : 'after') : 'replace';
-                } else if (isAtStart) {
-                    insertionMode = 'before';
-                    splitData = {
-                        textBefore: '',
-                        textAfter: formattedAfter
-                    };
-                } else if (isAtEnd) {
-                    insertionMode = 'after';
-                    splitData = {
-                        textBefore: formattedBefore,
-                        textAfter: ''
-                    };
-                } else {
-                    insertionMode = 'split';
-                    splitData = {
-                        textBefore: formattedBefore,
-                        textAfter: formattedAfter
-                    };
-                }
-
-                // Record the exact cursor character offset for restoration if the user presses ESC
-                const caretOffset = preRange.toString().length;
-                const restoreFocus = () => {
-                    restoreSelection(target, caretOffset, caretOffset);
-                };
+                const captured = captureInsertionAtCaret();
+                if (!captured) return;
 
                 // Show the add component dropdown
-                let rect = range.getBoundingClientRect();
-
-                // If the div is empty we center the dropdown based on the div's bounding rect
-                if (rect.x === 0 && rect.y === 0) {
-                    rect = target.getBoundingClientRect();
-                }
-
-                toolbarStore.open(
-                    rect.x, 
-                    rect.bottom, 
-                    sectionId, 
-                    targetComponentId, 
-                    isActuallyEmpty,
-                    {
-                        insertionMode,
-                        splitData,
-                        restoreFocus
-                    }
-                );
+                toolbarStore.openForInsertion(captured.caretRect.x, captured.caretRect.bottom, sectionId, captured.insertion);
                 break;
             }
         }
@@ -339,6 +396,18 @@
             updateAvailableWidth();
         }
         isDirty = true;
+    }
+
+    function handleFocus() {
+        updateAvailableWidth();
+
+        // Toolbars insert components at the caret of the text that has the focus
+        selectionStore.setCaretSource(componentData.id, () => captureInsertionAtCaret()?.insertion ?? null);
+
+        // A ghost has no component to select, even when it already holds typed text that is not saved yet
+        if (isGhost || isEmpty) {
+            selectInsertionPoint();
+        }
     }
 
     function handleSelectionChange(event?: Event) {
@@ -516,7 +585,7 @@
         class:is-inline-slot={!!componentData.insertBeforeId && !componentData.isBetweenBlocks && mode === 'edit'}
         data-placeholder={i18n.t('editor.insertComponentPlaceholder')}
         contenteditable={mode === 'edit'} 
-        onfocus={mode === 'edit' ? updateAvailableWidth : undefined}
+        onfocus={mode === 'edit' ? handleFocus : undefined}
         onblur={handleTextChange} 
         oninput={handleInput}
         onkeydown={mode === 'edit' ? handleKeyDown : undefined}

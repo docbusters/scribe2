@@ -11,6 +11,15 @@ export interface ToolbarOpenOptions {
     restoreFocus?: () => void;
 }
 
+/** Where and how a new component is inserted, given the caret of a text */
+export interface ToolbarInsertion extends ToolbarOpenOptions {
+    /** Component the new one is placed relative to. Null means appending at the end of the section */
+    targetId: string | null;
+    /** The text is empty, so the new component takes its place */
+    isEmpty: boolean;
+    insertionMode: ToolbarInsertionMode;
+}
+
 export class ToolbarStore {
     isOpen = $state(false);
     position = $state({ x: 0, y: 0 });
@@ -45,6 +54,15 @@ export class ToolbarStore {
         this.splitData = options?.splitData || null;
         this.restoreFocus = options?.restoreFocus || null;
         this.isOpen = true;
+    }
+
+    /** Opens the toolbar to insert a component at the place described by the insertion */
+    openForInsertion(x: number, y: number, sectionId: string, insertion: ToolbarInsertion) {
+        this.open(x, y, sectionId, insertion.targetId, insertion.isEmpty, {
+            insertionMode: insertion.insertionMode,
+            splitData: insertion.splitData,
+            restoreFocus: insertion.restoreFocus
+        });
     }
 
     close() {

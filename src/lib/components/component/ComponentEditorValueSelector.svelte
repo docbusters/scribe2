@@ -154,6 +154,7 @@
 <ComponentEditorButton
 	icon={props.icon}
 	name={props.name}
+	label={props.label}
 	disabled={props.disabled}
 	onclick={() => {
 		if (props.componentValue.type === 'binding') {

@@ -92,7 +92,11 @@ export const es: Translations = {
 		add: 'Añadir componente',
 		duplicate: 'Duplicar componente',
 		delete: 'Eliminar componente',
-		setValue: 'Asignar valor'
+		setValue: 'Asignar valor',
+		addLabel: 'Añadir',
+		duplicateLabel: 'Duplicar',
+		deleteLabel: 'Eliminar',
+		setValueLabel: 'Valor'
 	},
 	sections: {
 		defaultTitle: 'Nueva sección',
@@ -106,6 +110,19 @@ export const es: Translations = {
 	},
 	componentToolbar: {
 		pressEnter: 'Presiona ENTER para añadir'
+	},
+	topToolbar: {
+		groups: {
+			component: 'Componente',
+			data: 'Datos',
+			alignment: 'Alineación',
+			fit: 'Ajuste',
+			controls: 'Controles',
+			layout: 'Diseño',
+			chartType: 'Tipo de gráfico',
+			options: 'Opciones'
+		},
+		configureLabel: 'Configurar'
 	},
 	components: {
 		'text-binding': {
