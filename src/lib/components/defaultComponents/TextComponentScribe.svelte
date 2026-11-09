@@ -17,8 +17,9 @@
     let { componentData, sectionId, mode }: ScribeComponentProps<GhostTextComponent> = $props();
     const i18n = getI18n();
 
-    let value = $derived(parseStringForContentEditable(componentData.value.value));
-    let isEmpty = $derived(componentData.value.value === '');
+    let rawValue = $derived(componentData.value.value);
+    let value = $derived(parseStringForContentEditable(rawValue));
+    let isEmpty = $derived(rawValue === '');
 
     function parseTokens(text: string) {
         const tokens = [];
@@ -487,7 +488,9 @@
     onkeyup={mode === 'edit' ? handleSelectionChange : undefined}
 />
 
-{#key value}
+<!-- Keyed by the raw string, not the parsed array: the parent recreates ghost components on every recompute,
+     which would produce a new array each time and destroy the span that has just received focus -->
+{#key rawValue}
     <!-- The role and tabindex only exist in edit mode, where the span is an editable textbox -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <span
