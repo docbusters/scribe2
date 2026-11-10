@@ -211,7 +211,7 @@
 	/* Tab attached to the top edge of the ring, set back from the rounded corner */
 	.component-selection-label {
 		position: absolute;
-		top: -3px;
+		top: -2px;
 		right: calc(var(--scribe-radius-sm) + 0.25rem);
 		transform: translateY(-100%);
 		z-index: 1;

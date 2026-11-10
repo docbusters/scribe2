@@ -5,6 +5,7 @@
 	import type { ComponentConfig } from "$lib/domain/components/Component.js";
 	import { getI18n } from "$lib/i18n/i18n.svelte.js";
 	import type { ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
+	import { fade } from "svelte/transition";
 
     interface ComponentEditorProps {
         componentType: string;
@@ -103,7 +104,7 @@
 	{#each groups as group (group.title)}
 		<!-- ComponentEditOptions.ts finds this element by its class to open the add dropdown below the whole group -->
 		<div class="component-editor-group">
-			<div class="group-buttons" class:is-grid={isGrid(group)}>
+			<div class="group-buttons" class:is-grid={isGrid(group)} in:fade>
 				{#each group.buttons as button (button.option)}
 					{#if button.option.render}
 						<div style="display: contents;" use:renderOption={button}></div>

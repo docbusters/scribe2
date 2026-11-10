@@ -15,7 +15,7 @@
 
     // Buttons without a label are square icons, the ones with a label grow with their text
     const SMALL_STYLE = "width: 2rem; height: 2rem; min-width: 2rem; min-height: 2rem;";
-    const LARGE_STYLE = "height: auto; width: auto; min-width: 3.5rem; padding: 0.375rem 0.625rem; flex-direction: column; gap: 0.25rem;";
+    const LARGE_STYLE = "height: auto; width: auto; min-width: 4.125rem; min-height: 4.125rem; padding: 0.375rem 0.625rem; flex-direction: column; gap: 0.25rem;";
 </script>
 
 
