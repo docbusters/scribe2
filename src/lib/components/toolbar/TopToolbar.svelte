@@ -52,6 +52,7 @@
 			isBinding={false}
 			sectionId={selected.sectionId}
 			componentId=""
+			options={globalRegistry.getComponentOptions('text')}
 			getInsertion={getInsertion}
 			disabledOptions={INSERTION_POINT_DISABLED_OPTIONS}
 		/>

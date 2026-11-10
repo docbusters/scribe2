@@ -8,12 +8,25 @@
 	import { selectionStore } from '../../stores/selection-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
-	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
+	import { textFormatStore, type TextFormatCommand, type TextFormats } from '../../stores/text-format-store.svelte.ts';
+	import { untrack } from 'svelte';
+	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
 	import { getI18n } from '../../i18n/i18n.svelte.js';
 
     type GhostTextComponent = TextComponent & Partial<GhostComponentMeta>;
+
+    // The classes that render each format. parseDOM reads them back to save a text
+    const FORMAT_CLASSES: Record<TextFormatCommand, string> = {
+        bold: 'is-bold',
+        italic: 'is-italic',
+        underline: 'is-underline',
+        strikethrough: 'is-strikethrough'
+    };
+    const FORMAT_KEYS = Object.keys(FORMAT_CLASSES) as TextFormatCommand[];
+
+    const SHORTCUT_FORMATS: Record<string, TextFormatCommand> = { b: 'bold', i: 'italic', u: 'underline' };
 
     let { componentData, sectionId, mode }: ScribeComponentProps<GhostTextComponent> = $props();
     const i18n = getI18n();
@@ -94,10 +107,8 @@
 
     function parseDOM(node: Node): string {
         if (node.nodeType === Node.TEXT_NODE) {
-            let text = node.textContent || '';
-            // Scape special characters to prevent them from being interpreted as formatting when we parse the string again
-            text = text.replace(/([\\*_~+])/g, '\\$1');
-            return text;
+            // Escape special characters to prevent them from being interpreted as formatting when we parse the string again
+            return escapeSpecialChars(node.textContent || '');
         } else if (node.nodeName === 'BR') {
             return '\n';
         } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -309,6 +320,18 @@
             return;
         }
 
+        // Ctrl/Cmd + B, I and U do what the format buttons do. Left to the browser they would insert tags that are not part of the format
+        if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey) {
+            const command = SHORTCUT_FORMATS[event.key.toLowerCase()];
+            if (command) {
+                event.preventDefault();
+                // The state is read again, as the selection may have changed since the last selectionchange was handled
+                syncFormatState();
+                textFormatStore.toggle(command);
+                return;
+            }
+        }
+
         switch (event.key) {
             case 'Backspace': {
                 // Line breaks count as content, so Backspace first removes them natively
@@ -378,51 +401,139 @@
         }
     }
 
-    function handleSelectionChange(event?: Event) {
-        // Every text component listens to the document: leave early unless this one owns the selection or the format state
-        const currentSelection = getSelection(textDiv);
-        const isSelectionInside = !!textDiv && !!currentSelection && currentSelection.rangeCount > 0
-            && !currentSelection.isCollapsed && textDiv.contains(currentSelection.anchorNode);
-        if (!isSelectionInside && textFormatStore.componentId !== componentData.id) {
-            return;
-        }
-
-        // A click on a toolbar button must keep the marked fragment, as the button acts on it
-        if (event && typeof event.composedPath === 'function') {
-            const path = event.composedPath();
-            const insideToolbar = path.some(el => el instanceof HTMLElement && el.matches('.scribe-top-toolbar, .component-editor-container'));
-            if (insideToolbar) {
-                return;
+    /** The formats a character typed at the given node would inherit, which are the ones of the formatted spans around it */
+    function getFormatsAt(node: Node | null): TextFormats {
+        const formats: TextFormats = { bold: false, italic: false, underline: false, strikethrough: false };
+        for (let current = node; current && current !== textDiv; current = current.parentNode) {
+            if (current.nodeType !== Node.ELEMENT_NODE) continue;
+            const classList = (current as Element).classList;
+            for (const key of FORMAT_KEYS) {
+                if (classList.contains(FORMAT_CLASSES[key])) formats[key] = true;
             }
         }
+        return formats;
+    }
+
+    /**
+     * Tells the format store where the caret or the marked fragment is when it is in this text, so the format options
+     * act on it and show its formats. Every text component runs this on every change of the selection of the document,
+     * so it leaves early unless the selection is in this text or this text owns the format state
+     */
+    function syncFormatState() {
+        if (mode !== 'edit' || !textDiv) return;
 
         const selection = getSelection(textDiv);
-        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+        if (!selection || selection.rangeCount === 0 || !textDiv.contains(selection.anchorNode)) {
             if (textFormatStore.componentId === componentData.id) {
                 textFormatStore.clear();
             }
             return;
         }
 
-        // Check if the selection is within our text div
-        if (textDiv && textDiv.contains(selection.anchorNode)) {
-            const range = selection.getRangeAt(0);
-            
-            // Calculate the selected text indexes
-            const preRange = range.cloneRange();
-            preRange.selectNodeContents(textDiv);
-            preRange.setEnd(range.startContainer, range.startOffset);
-            
-            const startIndex = preRange.toString().length;
-            const selectedText = range.toString();
-            const endIndex = startIndex + selectedText.length;
-            
-            textFormatStore.setSelection(sectionId, componentData.id, {
-                start: startIndex,
-                end: endIndex,
-                text: selectedText
-            });
+        const range = selection.getRangeAt(0);
+
+        if (selection.isCollapsed) {
+            textFormatStore.setCaret(sectionId, componentData.id, getFormatsAt(range.startContainer), { node: range.startContainer, offset: range.startOffset });
+            return;
         }
+
+        // A ghost is not in the document yet, so a fragment marked in it cannot be formatted
+        if (isGhost) {
+            textFormatStore.setBlockedRange(sectionId, componentData.id);
+            return;
+        }
+
+        // Calculate the selected text indexes
+        const preRange = range.cloneRange();
+        preRange.selectNodeContents(textDiv);
+        preRange.setEnd(range.startContainer, range.startOffset);
+
+        const startIndex = preRange.toString().length;
+        const selectedText = range.toString();
+        const endIndex = startIndex + selectedText.length;
+
+        textFormatStore.setSelection(sectionId, componentData.id, {
+            start: startIndex,
+            end: endIndex,
+            text: selectedText
+        });
+    }
+
+    /**
+     * Types with a pending format: the first character is inserted as a formatted span, split from the text around it,
+     * and the caret is left inside it so the rest is typed natively with the same format. The editable is the working copy
+     * until the text loses the focus, so nothing else has to change for it to be saved
+     */
+    function insertFormattedText(element: HTMLElement, selection: Selection, text: string, formats: TextFormats) {
+        // An empty editable only holds the filler line break of browsers, which would end up after the typed text
+        if (isEditableEmpty(element)) {
+            element.querySelectorAll('br').forEach(br => br.remove());
+        }
+
+        // Splits everything from the caret on, so the new text can go between both halves. Spans that cross the caret are cloned
+        const caret = selection.getRangeAt(0);
+        const tail = document.createRange();
+        tail.setStart(caret.startContainer, caret.startOffset);
+        tail.setEnd(element, element.childNodes.length);
+        const tailContent = tail.extractContents();
+
+        const textNode = document.createTextNode(text);
+        let inserted: Node = textNode;
+        if (FORMAT_KEYS.some(key => formats[key])) {
+            const span = document.createElement('span');
+            for (const key of FORMAT_KEYS) {
+                if (formats[key]) span.classList.add(FORMAT_CLASSES[key]);
+            }
+            span.append(textNode);
+            inserted = span;
+        }
+        element.append(inserted, tailContent);
+
+        // Splitting at the edge of a span leaves an empty clone of it
+        for (const child of Array.from(element.children)) {
+            if (child !== inserted && child.tagName === 'SPAN' && child.textContent === '' && !child.querySelector('br')) {
+                child.remove();
+            }
+        }
+
+        if (inserted instanceof HTMLElement) {
+            mergeWithSameFormat(inserted);
+        }
+
+        selection.collapse(textNode, textNode.length);
+        isEmpty = false;
+        isDirty = true;
+    }
+
+    /** Joins a formatted span with the spans next to it that have exactly its format, so the saved text has no redundant toggles */
+    function mergeWithSameFormat(span: HTMLElement) {
+        const getFormatKey = (el: Element) => FORMAT_KEYS.filter(key => el.classList.contains(FORMAT_CLASSES[key])).join();
+        const isSameFormat = (node: Node | null): node is HTMLElement =>
+            node instanceof HTMLElement && node.tagName === 'SPAN' && getFormatKey(node) === getFormatKey(span);
+
+        const next = span.nextSibling;
+        if (isSameFormat(next)) {
+            span.append(...Array.from(next.childNodes));
+            next.remove();
+        }
+
+        const previous = span.previousSibling;
+        if (isSameFormat(previous)) {
+            previous.append(...Array.from(span.childNodes));
+            span.remove();
+        }
+    }
+
+    function handleBeforeInput(event: InputEvent) {
+        const pending = textFormatStore.componentId === componentData.id ? textFormatStore.pending : null;
+        if (!pending || event.inputType !== 'insertText' || !event.data || !textDiv) return;
+
+        const selection = getSelection(textDiv);
+        if (!selection || selection.rangeCount === 0 || !selection.isCollapsed || !textDiv.contains(selection.anchorNode)) return;
+
+        event.preventDefault();
+        insertFormattedText(textDiv, selection, event.data, pending);
+        textFormatStore.consumePending();
     }
 
     let textDiv: HTMLSpanElement | null = $state(null);
@@ -500,10 +611,17 @@
     }
 
     $effect(() => {
-        // When value changes and textDiv is recreated, we restore the selection if a fragment of this component is still marked
-        if (textDiv && textFormatStore.selectionRange && textFormatStore.hasSelection(sectionId, componentData.id)) {
-            restoreSelection(textDiv, textFormatStore.selectionRange.start, textFormatStore.selectionRange.end);
-        }
+        // When the value changes the span is recreated, so the fragment of this component that is still marked is marked again.
+        // Only the span is tracked: restoring the selection changes the selection, which updates the store, which would restore it again
+        const element = textDiv;
+        if (!element) return;
+
+        untrack(() => {
+            const marked = textFormatStore.selectionRange;
+            if (marked && textFormatStore.componentId === componentData.id) {
+                restoreSelection(element, marked.start, marked.end);
+            }
+        });
     });
 
     // A text that is destroyed (for example deleted) must not leave a marked fragment behind
@@ -514,10 +632,7 @@
     });
 </script>
 
-<svelte:document
-    onpointerup={mode === 'edit' ? handleSelectionChange : undefined}
-    onkeyup={mode === 'edit' ? handleSelectionChange : undefined}
-/>
+<svelte:document onselectionchange={mode === 'edit' ? syncFormatState : undefined} />
 
 <!-- Keyed by the raw string, not the parsed array: the parent recreates ghost components on every recompute,
      which would produce a new array each time and destroy the span that has just received focus -->
@@ -540,6 +655,7 @@
         contenteditable={mode === 'edit'} 
         onfocus={mode === 'edit' ? handleFocus : undefined}
         onblur={handleTextChange} 
+        onbeforeinput={mode === 'edit' ? handleBeforeInput : undefined}
         oninput={handleInput}
         onkeydown={mode === 'edit' ? handleKeyDown : undefined}
     >
@@ -613,19 +729,20 @@
         cursor: text;
     }
 
-    .is-bold {
+    /* Global inside the text, because spans created by hand when typing with a pending format do not carry the class that scopes these styles */
+    .edit-text :global(.is-bold) {
         font-weight: var(--scribe-font-weight-bold);
     }
 
-    .is-italic {
+    .edit-text :global(.is-italic) {
         font-style: italic;
     }
 
-    .is-underline {
+    .edit-text :global(.is-underline) {
         text-decoration: underline;
     }
 
-    .is-strikethrough {
+    .edit-text :global(.is-strikethrough) {
         text-decoration: line-through;
     }
 </style>

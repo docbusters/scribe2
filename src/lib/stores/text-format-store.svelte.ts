@@ -1,34 +1,114 @@
 import type { StringValue } from "../domain/data/DataValue.js";
 import { editStore } from "./edit-store.svelte.js";
 import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../constants/DocumentConstants.js';
+import { removeEmptyToggles } from '../utils/textFormatEscape.js';
 
 export type TextFormatCommand = 'bold' | 'italic' | 'underline' | 'strikethrough';
 
-/** Tracks the fragment of a text that is marked, so the format options of the toolbars know what they act on */
+export interface TextFormats {
+    bold: boolean;
+    italic: boolean;
+    strikethrough: boolean;
+    underline: boolean;
+}
+
+/** Where the caret is. Compared member by member, to know whether the caret has moved */
+export interface CaretKey {
+    node: Node | null;
+    offset: number;
+}
+
+const NO_FORMATS: TextFormats = { bold: false, italic: false, strikethrough: false, underline: false };
+
+function areSameFormats(a: TextFormats, b: TextFormats): boolean {
+    return a.bold === b.bold && a.italic === b.italic && a.strikethrough === b.strikethrough && a.underline === b.underline;
+}
+
+function areSameCaret(a: CaretKey | null, b: CaretKey | null): boolean {
+    return a?.node === b?.node && a?.offset === b?.offset;
+}
+
+/**
+ * Follows the text that holds the caret, so the format options of the toolbars know what they act on and what to show.
+ * With a marked fragment the options format it. With only a caret they set the format of what is typed next (the pending format)
+ */
 export class TextFormatStore {
+    /** The text that holds the caret or the marked fragment */
     sectionId = $state<string | null>(null);
     componentId = $state<string | null>(null);
+    /** The marked fragment, or null when there is only a caret */
     selectionRange = $state<{ start: number, end: number, text: string } | null>(null);
-    activeFormats = $state<{ bold: boolean, italic: boolean, strikethrough: boolean, underline: boolean }>({
-        bold: false,
-        italic: false,
-        strikethrough: false,
-        underline: false
-    });
+    /** What the options show: the formats of the marked fragment, or the ones at the caret (the pending ones after a toggle) */
+    activeFormats = $state<TextFormats>({ ...NO_FORMATS });
+    /** The formats of the characters typed next, once a format is toggled at the caret. Null while they follow the caret */
+    pending = $state<TextFormats | null>(null);
+    /** A fragment is marked in a text that is not in the document yet (a ghost), so it cannot be formatted */
+    rangeBlocked = $state(false);
 
-    /** Whether a fragment of the given text is marked. A caret without a range is not a selection */
-    hasSelection(sectionId: string, componentId: string): boolean {
-        return this.selectionRange !== null
-            && this.selectionRange.end > this.selectionRange.start
-            && this.sectionId === sectionId
-            && this.componentId === componentId;
+    // Not reactive: they are only compared when the caret moves or a format is toggled
+    private caretKey: CaretKey | null = null;
+    private caretFormats: TextFormats = { ...NO_FORMATS };
+    private pendingCaretKey: CaretKey | null = null;
+
+    /** Whether the options can act: a text holds the caret, and a marked fragment is in a text that can be formatted */
+    get canFormat(): boolean {
+        return this.componentId !== null && !this.rangeBlocked;
+    }
+
+    private setOwner(sectionId: string, componentId: string) {
+        if (this.sectionId !== sectionId) this.sectionId = sectionId;
+        if (this.componentId !== componentId) this.componentId = componentId;
+    }
+
+    private setActiveFormats(formats: TextFormats) {
+        if (!areSameFormats(this.activeFormats, formats)) {
+            this.activeFormats = { ...formats };
+        }
+    }
+
+    private dropPending() {
+        this.pending = null;
+        this.pendingCaretKey = null;
+    }
+
+    /**
+     * The selection of a text is only a caret. The formats are the ones the next typed character would inherit there.
+     * A pending format is dropped as soon as the caret is somewhere else
+     */
+    setCaret(sectionId: string, componentId: string, formats: TextFormats, caretKey: CaretKey) {
+        this.setOwner(sectionId, componentId);
+        if (this.selectionRange !== null) this.selectionRange = null;
+        if (this.rangeBlocked) this.rangeBlocked = false;
+
+        this.caretKey = caretKey;
+        this.caretFormats = { ...formats };
+
+        if (this.pending && areSameCaret(this.pendingCaretKey, caretKey)) return;
+        this.dropPending();
+        this.setActiveFormats(formats);
+    }
+
+    /** A fragment is marked in a text that cannot be formatted, as it is not in the document yet */
+    setBlockedRange(sectionId: string, componentId: string) {
+        this.setOwner(sectionId, componentId);
+        if (this.selectionRange !== null) this.selectionRange = null;
+        this.caretKey = null;
+        this.dropPending();
+        this.rangeBlocked = true;
+        this.setActiveFormats(NO_FORMATS);
     }
 
     setSelection(sectionId: string, componentId: string, selectionRange: { start: number, end: number, text: string }) {
-        this.sectionId = sectionId;
-        this.componentId = componentId;
-        this.selectionRange = selectionRange;
-        
+        this.setOwner(sectionId, componentId);
+        this.caretKey = null;
+        this.dropPending();
+        if (this.rangeBlocked) this.rangeBlocked = false;
+
+        const current = this.selectionRange;
+        if (!current || current.start !== selectionRange.start || current.end !== selectionRange.end || current.text !== selectionRange.text) {
+            this.selectionRange = selectionRange;
+        }
+
         // Compute active formats based on the selection
         const origValueObj = editStore.getComponentValue(sectionId, componentId);
         if (origValueObj && typeof origValueObj.type === 'string') {
@@ -81,18 +161,50 @@ export class TextFormatStore {
             finalBold = bold; finalItalic = italic; finalStrikethrough = strikethrough; finalUnderline = underline;
         }
 
-        this.activeFormats = {
+        this.setActiveFormats({
             bold: finalBold,
             italic: finalItalic,
             strikethrough: finalStrikethrough,
             underline: finalUnderline
-        };
+        });
     }
 
     clear() {
         this.sectionId = null;
         this.componentId = null;
         this.selectionRange = null;
+        this.rangeBlocked = false;
+        this.caretKey = null;
+        this.dropPending();
+    }
+
+    /**
+     * Toggles a format. With a marked fragment it is applied to it. With only a caret it becomes the pending format,
+     * so the characters typed next at this same caret get it
+     */
+    toggle(command: TextFormatCommand) {
+        if (!this.canFormat) return;
+
+        if (this.selectionRange) {
+            this.applyFormat(command);
+            return;
+        }
+
+        const next: TextFormats = { ...this.activeFormats, [command]: !this.activeFormats[command] };
+        this.activeFormats = next;
+
+        // Toggling back to what the caret already has leaves nothing pending
+        if (areSameFormats(next, this.caretFormats)) {
+            this.dropPending();
+        } else {
+            this.pending = { ...next };
+            this.pendingCaretKey = this.caretKey;
+        }
+    }
+
+    /** The pending format has been applied to what was typed, so from now on the formats follow the caret */
+    consumePending() {
+        this.dropPending();
     }
 
     applyFormat(command: TextFormatCommand) {
@@ -200,10 +312,7 @@ export class TextFormatStore {
         newText += afterText;
 
         // Clean up empty toggles
-        const emptyToggle = char + char;
-        while (newText.includes(emptyToggle)) {
-            newText = newText.replace(emptyToggle, '');
-        }
+        newText = removeEmptyToggles(newText, char);
 
         editStore.setComponentValue(this.sectionId, this.componentId, { type: 'string', value: newText });
 

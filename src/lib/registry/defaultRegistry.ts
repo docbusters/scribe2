@@ -34,19 +34,19 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
     };
 
     /**
-     * Option that toggles a format on the fragment of the text that is marked. It is disabled while no fragment is marked,
-     * and it shows as selected when the whole fragment already has the format
+     * Option that toggles a format. It acts on the text that holds the caret, which the store follows: it formats the marked
+     * fragment, or the characters typed next when there is only a caret. It shows as selected when the format is active there
      */
     function createTextFormatOption(command: TextFormatCommand, name: string, icon: string): ComponentEditOptions {
         return {
             type: `format-${command}`,
             name,
             group: groups.format,
-            isSelected: ({ sectionId, componentId }) => textFormatStore.hasSelection(sectionId, componentId) && textFormatStore.activeFormats[command],
-            isDisabled: ({ sectionId, componentId }) => !textFormatStore.hasSelection(sectionId, componentId),
+            isSelected: () => textFormatStore.componentId !== null && textFormatStore.activeFormats[command],
+            isDisabled: () => !textFormatStore.canFormat,
             props: {
                 icon,
-                onclick: () => textFormatStore.applyFormat(command),
+                onclick: () => textFormatStore.toggle(command),
             },
         };
     }
