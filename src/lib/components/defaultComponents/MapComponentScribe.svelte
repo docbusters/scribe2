@@ -93,7 +93,10 @@
     .map-container {
         flex: 1;
         overflow: hidden;
-        height: 400px;
+        /* The box of the block gives the height */
+        height: 100%;
+        min-height: 0;
+        min-width: 0;
         width: 100%;
         border-radius: var(--scribe-radius-2xl);
         padding: 0.5rem;

@@ -18,6 +18,8 @@ export interface InlineComponent<T extends string, V extends DataValue, P extend
 
 export interface BlockComponent<T extends string, V extends DataValue, P extends ComponentConfig | undefined = undefined> extends BaseComponent<T, V, P> {
     mode: 'block';
+    /** Height in px chosen by the user. Only used by components whose registry entry defines a height; otherwise its default is used */
+    height?: number;
 }
 
 /** Metadata attached to synthetic ghost placeholder components during editing */

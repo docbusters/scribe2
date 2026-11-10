@@ -228,11 +228,13 @@
         cursor: ns-resize;
     }
 
+    /* Inside the corner of the image: the container clips its content with a rounded corner, which would cut
+       a handle centred on the corner of the image */
     .resize-handle.bottom-right {
-        bottom: -5px;
-        right: -5px;
-        width: 10px;
-        height: 10px;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
         cursor: nwse-resize;
     }

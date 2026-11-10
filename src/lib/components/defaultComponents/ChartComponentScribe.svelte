@@ -17,6 +17,15 @@
 
 	const config = $derived(componentData.config);
 
+	// The arc chart is drawn in a semicircle, so it is as wide as twice its radius and as tall as its radius plus the legend.
+	// The radius follows the size of the box so the arc and its legend always fit in it
+	const ARC_LEGEND_SPACE = 56;
+	const ARC_RING_WIDTH = 20;
+	const ARC_RING_GAP = 10;
+	let wrapperWidth = $state(0);
+	let wrapperHeight = $state(0);
+	const arcRadius = $derived(Math.max(48, Math.min(wrapperWidth / 2, wrapperHeight - ARC_LEGEND_SPACE)));
+
 	const arrayValue = $derived(resolvedValue as ArrayValue<RecordValue<string, DataValue>>);
 
 	let chartData = $state<Record<string, unknown>[]>([]);
@@ -101,7 +110,7 @@
 				icon='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>' 
 			/>
 		{:else}
-			<div class="chart-wrapper">
+			<div class="chart-wrapper" bind:clientWidth={wrapperWidth} bind:clientHeight={wrapperHeight}>
                 {#key chartData}
                     
                     {#if config.type === 'bar'}
@@ -230,15 +239,15 @@
                                 color: undefined,
                                 data: chartData.map((d) => ({ [xKey]: d[xKey], value: d[s.key], _seriesKey: s.key })),
                                 props: {
-                                    outerRadius: 220 - i * 30,
-                                    innerRadius: 220 - i * 30 - 20
+                                    outerRadius: Math.max(ARC_RING_WIDTH, arcRadius - i * (ARC_RING_WIDTH + ARC_RING_GAP)),
+                                    innerRadius: Math.max(0, arcRadius - i * (ARC_RING_WIDTH + ARC_RING_GAP) - ARC_RING_WIDTH)
                                 }
                             }))}
                             range={[-90, 90]}
-                            outerRadius={220}
+                            outerRadius={arcRadius}
                             cornerRadius={10}
                             padAngle={0.02}
-                            props={{ group: { y: 220 / 2.25 }, pie: { motion: 'spring' } }}
+                            props={{ group: { y: arcRadius / 2.25 }, pie: { motion: 'spring' } }}
                             legend={{
                                 classes: {
                                     root: 'pie-chart-root',
@@ -283,6 +292,10 @@
 	.chart-container {
 		flex: 1;
 		width: 100%;
+		/* The box of the block gives the height: the chart fills it and nothing sticks out of it */
+		min-width: 0;
+		min-height: 0;
+		overflow: hidden;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -295,7 +308,8 @@
 	}
 	.chart-wrapper {
 		width: 100%;
-		height: 300px;
+		flex: 1;
+		min-height: 0;
 	}
 	:global(.scribe-chart-tooltip) {
 		font-family: var(--scribe-font-sans);

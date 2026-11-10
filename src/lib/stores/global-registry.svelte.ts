@@ -51,6 +51,15 @@ class GlobalRegistry {
         return comp.supportedBindingValueTypes || [];
     }
 
+    /** Height definition of a component, or null if the component is as tall as its content */
+    getComponentHeight(type: string) {
+        const comp = this.components[type];
+        if (!comp) {
+            throw new Error(`Component of type ${type} not found in registry`);
+        }
+        return comp.height ? { ...comp.height, isResizeable: !!comp.isResizeable } : null;
+    }
+
     getComponentOptions(type: string) {
         const comp = this.components[type];
         if (!comp) {

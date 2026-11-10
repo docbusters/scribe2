@@ -107,6 +107,7 @@ export interface Translations {
 	};
 	editor: {
 		emptySectionPlaceholder: string;
+		resizeHeight: string;
 	};
 	componentToolbar: {
 		pressEnter: string;

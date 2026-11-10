@@ -1,4 +1,4 @@
-import type { BaseComponent, ComponentConfig } from "../domain/components/Component.js";
+import type { BaseComponent, BlockComponent, ComponentConfig } from "../domain/components/Component.js";
 import type { CollectionValue, DataValue, PrimitiveValue, StringValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 import type { ParagraphSection, Section } from "../domain/Section.js";
@@ -271,6 +271,14 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const component = this.getComponent(sectionId, componentId);
         if (!component) return false;
         component.config = newConfig;
+        return true;
+    }
+
+    /** Sets the height in px of a block component. Returns false if the component is not found or is not a block */
+    setComponentHeight(sectionId: string, componentId: string, height: number) {
+        const component = this.getComponent(sectionId, componentId);
+        if (!component || component.mode !== 'block') return false;
+        (component as BlockComponent<string, DataValue, ComponentConfig | undefined>).height = height;
         return true;
     }
 

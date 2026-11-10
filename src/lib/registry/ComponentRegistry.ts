@@ -23,10 +23,25 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     isDarkMode: boolean;
 }
 
+/** Height in px of a block component: the one it has when inserted and the limits it can be resized between */
+export interface ComponentHeight {
+    default: number;
+    min: number;
+    max: number;
+}
+
+/**
+ * The height of a block component. With a height the block is a box of that height and its content must fill it.
+ * If it is resizeable the user can change the height of the selected block between min and max, so the height is required
+ */
+export type ComponentHeightDefinition =
+    | { isResizeable?: false; height?: ComponentHeight }
+    | { isResizeable: true; height: ComponentHeight };
+
 export type ComponentRegistry<
     TComponent extends BaseComponent<string, DataValue, ComponentConfig | undefined> = never
 > = {
-    [C in DefaultComponents | TComponent as C['type']]: {
+    [C in DefaultComponents | TComponent as C['type']]: ComponentHeightDefinition & {
         name: string;
         description: string;
         icon: string;

@@ -113,6 +113,68 @@
 
 	type AgnosticActionProps = ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>;
 
+	/* * BLOCK HEIGHT * */
+
+	const KEY_STEP = 10;
+	const KEY_STEP_LARGE = 50;
+
+	// A block whose registry entry defines a height is a box of that height, and its component fills it
+	let heightDefinition = $derived(componentData.mode === 'block' ? globalRegistry.getComponentHeight(componentData.type) : null);
+
+	// The height while the handle is being dragged, saved when it is released
+	let previewHeight = $state<number | null>(null);
+	let resizeStart: { y: number; height: number } | null = null;
+
+	function clampHeight(height: number) {
+		if (!heightDefinition) return height;
+		return Math.min(heightDefinition.max, Math.max(heightDefinition.min, Math.round(height)));
+	}
+
+	let blockHeight = $derived.by(() => {
+		if (!heightDefinition) return null;
+		const chosen = (componentData as { height?: number }).height;
+		return clampHeight(previewHeight ?? chosen ?? heightDefinition.default);
+	});
+
+	let canResize = $derived(mode === 'edit' && isSelected && !!heightDefinition?.isResizeable);
+
+	function startResize(event: PointerEvent) {
+		if (blockHeight === null) return;
+		// The handle is not part of the text or of the block: it must not move the caret or start a selection
+		event.preventDefault();
+		event.stopPropagation();
+		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+		resizeStart = { y: event.clientY, height: blockHeight };
+		previewHeight = blockHeight;
+	}
+
+	function moveResize(event: PointerEvent) {
+		if (!resizeStart) return;
+		previewHeight = clampHeight(resizeStart.height + event.clientY - resizeStart.y);
+	}
+
+	function endResize(event: PointerEvent) {
+		if (!resizeStart) return;
+		(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
+
+		const height = previewHeight;
+		resizeStart = null;
+		previewHeight = null;
+		if (height !== null) {
+			editStore.setComponentHeight(sectionId, componentData.id, height);
+		}
+	}
+
+	function handleResizeKeydown(event: KeyboardEvent) {
+		if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+		event.preventDefault();
+		event.stopPropagation();
+		if (blockHeight === null) return;
+
+		const step = event.shiftKey ? KEY_STEP_LARGE : KEY_STEP;
+		editStore.setComponentHeight(sectionId, componentData.id, clampHeight(blockHeight + (event.key === 'ArrowDown' ? step : -step)));
+	}
+
 	const mountComponent: Action<HTMLElement, AgnosticActionProps> = (node, props) => {
 		const componentDef = globalRegistry.getComponent(props.componentData.type);
 		const instanceData = componentDef.mount(node, props);
@@ -132,9 +194,18 @@
 	};
 </script>
 
+{#snippet mounted(resolved: { value: AgnosticActionProps['resolvedValue']; isBinding: boolean })}
+	<div
+		class="component-mount"
+		class:is-sized={blockHeight !== null}
+		style:height={blockHeight !== null ? `${blockHeight}px` : undefined}
+		use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolved.value, isBinding: resolved.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}
+	></div>
+{/snippet}
+
 {#if componentData}
 	{#await resolvedValue}
-		<Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
+		<Skeleton style="flex: 1; width: 100%; height: {blockHeight !== null ? `${blockHeight}px` : '100%'}; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
 	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -142,10 +213,31 @@
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
-				<div style="display: contents;" use:mountComponent={{ componentData,  sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
+				{@render mounted(resolvedValuePromise)}
+				{#if canResize && heightDefinition}
+					<!-- A focusable separator is a widget (the splitter pattern), so the tabindex is valid -->
+					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+					<div
+						role="separator"
+						aria-orientation="horizontal"
+						aria-label={i18n.t('editor.resizeHeight')}
+						aria-valuemin={heightDefinition.min}
+						aria-valuemax={heightDefinition.max}
+						aria-valuenow={blockHeight}
+						tabindex="0"
+						contenteditable="false"
+						class="component-resize-handle"
+						class:is-dragging={previewHeight !== null}
+						onpointerdown={startResize}
+						onpointermove={moveResize}
+						onpointerup={endResize}
+						onpointercancel={endResize}
+						onkeydown={handleResizeKeydown}
+					></div>
+				{/if}
 			</div>
 		{:else}
-			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
+			{@render mounted(resolvedValuePromise)}
 		{/if}
 	{:catch error}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -170,6 +262,45 @@
 	.component-edit-contents {
 		position: relative;
 		transition: background-color 0.2s ease;
+	}
+
+	.component-mount {
+		display: contents;
+	}
+
+	/* A block with a height is a box of that height. Its component fills it and whatever does not fit is cut off,
+	   so no content ever sticks out of the block */
+	.component-mount.is-sized {
+		display: flex;
+		width: 100%;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	/* Pill on the bottom edge of the selection ring, dragged to change the height of the block */
+	.component-resize-handle {
+		position: absolute;
+		left: 50%;
+		bottom: -8px;
+		z-index: 2;
+		width: 3rem;
+		height: 0.5rem;
+		transform: translateX(-50%);
+		border-radius: 999px;
+		background-color: var(--scribe-accent);
+		border: 1px solid var(--scribe-doc-background);
+		box-shadow: var(--scribe-shadow-sm);
+		cursor: ns-resize;
+		touch-action: none;
+		outline: none;
+		transition: transform 0.1s, box-shadow 0.2s;
+	}
+
+	.component-resize-handle:hover,
+	.component-resize-handle:focus-visible,
+	.component-resize-handle.is-dragging {
+		transform: translateX(-50%) scale(1.15);
+		box-shadow: var(--scribe-shadow-md);
 	}
 
 	.component-edit-contents.is-inline {
