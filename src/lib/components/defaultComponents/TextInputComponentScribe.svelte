@@ -72,6 +72,8 @@
         border: 1px solid color-mix(in srgb, var(--scribe-border-color) 50%, transparent);
         border-radius: var(--scribe-radius-md, 0.5em);
         min-width: 2.5rem;
+        /* As tall as a line of text, so a row with an input is not taller than a row without one */
+        height: 1lh;
         margin: 0 0.5rem;
         outline: none;
         transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);

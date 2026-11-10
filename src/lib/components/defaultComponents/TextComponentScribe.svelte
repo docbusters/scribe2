@@ -720,9 +720,14 @@
     .edit-text.is-empty {
         display: inline-block;
         min-width: 1ch;
-        min-height: 1em;
-        vertical-align: middle;
         cursor: text;
+    }
+
+    /* An empty inline-block has no line of its own, so its caret would not line up with the text around it and its height
+       would not match a line. A zero-width space (generated, so it is not part of the content) gives it one line, with the
+       baseline and height of the surrounding text. The other slots draw their own content or have their own height */
+    .edit-text.is-empty:not(.is-between-blocks):not(.is-section-placeholder)::before {
+        content: '\200b';
     }
 
     .edit-text.is-ghost {
