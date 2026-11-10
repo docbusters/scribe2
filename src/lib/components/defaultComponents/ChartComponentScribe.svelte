@@ -7,9 +7,12 @@
 	import { capitalizeStrings } from '$lib/utils/capitalizeStrings.js';
 	import { randomHexColor } from '$lib/utils/randomHexColor.js';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
 
 	let {
 		componentData,
+		sectionId,
+		mode,
 		resolvedValue,
 		updateComponentConfig
 	}: ScribeComponentProps<ChartComponent> = $props();
@@ -281,6 +284,7 @@
 		{/if}
 	{:else}
 		<EmptyContent
+			action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.setValue'))}
 			message={i18n.t('errors.chartMissingData')}
 			icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-chart-column&quot;><path d=&quot;M3 3v16a2 2 0 0 0 2 2h16&quot;/><path d=&quot;M18 17V9&quot;/><path d=&quot;M13 17V5&quot;/><path d=&quot;M8 17v-3&quot;/></svg>"
 			isError

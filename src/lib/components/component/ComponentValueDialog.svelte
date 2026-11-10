@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { type ComponentEditProps } from '$lib/registry/ComponentEditOptions.js';
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
-	import ComponentEditorButton from './ComponentEditorButton.svelte';
+	import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
 	import Dialog from '../utilComponents/Dialog.svelte';
 	import Button from '../utilComponents/Button.svelte';
 	import type { BindingValue, DataValue } from '$lib/domain/data/DataValue.js';
@@ -12,8 +11,8 @@
 	import ScrollArea from '../utilComponents/ScrollArea.svelte';
 	import DataTypeCard from '../utilComponents/DataTypeCard.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import { untrack } from 'svelte';
 
-	let props: ComponentEditProps = $props();
 	const i18n = getI18n();
 
 	interface ValueSourceOption {
@@ -25,8 +24,16 @@
 		description?: string;
 	}
 
+	/** The component being edited, or null when the dialog is closed or the component no longer exists */
+	const component = $derived.by(() => {
+		const target = valueDialogStore.target;
+		return target ? editStore.getComponent(target.sectionId, target.componentId) : null;
+	});
+
 	const supportedValues = $derived.by<ValueSourceOption[]>(() => {
-		const baseValues = globalRegistry.getComponentValueTypes(props.componentType);
+		if (!component) return [];
+
+		const baseValues = globalRegistry.getComponentValueTypes(component.type);
 		const options: ValueSourceOption[] = [];
 		for (const type of baseValues) {
 			// NOTE: We use stringified values in order to know the binding type
@@ -40,7 +47,7 @@
 					description: i18n.t('types.bindingDefaultDesc')
 				});
 				const customBindings = customBindingsStore.getBindingsList();
-				const supportedBindingTypes = globalRegistry.getComponentSupportedBindingValueTypes(props.componentType);
+				const supportedBindingTypes = globalRegistry.getComponentSupportedBindingValueTypes(component.type);
 				for (const cb of customBindings) {
 					const availableIds = customBindingsStore.getAvailableIds(cb.type, supportedBindingTypes);
 					const hasSupportedValues = availableIds.length === 0 || availableIds.some(item => !item.disabled);
@@ -87,7 +94,6 @@
 		return options;
 	});
 
-	let open = $state(false);
 	let valueType = $state<string>();
 	let value = $state<DataValue['value']>();
 
@@ -98,6 +104,30 @@
 		} catch {
 			return null;
 		}
+	});
+
+	// Loads the value of the component every time the dialog is opened for one
+	$effect(() => {
+		const target = valueDialogStore.target;
+		if (!target) return;
+
+		untrack(() => {
+			const current = editStore.getComponent(target.sectionId, target.componentId);
+			if (!current) {
+				valueDialogStore.close();
+				return;
+			}
+
+			if (current.value.type === 'binding') {
+				const bv = current.value as BindingValue;
+				valueType = JSON.stringify({ type: 'binding', bindingType: bv.bindingType || 'default' });
+				value = bv.value;
+			} else {
+				valueType = JSON.stringify({ type: current.value.type });
+				// We must deep clone the value in order to avoid mofifying the original data while editing
+				value = $state.snapshot(current.value.value);
+			}
+		});
 	});
 
 	function handleSelectValueType(newValType: string) {
@@ -124,7 +154,8 @@
 	}
 
 	function handleSetValue() {
-		if (!parsedValueType || value === undefined) return;
+		const target = valueDialogStore.target;
+		if (!target || !parsedValueType || value === undefined) return;
 		if (parsedValueType.type === 'empty') {
 			value = undefined;
 		}
@@ -133,101 +164,83 @@
 
 		if (parsedValueType.type === 'binding') {
 
-			parsedValue = { 
-				type: 'binding', 
-				bindingType: parsedValueType.bindingType, 
-				value: $state.snapshot(value) as string, 
+			parsedValue = {
+				type: 'binding',
+				bindingType: parsedValueType.bindingType,
+				value: $state.snapshot(value) as string,
 			} as BindingValue;
 		} else {
-			
+
 			parsedValue = { type: parsedValueType.type as DataValue['type'], value: $state.snapshot(value) } as DataValue;
 			if (parsedValueType.type === 'number') {
 				parsedValue.value = Number($state.snapshot(value));
-			} 
+			}
 		}
 
-		editStore.setComponentValue(props.sectionId, props.componentId, parsedValue);
-		open = false;
+		editStore.setComponentValue(target.sectionId, target.componentId, parsedValue);
+		valueDialogStore.close();
 	}
 </script>
 
-<ComponentEditorButton
-	icon={props.icon}
-	name={props.name}
-	label={props.label}
-	disabled={props.disabled}
-	onclick={() => {
-		if (props.componentValue.type === 'binding') {
-			const bv = props.componentValue as BindingValue;
-			valueType = JSON.stringify({ type: 'binding', bindingType: bv.bindingType || 'default' });
-			value = bv.value;
-		} else {
-			valueType = JSON.stringify({ type: props.componentValue.type });
-			// We must deep clone the value in order to avoid mofifying the original data while editing
-			value = $state.snapshot(props.componentValue.value);
-		}
-		open = true;
-	}}
-	isSelected={props.isSelected}
-/>
-
-<Dialog bind:open title={i18n.t('valueSelector.typeTitle')}>
-	<div class="value-selector-container">
-		<div class="config-section">
-			<div class="section-header">
-				<div class="title-with-icon">
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-					<h5>{i18n.t('valueSelector.typeTitle')}</h5>
-				</div>
-				<p class="section-desc">{i18n.t('valueSelector.typeDesc')}</p>
-			</div>
-			
-			<div class="sources-grid">
-				{#each supportedValues as option (option.value)}
-					<DataTypeCard
-						type={option.type}
-						bindingType={option.bindingType}
-						category={option.category}
-						label={option.label}
-						description={option.description}
-						selected={valueType === option.value}
-						onclick={() => handleSelectValueType(option.value)}
-					/>
-				{/each}
-			</div>
-		</div>
-
-		{#if parsedValueType}
-			<Divider />
-			
+<Dialog bind:open={() => valueDialogStore.isOpen, (isOpen) => { if (!isOpen) valueDialogStore.close(); }} title={i18n.t('valueSelector.typeTitle')}>
+	{#if component}
+		<div class="value-selector-container">
 			<div class="config-section">
 				<div class="section-header">
 					<div class="title-with-icon">
-						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-						<h5>{i18n.t('valueSelector.configTitle')}</h5>
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+						<h5>{i18n.t('valueSelector.typeTitle')}</h5>
 					</div>
-					<p class="section-desc">{i18n.t('valueSelector.configDesc')}</p>
+					<p class="section-desc">{i18n.t('valueSelector.typeDesc')}</p>
 				</div>
-				
-				<ScrollArea
-					orientation="vertical"
-					class="value-config-scrollarea"
-					viewportClasses="value-config-viewport"
-				>
-					<div class={parsedValueType.type === 'record' || parsedValueType.type === 'array' ? 'value-input-card' : 'input-wrapper'}>
-						<ComponentEditorValue
-							{parsedValueType}
-							bind:value={value}
-							componentType={props.componentType}
+
+				<div class="sources-grid">
+					{#each supportedValues as option (option.value)}
+						<DataTypeCard
+							type={option.type}
+							bindingType={option.bindingType}
+							category={option.category}
+							label={option.label}
+							description={option.description}
+							selected={valueType === option.value}
+							onclick={() => handleSelectValueType(option.value)}
 						/>
-					</div>
-				</ScrollArea>
+					{/each}
+				</div>
 			</div>
-		{/if}
-	</div>
+
+			{#if parsedValueType}
+				<Divider />
+
+				<div class="config-section">
+					<div class="section-header">
+						<div class="title-with-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+							<h5>{i18n.t('valueSelector.configTitle')}</h5>
+						</div>
+						<p class="section-desc">{i18n.t('valueSelector.configDesc')}</p>
+					</div>
+
+					<ScrollArea
+						orientation="vertical"
+						class="value-config-scrollarea"
+						viewportClasses="value-config-viewport"
+					>
+						<div class={parsedValueType.type === 'record' || parsedValueType.type === 'array' ? 'value-input-card' : 'input-wrapper'}>
+							<ComponentEditorValue
+								{parsedValueType}
+								bind:value={value}
+								componentType={component.type}
+							/>
+						</div>
+					</ScrollArea>
+				</div>
+			{/if}
+		</div>
+	{/if}
 
 	{#snippet footer()}
-		<Button variant="ghost" onclick={() => (open = false)}>{i18n.t('common.cancel')}</Button>
+		<Button variant="ghost" onclick={() => valueDialogStore.close()}>{i18n.t('common.cancel')}</Button>
 		<Button onclick={handleSetValue}>{i18n.t('common.apply')}</Button>
 	{/snippet}
 </Dialog>

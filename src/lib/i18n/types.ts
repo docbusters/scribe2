@@ -105,6 +105,10 @@ export interface Translations {
 		duplicate: string;
 		delete: string;
 	};
+	emptyContent: {
+		setValue: string;
+		changeValue: string;
+	};
 	editor: {
 		emptySectionPlaceholder: string;
 		resizeHeight: string;

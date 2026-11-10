@@ -17,6 +17,7 @@
 	import { bindingStore } from "$lib/stores/binding-store.svelte.js";
 	import { editStore } from "$lib/stores/edit-store.svelte.js";
 	import { selectionStore } from "$lib/stores/selection-store.svelte.js";
+	import { valueDialogStore } from "$lib/stores/value-dialog-store.svelte.js";
 	import { globalRegistry } from "$lib/stores/global-registry.svelte.js";
 	import type { ComponentRendererProps } from "$lib/types/CustomRendererProps.js";
 	import type { UpdateType } from "$lib/types/ScribeProps.js";
@@ -245,8 +246,9 @@
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
-				<EmptyContent 
-					message={i18n.t('errors.componentError')} 
+				<EmptyContent
+					action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.changeValue'))}
+					message={i18n.t('errors.componentError')}
 					description={error.message} 
 					icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-triangle-alert&quot;><path d=&quot;m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3&quot;/><path d=&quot;M12 9v4&quot;/><path d=&quot;M12 17h.01&quot;/></svg>" 
 					isError={true} 

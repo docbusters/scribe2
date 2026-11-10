@@ -1,9 +1,8 @@
-import ComponentEditorValueSelector from "$lib/components/component/ComponentEditorValueSelector.svelte";
 import type { ComponentConfig } from "$lib/domain/components/Component.js";
 import type { DataValue } from "$lib/domain/data/DataValue.js";
 import { editStore } from "$lib/stores/edit-store.svelte.js";
 import { toolbarStore, type ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
-import { mount, unmount } from "svelte";
+import { valueDialogStore } from "$lib/stores/value-dialog-store.svelte.js";
 
 export interface ComponentEditOnClick {
     event: MouseEvent;
@@ -117,17 +116,11 @@ export const deleteComponentOption: ComponentEditOptions = {
 export const setValueOption: ComponentEditOptions = {
     type: 'setValue',
     name: 'Set value',
-    render: (container, props) => {
-        const app = mount(ComponentEditorValueSelector, {
-            target: container,
-            props,
-        });
-        return () => {
-            unmount(app);
-        };
-    },
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>',
+        onclick: (data: ComponentEditOnClick) => {
+            valueDialogStore.open(data.sectionId, data.componentId);
+        }
     }
 };
 

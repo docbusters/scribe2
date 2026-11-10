@@ -6,8 +6,9 @@
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
 	import { fade } from 'svelte/transition';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
 
-    let { componentData, resolvedValue }: ScribeComponentProps<LatexComponent> = $props();
+    let { componentData, sectionId, mode, resolvedValue }: ScribeComponentProps<LatexComponent> = $props();
     const i18n = getI18n();
 
 
@@ -42,7 +43,8 @@
                     {@html rendered}
                 </div>
             {:else}
-                <EmptyContent 
+                <EmptyContent
+                    action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.changeValue'))}
                     message={config?.errorText || i18n.t('errors.latexUnrecognised')}
                     icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;error-svg lucide lucide-calculator-icon lucide-calculator&quot;><rect width=&quot;16&quot; height=&quot;20&quot; x=&quot;4&quot; y=&quot;2&quot; rx=&quot;2&quot;/><line x1=&quot;8&quot; x2=&quot;16&quot; y1=&quot;6&quot; y2=&quot;6&quot;/><line x1=&quot;16&quot; x2=&quot;16&quot; y1=&quot;14&quot; y2=&quot;18&quot;/><path d=&quot;M16 10h.01&quot;/><path d=&quot;M12 10h.01&quot;/><path d=&quot;M8 10h.01&quot;/><path d=&quot;M12 14h.01&quot;/><path d=&quot;M8 14h.01&quot;/><path d=&quot;M12 18h.01&quot;/><path d=&quot;M8 18h.01&quot;/></svg>"
                     valueStyle="font-family: var(--scribe-font-mono);"
@@ -51,7 +53,8 @@
                 />
             {/if}
         {:else}
-            <EmptyContent 
+            <EmptyContent
+                action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.setValue'))}
                 message={config?.emptyText || i18n.t('errors.latexEmpty')}
                 icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;error-svg lucide lucide-calculator-icon lucide-calculator&quot;><rect width=&quot;16&quot; height=&quot;20&quot; x=&quot;4&quot; y=&quot;2&quot; rx=&quot;2&quot;/><line x1=&quot;8&quot; x2=&quot;16&quot; y1=&quot;6&quot; y2=&quot;6&quot;/><line x1=&quot;16&quot; x2=&quot;16&quot; y1=&quot;14&quot; y2=&quot;18&quot;/><path d=&quot;M16 10h.01&quot;/><path d=&quot;M12 10h.01&quot;/><path d=&quot;M8 10h.01&quot;/><path d=&quot;M12 14h.01&quot;/><path d=&quot;M8 14h.01&quot;/><path d=&quot;M12 18h.01&quot;/><path d=&quot;M8 18h.01&quot;/></svg>"
             />

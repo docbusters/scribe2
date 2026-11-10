@@ -105,6 +105,10 @@ export const en: Translations = {
 		duplicate: 'Duplicate section',
 		delete: 'Delete section'
 	},
+	emptyContent: {
+		setValue: 'Set value',
+		changeValue: 'Change value'
+	},
 	editor: {
 		emptySectionPlaceholder: 'Start typing, or press Ctrl + Space to add a component',
 		resizeHeight: 'Resize height'

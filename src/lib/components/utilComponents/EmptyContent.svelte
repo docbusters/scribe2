@@ -8,20 +8,22 @@
             icon: { type: 'String' },
             isError: { type: 'Boolean' },
             valueStyle: { type: 'String' },
-            style: { type: 'String' }
+            style: { type: 'String' },
+            action: { type: 'Object' }
         }
     }}
 />
 
 <script lang="ts">
 	import type { EmptyContentProps } from "$lib/types/EmptyContentProps.js";
+	import Button from "./Button.svelte";
 
     /* eslint-disable svelte/no-at-html-tags */
-    let { message, description, icon, isError = false, valueStyle, style }: EmptyContentProps = $props();
+    let { message, description, icon, isError = false, valueStyle, style, action }: EmptyContentProps = $props();
 
 </script>
 
-<div class="empty-container" style={style}>
+<div class="empty-container" class:has-action={!!action} style={style}>
     {#if icon}
         <div class={`icon ${isError ? 'icon-error' : ''}`}>
             {@html icon}
@@ -34,6 +36,11 @@
         <span style={valueStyle} class="value">
             {description}
         </span>
+    {/if}
+    {#if action}
+        <div class="action">
+            <Button size="sm" style="border-radius: 50px; padding: 0 1.25rem; font-size: var(--scribe-font-size-sm);" onclick={() => action.onclick()}>{action.label}</Button>
+        </div>
     {/if}
 </div>
 
@@ -53,6 +60,16 @@
         border-radius: var(--scribe-radius-2xl);
         background-color: var(--scribe-section-background);
         flex: 1;
+    }
+
+    /* The button needs room around it; a style given by the component still wins as it is inline */
+    .empty-container.has-action {
+        padding-block: 1.75rem;
+    }
+
+    /* On top of the gap of the card, so the button is clearly set apart from the message */
+    .action {
+        margin-top: 0.75rem;
     }
 
     .icon {

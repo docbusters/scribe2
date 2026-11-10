@@ -39,6 +39,7 @@
 	import Button from './utilComponents/Button.svelte';
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
+	import ComponentValueDialog from './component/ComponentValueDialog.svelte';
 	import TopToolbar from './toolbar/TopToolbar.svelte';
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
@@ -303,6 +304,7 @@
 			<BindingsFloatingPanel floating={true} />
 		{/if}
 		<ComponentToolbar />
+		<ComponentValueDialog />
 	{/if}
 	<div bind:this={portalTarget} class="scribe-portal-target"></div>
 </div>
