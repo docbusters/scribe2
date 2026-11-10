@@ -525,32 +525,126 @@
         tail.setEnd(element, element.childNodes.length);
         const tailContent = tail.extractContents();
 
-        const textNode = document.createTextNode(text);
-        let inserted: Node = textNode;
+        const content = createTextNodes(text);
+        const lastNode = content.lastChild;
+        let inserted: Node = content;
         if (FORMAT_KEYS.some(key => formats[key])) {
             const span = document.createElement('span');
             for (const key of FORMAT_KEYS) {
                 if (formats[key]) span.classList.add(FORMAT_CLASSES[key]);
             }
-            span.append(textNode);
+            span.append(content);
             inserted = span;
         }
         element.append(inserted, tailContent);
 
         // Splitting at the edge of a span leaves an empty clone of it
-        for (const child of Array.from(element.children)) {
-            if (child !== inserted && child.tagName === 'SPAN' && child.textContent === '' && !child.querySelector('br')) {
-                child.remove();
-            }
-        }
+        removeEmptySpans(element, inserted);
 
         if (inserted instanceof HTMLElement) {
             mergeWithSameFormat(inserted);
         }
 
-        selection.collapse(textNode, textNode.length);
+        if (lastNode) collapseAfter(selection, lastNode);
         isEmpty = false;
         isDirty = true;
+    }
+
+    /** The nodes of a text: its characters and a line break (<br>) for each newline, as the editable shows them */
+    function createTextNodes(text: string): DocumentFragment {
+        const fragment = document.createDocumentFragment();
+        text.split('\n').forEach((line, index) => {
+            if (index > 0) fragment.append(document.createElement('br'));
+            if (line) fragment.append(document.createTextNode(line));
+        });
+        return fragment;
+    }
+
+    /** Puts the caret right after a node that has just been inserted */
+    function collapseAfter(selection: Selection, node: Node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            selection.collapse(node, node.textContent?.length ?? 0);
+        } else if (node.parentNode) {
+            selection.collapse(node.parentNode, Array.from(node.parentNode.childNodes).indexOf(node as ChildNode) + 1);
+        }
+    }
+
+    /** Removes the formatted spans that have no content left, as they would be saved as empty toggles */
+    function removeEmptySpans(element: HTMLElement, except?: Node) {
+        for (const child of Array.from(element.children)) {
+            if (child !== except && child.tagName === 'SPAN' && child.textContent === '' && !child.querySelector('br')) {
+                child.remove();
+            }
+        }
+    }
+
+    /**
+     * Inserts pasted or dropped text at a place of the editable, replacing what that place marks. Only plain text gets here,
+     * so the text takes the format of where it lands (or the pending format), like typed text
+     */
+    function insertPlainText(text: string, target: Range) {
+        if (!textDiv) return;
+        const selection = getSelection(textDiv);
+        if (!selection) return;
+
+        // An empty editable only holds the filler line break of browsers, which would end up after the inserted text
+        if (isEditableEmpty(textDiv)) {
+            textDiv.querySelectorAll('br').forEach(br => br.remove());
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(target);
+        const range = selection.getRangeAt(0);
+        if (!range.collapsed) {
+            range.deleteContents();
+            removeEmptySpans(textDiv);
+        }
+
+        const pending = textFormatStore.componentId === componentData.id ? textFormatStore.pending : null;
+        if (pending) {
+            insertFormattedText(textDiv, selection, text, pending);
+            textFormatStore.consumePending();
+            return;
+        }
+
+        const content = createTextNodes(text);
+        const lastNode = content.lastChild;
+        range.insertNode(content);
+        if (lastNode) collapseAfter(selection, lastNode);
+        isEmpty = false;
+        isDirty = true;
+    }
+
+    /**
+     * Pasting and dropping only insert the plain text of what comes: images, files and HTML are ignored, as they are not
+     * part of a text. The place is where the browser says it would insert, or the selection when it does not say
+     */
+    function handlePlainTextInsertion(event: InputEvent) {
+        if (!textDiv) return;
+        const text = (event.dataTransfer?.getData('text/plain') ?? '').replace(/\r\n?/g, '\n');
+        if (!text) return;
+
+        const selection = getSelection(textDiv);
+        const staticRange = event.getTargetRanges()[0];
+        const range = document.createRange();
+
+        if (staticRange && textDiv.contains(staticRange.startContainer) && textDiv.contains(staticRange.endContainer)) {
+            range.setStart(staticRange.startContainer, staticRange.startOffset);
+            range.setEnd(staticRange.endContainer, staticRange.endOffset);
+        } else if (selection && selection.rangeCount > 0 && textDiv.contains(selection.anchorNode)) {
+            const current = selection.getRangeAt(0);
+            range.setStart(current.startContainer, current.startOffset);
+            range.setEnd(current.endContainer, current.endOffset);
+        } else {
+            return;
+        }
+
+        insertPlainText(text, range);
+    }
+
+    /** Dropped files would be opened by the browser or inserted as images, and neither belongs in a text */
+    function handleDrop(event: DragEvent) {
+        if (event.dataTransfer?.files.length) event.preventDefault();
     }
 
     /** Joins a formatted span with the spans next to it that have exactly its format, so the saved text has no redundant toggles */
@@ -573,6 +667,12 @@
     }
 
     function handleBeforeInput(event: InputEvent) {
+        if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrop') {
+            event.preventDefault();
+            handlePlainTextInsertion(event);
+            return;
+        }
+
         const pending = textFormatStore.componentId === componentData.id ? textFormatStore.pending : null;
         if (!pending || event.inputType !== 'insertText' || !event.data || !textDiv) return;
 
@@ -690,6 +790,7 @@
         onfocus={mode === 'edit' ? handleFocus : undefined}
         onblur={handleTextChange} 
         onbeforeinput={mode === 'edit' ? handleBeforeInput : undefined}
+        ondrop={mode === 'edit' ? handleDrop : undefined}
         oninput={handleInput}
         onkeydown={mode === 'edit' ? handleKeyDown : undefined}
     >
