@@ -120,9 +120,16 @@ export interface Translations {
 			controls: string;
 			layout: string;
 			chartType: string;
+			format: string;
 			options: string;
 		};
 		configureLabel: string;
+	};
+	textFormat: {
+		bold: string;
+		italic: string;
+		underline: string;
+		strikethrough: string;
 	};
 	components: {
 		'text-binding': {

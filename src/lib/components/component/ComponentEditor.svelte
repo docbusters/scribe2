@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
-	import { defaultComponentOptions, type ComponentEditOptions, type BaseComponentEditOptions } from "$lib/registry/ComponentEditOptions.js";
+	import { defaultComponentOptions, type ComponentEditOptions, type BaseComponentEditOptions, type ComponentEditOptionContext } from "$lib/registry/ComponentEditOptions.js";
 	import ComponentEditorButton from "./ComponentEditorButton.svelte";
     import { mount, unmount } from "svelte";
 	import type { DataValue } from "$lib/domain/data/DataValue.js";
@@ -63,23 +63,27 @@
 		const texts = getOptionTexts(option);
 		// Only the ribbon draws large buttons, so the label is not passed to the floating toolbar
 		const label = isRibbon ? texts.label : undefined;
-		const isOptionDisabled = disabled || disabledOptions.includes(option.type);
-		const isSelected = option.isSelected ? option.isSelected({ value: componentValue, config: componentConfig }) : false;
+
+		// The state of the option is read through getters when it is rendered, not once here. This way the buttons
+		// follow the component value and the stores read by the option without mounting every option again
+		const getContext = (): ComponentEditOptionContext => ({ sectionId, componentId, value: componentValue, config: componentConfig });
+		const isOptionDisabled = () => disabled || disabledOptions.includes(option.type) || (option.isDisabled?.(getContext()) ?? false);
+		const isOptionSelected = () => option.isSelected?.(getContext()) ?? false;
 
 		// If a custom render function is provided, use it to render the option
 		if (option.render) {
 			return option.render(target, {
-				componentType,
-				componentValue,
-				sectionId,
-				componentId,
-				disabled: isOptionDisabled,
+				get componentType() { return componentType; },
+				get componentValue() { return componentValue; },
+				get sectionId() { return sectionId; },
+				get componentId() { return componentId; },
+				get disabled() { return isOptionDisabled(); },
 				name: texts.name,
 				label,
 				onclick: option.props.onclick,
 				icon: option.props.icon,
-				isBinding,
-				isSelected
+				get isBinding() { return isBinding; },
+				get isSelected() { return isOptionSelected(); }
 			}) ?? undefined;
 		}
 
@@ -88,12 +92,12 @@
 		const app = mount(ComponentEditorButton, {
 			target,
 			props: {
-				disabled: isOptionDisabled,
+				get disabled() { return isOptionDisabled(); },
 				name: texts.name,
 				label,
 				onclick: (e) => option.props!.onclick?.({ event: e, sectionId, componentId, insertion: getInsertion?.() ?? undefined }),
 				icon: option.props.icon,
-				isSelected,
+				get isSelected() { return isOptionSelected(); },
 				...sizeProps
 			}
 		});

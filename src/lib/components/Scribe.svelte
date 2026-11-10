@@ -39,7 +39,6 @@
 	import { selectionStore } from '../stores/selection-store.svelte.js';
 	import Button from './utilComponents/Button.svelte';
 	import { parseStringForContentEditable } from '../utils/parseStringForContentEditable.js';
-	import TextFormatToolbar from './utilComponents/TextFormatToolbar.svelte';
 	import ComponentToolbar from './component/ComponentToolbar.svelte';
 	import TopToolbar from './toolbar/TopToolbar.svelte';
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
@@ -305,7 +304,6 @@
 			<BindingsFloatingPanel floating={true} />
 		{/if}
 		<ComponentToolbar />
-		<TextFormatToolbar />
 	{/if}
 	<div bind:this={portalTarget} class="scribe-portal-target"></div>
 </div>

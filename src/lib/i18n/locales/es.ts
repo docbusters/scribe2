@@ -120,9 +120,16 @@ export const es: Translations = {
 			controls: 'Controles',
 			layout: 'Diseño',
 			chartType: 'Tipo de gráfico',
+			format: 'Formato',
 			options: 'Opciones'
 		},
 		configureLabel: 'Configurar'
+	},
+	textFormat: {
+		bold: 'Negrita',
+		italic: 'Cursiva',
+		underline: 'Subrayado',
+		strikethrough: 'Tachado'
 	},
 	components: {
 		'text-binding': {

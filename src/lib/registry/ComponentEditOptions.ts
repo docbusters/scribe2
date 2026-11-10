@@ -28,6 +28,14 @@ export interface ComponentEditProps {
     isSelected: boolean;
 }
 
+/** What an option knows about the component it acts on, to decide whether it is selected or disabled */
+export interface ComponentEditOptionContext {
+    sectionId: string;
+    componentId: string;
+    value: DataValue;
+    config: ComponentConfig | undefined;
+}
+
 export type ComponentEditOptions = BaseComponentEditOptions | SeparatorEditOption;
 
 export interface BaseComponentEditOptions {
@@ -37,8 +45,13 @@ export interface BaseComponentEditOptions {
     label?: string;
     /** Only used by the top toolbar. Title of the group the option belongs to. Options sharing a group are drawn together, even when they are not consecutive */
     group?: string;
-    /** Function to determine if the option is selected. If not provided, the option will not be considered selected. */
-    isSelected?: (data: { value: DataValue; config: ComponentConfig | undefined }) => boolean;
+    /**
+     * Function to determine if the option is selected. If not provided, the option will not be considered selected.
+     * It is evaluated reactively, so it can read stores and the buttons follow them without being mounted again
+     */
+    isSelected?: (data: ComponentEditOptionContext) => boolean;
+    /** Function to determine if the option is disabled, on top of the disabled options of the component. Evaluated reactively like isSelected */
+    isDisabled?: (data: ComponentEditOptionContext) => boolean;
     /** Framework-agnostic render function to render custom HTML/elements. Can return a cleanup function */
     render?: (container: HTMLElement, data: ComponentEditProps) => (() => void) | void;
     /** Props passed to the default button or custom render function */

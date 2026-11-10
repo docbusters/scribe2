@@ -6,8 +6,9 @@ import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, Tabl
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
-import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick } from './ComponentEditOptions.js';
+import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick, type ComponentEditOptions } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
+import { textFormatStore, type TextFormatCommand } from '$lib/stores/text-format-store.svelte.js';
 import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
@@ -29,7 +30,26 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         chartType: i18n.t('topToolbar.groups.chartType'),
         // Same group as the default "set value" option, so both buttons are drawn together
         data: i18n.t('topToolbar.groups.data'),
+        format: i18n.t('topToolbar.groups.format'),
     };
+
+    /**
+     * Option that toggles a format on the fragment of the text that is marked. It is disabled while no fragment is marked,
+     * and it shows as selected when the whole fragment already has the format
+     */
+    function createTextFormatOption(command: TextFormatCommand, name: string, icon: string): ComponentEditOptions {
+        return {
+            type: `format-${command}`,
+            name,
+            group: groups.format,
+            isSelected: ({ sectionId, componentId }) => textFormatStore.hasSelection(sectionId, componentId) && textFormatStore.activeFormats[command],
+            isDisabled: ({ sectionId, componentId }) => !textFormatStore.hasSelection(sectionId, componentId),
+            props: {
+                icon,
+                onclick: () => textFormatStore.applyFormat(command),
+            },
+        };
+    }
 
     return {
     'text-binding': {
@@ -56,6 +76,14 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             value: 'string',
         },
         valueTypes: ['empty', 'string'],
+        options: [
+            ...defaultComponentOptions,
+            { type: 'separator' },
+            createTextFormatOption('bold', i18n.t('textFormat.bold'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold-icon lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>'),
+            createTextFormatOption('italic', i18n.t('textFormat.italic'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic-icon lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>'),
+            createTextFormatOption('underline', i18n.t('textFormat.underline'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline-icon lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>'),
+            createTextFormatOption('strikethrough', i18n.t('textFormat.strikethrough'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-strikethrough-icon lucide-strikethrough"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" x2="20" y1="12" y2="12"/></svg>'),
+        ],
     },
     'text-input': {
         name: i18n.t('components.text-input.name'),

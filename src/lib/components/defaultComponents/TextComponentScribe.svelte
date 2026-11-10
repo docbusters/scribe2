@@ -8,7 +8,7 @@
 	import { selectionStore } from '../../stores/selection-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
-	import { textFormatToolbarStore } from '../../stores/text-format-toolbar-store.svelte.ts';
+	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
 	import { getI18n } from '../../i18n/i18n.svelte.js';
@@ -379,18 +379,18 @@
     }
 
     function handleSelectionChange(event?: Event) {
-        // Every text component listens to the document: leave early unless this one owns the selection or the toolbar
+        // Every text component listens to the document: leave early unless this one owns the selection or the format state
         const currentSelection = getSelection(textDiv);
         const isSelectionInside = !!textDiv && !!currentSelection && currentSelection.rangeCount > 0
             && !currentSelection.isCollapsed && textDiv.contains(currentSelection.anchorNode);
-        if (!isSelectionInside && textFormatToolbarStore.componentId !== componentData.id) {
+        if (!isSelectionInside && textFormatStore.componentId !== componentData.id) {
             return;
         }
 
-        // If the event is triggered by a click inside the toolbar, we ignore it to prevent the toolbar from closing immediately after opening
+        // A click on a toolbar button must keep the marked fragment, as the button acts on it
         if (event && typeof event.composedPath === 'function') {
             const path = event.composedPath();
-            const insideToolbar = path.some(el => el instanceof HTMLElement && (el.matches('.text-toolbar-container') || el.closest('.text-toolbar-container')));
+            const insideToolbar = path.some(el => el instanceof HTMLElement && el.matches('.scribe-top-toolbar, .component-editor-container'));
             if (insideToolbar) {
                 return;
             }
@@ -398,8 +398,8 @@
 
         const selection = getSelection(textDiv);
         if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-            if (textFormatToolbarStore.componentId === componentData.id) {
-                textFormatToolbarStore.close();
+            if (textFormatStore.componentId === componentData.id) {
+                textFormatStore.clear();
             }
             return;
         }
@@ -417,18 +417,11 @@
             const selectedText = range.toString();
             const endIndex = startIndex + selectedText.length;
             
-            // Get the position of the start of the selection to position the toolbar
-            const startRange = range.cloneRange();
-            startRange.collapse(true);
-            const rect = startRange.getBoundingClientRect();
-
-            // Obtain the position to display the toolbar
-            const selectionRange = {
+            textFormatStore.setSelection(sectionId, componentData.id, {
                 start: startIndex,
                 end: endIndex,
                 text: selectedText
-            }
-            textFormatToolbarStore.open(rect.x + window.scrollX, rect.top + window.scrollY, sectionId, componentData.id, selectionRange);
+            });
         }
     }
 
@@ -507,9 +500,16 @@
     }
 
     $effect(() => {
-        // When value changes and textDiv is recreated, we restore the selection if the toolbar is still open for this component
-        if (textDiv && textFormatToolbarStore.isOpen && textFormatToolbarStore.componentId === componentData.id && textFormatToolbarStore.selectionRange) {
-            restoreSelection(textDiv, textFormatToolbarStore.selectionRange.start, textFormatToolbarStore.selectionRange.end);
+        // When value changes and textDiv is recreated, we restore the selection if a fragment of this component is still marked
+        if (textDiv && textFormatStore.selectionRange && textFormatStore.hasSelection(sectionId, componentData.id)) {
+            restoreSelection(textDiv, textFormatStore.selectionRange.start, textFormatStore.selectionRange.end);
+        }
+    });
+
+    // A text that is destroyed (for example deleted) must not leave a marked fragment behind
+    $effect(() => () => {
+        if (textFormatStore.componentId === componentData.id) {
+            textFormatStore.clear();
         }
     });
 </script>

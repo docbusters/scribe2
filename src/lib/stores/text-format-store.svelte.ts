@@ -4,9 +4,8 @@ import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../c
 
 export type TextFormatCommand = 'bold' | 'italic' | 'underline' | 'strikethrough';
 
-export class TextFormatToolbarStore {
-    isOpen = $state(false);
-    position = $state({ x: 0, y: 0 });
+/** Tracks the fragment of a text that is marked, so the format options of the toolbars know what they act on */
+export class TextFormatStore {
     sectionId = $state<string | null>(null);
     componentId = $state<string | null>(null);
     selectionRange = $state<{ start: number, end: number, text: string } | null>(null);
@@ -17,8 +16,15 @@ export class TextFormatToolbarStore {
         underline: false
     });
 
-    open(x: number, y: number, sectionId: string, componentId: string, selectionRange: { start: number, end: number, text: string }) {
-        this.position = { x, y };
+    /** Whether a fragment of the given text is marked. A caret without a range is not a selection */
+    hasSelection(sectionId: string, componentId: string): boolean {
+        return this.selectionRange !== null
+            && this.selectionRange.end > this.selectionRange.start
+            && this.sectionId === sectionId
+            && this.componentId === componentId;
+    }
+
+    setSelection(sectionId: string, componentId: string, selectionRange: { start: number, end: number, text: string }) {
         this.sectionId = sectionId;
         this.componentId = componentId;
         this.selectionRange = selectionRange;
@@ -28,8 +34,6 @@ export class TextFormatToolbarStore {
         if (origValueObj && typeof origValueObj.type === 'string') {
              this.computeActiveFormats((origValueObj as StringValue).value, selectionRange.start, selectionRange.end);
         }
-
-        this.isOpen = true;
     }
 
     private computeActiveFormats(markdown: string, visualStart: number, visualEnd: number) {
@@ -85,8 +89,7 @@ export class TextFormatToolbarStore {
         };
     }
 
-    close() {
-        this.isOpen = false;
+    clear() {
         this.sectionId = null;
         this.componentId = null;
         this.selectionRange = null;
@@ -209,4 +212,4 @@ export class TextFormatToolbarStore {
     }
 }
 
-export const textFormatToolbarStore = new TextFormatToolbarStore();
+export const textFormatStore = new TextFormatStore();

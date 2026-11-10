@@ -22,11 +22,11 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
   - `edit-store`: every document mutation. `insertComponent` modes are `after`, `before`, `replace` and `split`.
   - `selection-store`: selected component or insertion point, plus the caret source.
   - `toolbar-store`: the add-component dropdown.
-  - `text-format-toolbar-store`, `global-registry`, `binding-store`, `custom-bindings-store`.
+  - `text-format-store` (the marked fragment of a text, used by the bold, italic, underline and strikethrough options of the `text` component), `global-registry`, `binding-store`, `custom-bindings-store`.
 - `registry/`:
   - `defaultRegistry.ts`: `getDefaultRegistry(i18n)`, where `i18n` is required.
   - `ComponentRegistry.ts`: the component contract.
-  - `ComponentEditOptions.ts`: the buttons of the hover and top toolbars. Options accept `group` and `label`, which only the ribbon uses.
+  - `ComponentEditOptions.ts`: the buttons of the hover and top toolbars. Options accept `group` and `label`, which only the ribbon uses. `isSelected` and `isDisabled` receive `{ sectionId, componentId, value, config }` and are evaluated reactively (`ComponentEditor` passes getters to the buttons), so they can read stores without the options being mounted again.
 - `components/component/`: `ComponentRenderer` (the `.component-edit-contents` wrapper, hover toolbar, selection ring and label), `ComponentEditor` (`layout: 'floating' | 'ribbon'`) and `ComponentToolbar` (the add-component dropdown).
 - `components/toolbar/TopToolbar.svelte` is the ribbon. `components/sections/ParagraphSection.svelte` builds the ghost texts. `components/defaultComponents/*` are the built-in components.
 - i18n lives in `i18n/locales/en.ts`, `es.ts` and `types.ts`. Every new key goes in all three. Use `getI18n()` and `i18n.t('a.b')`.
