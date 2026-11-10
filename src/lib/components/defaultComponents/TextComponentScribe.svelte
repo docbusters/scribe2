@@ -8,8 +8,8 @@
 	import { selectionStore } from '../../stores/selection-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
-	import { textFormatStore, type TextFormatCommand, type TextFormats } from '../../stores/text-format-store.svelte.ts';
-	import { untrack } from 'svelte';
+	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
+	import { getFormatsInRange, toggleTextFormat, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
 	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
@@ -206,6 +206,21 @@
     }
 
     /**
+     * Saves what has been typed in a ghost as a text of the document, so it can be split like any other text.
+     * Returns the id of the new text, or null if this is not a ghost or the text could not be created
+     */
+    function saveTypedGhost(): string | null {
+        if (!isGhost || !textDiv) return null;
+
+        const newId = createTextFromGhost({ type: 'string', value: readEditableContent(textDiv) });
+        if (newId === null) return null;
+
+        // The text is already saved, so it must not be saved again when the element loses the focus
+        isDirty = false;
+        return newId;
+    }
+
+    /**
      * Describes where a component would be inserted at the caret of this text, or null if the caret is not inside it.
      * A ghost with typed content is not part of the document yet, so its text is created here to have a text to split.
      */
@@ -258,11 +273,9 @@
         let findCaretElement = (): HTMLElement | null => target;
 
         if (isGhost && !isActuallyEmpty) {
-            const newId = createTextFromGhost({ type: 'string', value: readEditableContent(target) });
+            const newId = saveTypedGhost();
             if (newId === null) return null;
 
-            // The text is already saved, so it must not be saved again when the element loses the focus
-            isDirty = false;
             targetId = newId;
 
             const scope: ParentNode = target.closest('.scribe-document') ?? document;
@@ -437,12 +450,6 @@
             return;
         }
 
-        // A ghost is not in the document yet, so a fragment marked in it cannot be formatted
-        if (isGhost) {
-            textFormatStore.setBlockedRange(sectionId, componentData.id);
-            return;
-        }
-
         // Calculate the selected text indexes
         const preRange = range.cloneRange();
         preRange.selectNodeContents(textDiv);
@@ -452,11 +459,52 @@
         const selectedText = range.toString();
         const endIndex = startIndex + selectedText.length;
 
-        textFormatStore.setSelection(sectionId, componentData.id, {
-            start: startIndex,
-            end: endIndex,
-            text: selectedText
-        });
+        textFormatStore.setSelection(
+            sectionId,
+            componentData.id,
+            { start: startIndex, end: endIndex, text: selectedText },
+            getFormatsInRange(readEditableContent(textDiv), startIndex, endIndex),
+            formatSelection
+        );
+    }
+
+    /** Replaces the content of the editable with what the template renders for a text, so it can be rewritten without recreating the editable */
+    function renderContent(element: HTMLElement, markdown: string) {
+        const nodes: Node[] = [];
+        for (const line of parseStringForContentEditable(markdown)) {
+            if (line === '') {
+                nodes.push(document.createElement('br'));
+                continue;
+            }
+
+            for (const token of parseTokens(line)) {
+                const span = document.createElement('span');
+                for (const key of FORMAT_KEYS) {
+                    if (token[key]) span.classList.add(FORMAT_CLASSES[key]);
+                }
+                span.textContent = token.text;
+                nodes.push(span);
+            }
+        }
+        element.replaceChildren(...nodes);
+    }
+
+    /**
+     * Toggles a format on the marked fragment. The editable is the working copy until the text loses the focus (as when typing),
+     * so the fragment is rewritten there and marked again. The editable keeps the focus, and a text that is not in the document
+     * yet needs no special treatment: it is saved on blur like any other change
+     */
+    function formatSelection(command: TextFormatCommand) {
+        const marked = textFormatStore.selectionRange;
+        if (!textDiv || !marked) return;
+
+        const content = toggleTextFormat(readEditableContent(textDiv), marked.start, marked.end, command, textFormatStore.activeFormats[command]);
+        renderContent(textDiv, content);
+        restoreSelection(textDiv, marked.start, marked.end);
+        isDirty = true;
+
+        // The formats of the fragment have changed, and the options show them
+        syncFormatState();
     }
 
     /**
@@ -544,7 +592,7 @@
     });
 
     /**
-     * Restores the native DOM text selection using absolute string indices, useful when the component is re rendered
+     * Marks a fragment of the editable again using absolute string indices, useful when its content is rewritten
      * and the selection is lost
      */
     function restoreSelection(element: HTMLElement, start: number, end: number) {
@@ -609,20 +657,6 @@
             selection?.addRange(range);
         }
     }
-
-    $effect(() => {
-        // When the value changes the span is recreated, so the fragment of this component that is still marked is marked again.
-        // Only the span is tracked: restoring the selection changes the selection, which updates the store, which would restore it again
-        const element = textDiv;
-        if (!element) return;
-
-        untrack(() => {
-            const marked = textFormatStore.selectionRange;
-            if (marked && textFormatStore.componentId === componentData.id) {
-                restoreSelection(element, marked.start, marked.end);
-            }
-        });
-    });
 
     // A text that is destroyed (for example deleted) must not leave a marked fragment behind
     $effect(() => () => {

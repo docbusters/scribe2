@@ -8,7 +8,8 @@ import LatexComponentScribe from '../components/defaultComponents/LatexComponent
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
 import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick, type ComponentEditOptions } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
-import { textFormatStore, type TextFormatCommand } from '$lib/stores/text-format-store.svelte.js';
+import { textFormatStore } from '$lib/stores/text-format-store.svelte.js';
+import type { TextFormatCommand } from '$lib/utils/textFormat.js';
 import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';

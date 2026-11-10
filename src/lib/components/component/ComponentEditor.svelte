@@ -115,7 +115,13 @@
 							icon={button.option.props.icon}
 							disabled={isOptionDisabled(button.option)}
 							isSelected={isOptionSelected(button.option)}
-							onclick={(event) => button.option.props.onclick?.({ event, sectionId, componentId, insertion: getInsertion?.() ?? undefined })}
+							onclick={(event) => button.option.props.onclick?.({
+								event,
+								sectionId,
+								componentId,
+								// Read only by the options that need the caret. Capturing it can save a new text, which a format button must not do
+								get insertion() { return getInsertion?.() ?? undefined; }
+							})}
 						/>
 					{/if}
 				{/each}
