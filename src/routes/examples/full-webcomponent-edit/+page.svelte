@@ -5,5 +5,5 @@
 </script>
 
 <div class="flex w-full py-10 border-box justify-center">
-	<scribe-interpreter document={fullExampleDocument} bindings={fullExampleBindings} class="max-w-[70vw]" mode="edit" showToolbar={true} showPrintButton={true}></scribe-interpreter>
+	<scribe-interpreter document={fullExampleDocument} bindings={fullExampleBindings} class="max-w-[70vw]" mode="edit" showPrintButton={true}></scribe-interpreter>
 </div>

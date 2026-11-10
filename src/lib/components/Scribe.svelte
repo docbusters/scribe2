@@ -15,7 +15,6 @@
 			customBindings: { type: 'Object' },
 			lang: { type: 'String' },
 			showBindingsPanel: { type: 'Boolean' },
-			showToolbar: { type: 'Boolean' },
 			showPrintButton: { type: 'Boolean' },
 		}
 	}}
@@ -45,7 +44,7 @@
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
 	import { setI18n } from '../i18n/i18n.svelte.js';
 
-	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showToolbar = false, showPrintButton = false }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showPrintButton = false }: ScribeProps = $props();
 
 	// svelte-ignore state_referenced_locally
 	const i18n = setI18n(lang);
@@ -274,7 +273,7 @@
 <svelte:document onpointerdowncapture={handleClearSelection} />
 
 <div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleClearSelection}>
-	{#if mode === 'edit' && showToolbar}
+	{#if mode === 'edit'}
 		<TopToolbar />
 	{/if}
 	{#if mode === 'edit' && showPrintButton}

@@ -17,7 +17,7 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 ## Architecture
 
 - `src/lib/index.ts` is the public API (`Scribe`, `getDefaultRegistry`, `defaultRegistry`, types, i18n, focus helpers). Changing anything exported there changes a published API.
-- `components/Scribe.svelte` is the root and declares the custom element with `shadow: 'none'`, so styles are global. A new prop needs three edits: `types/ScribeProps.ts`, the `customElement.props` list and the `$props()` destructure. See `showBindingsPanel`, `showToolbar` and `showPrintButton`.
+- `components/Scribe.svelte` is the root and declares the custom element with `shadow: 'none'`, so styles are global. A new prop needs three edits: `types/ScribeProps.ts`, the `customElement.props` list and the `$props()` destructure. See `showBindingsPanel` and `showPrintButton`.
 - `stores/*.svelte.ts` are singletons built on `$state` classes:
   - `edit-store`: every document mutation. `insertComponent` modes are `after`, `before`, `replace` and `split`.
   - `selection-store`: selected component or insertion point, plus the caret source.
@@ -26,8 +26,8 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 - `registry/`:
   - `defaultRegistry.ts`: `getDefaultRegistry(i18n)`, where `i18n` is required.
   - `ComponentRegistry.ts`: the component contract.
-  - `ComponentEditOptions.ts`: the buttons of the hover and top toolbars. Options accept `group` and `label`, which only the ribbon uses. `isSelected` and `isDisabled` receive `{ sectionId, componentId, value, config }` and are evaluated reactively (`ComponentEditor` passes getters to the buttons), so they can read stores without the options being mounted again.
-- `components/component/`: `ComponentRenderer` (the `.component-edit-contents` wrapper, hover toolbar, selection ring and label), `ComponentEditor` (`layout: 'floating' | 'ribbon'`) and `ComponentToolbar` (the add-component dropdown).
+  - `ComponentEditOptions.ts`: the buttons of the top toolbar (the ribbon). Options are drawn in groups by their `group` title, as large buttons when they have a `label` or small icons otherwise. `isSelected` and `isDisabled` receive `{ sectionId, componentId, value, config }` and are evaluated reactively in the `ComponentEditor` template, so they can read stores without the buttons being mounted again. An option can draw itself with `render`.
+- `components/component/`: `ComponentRenderer` (the `.component-edit-contents` wrapper, hover highlight, selection ring and label), `ComponentEditor` (the options of the selected component as titled groups of buttons, used only by the top toolbar) and `ComponentToolbar` (the add-component dropdown).
 - `components/toolbar/TopToolbar.svelte` is the ribbon. `components/sections/ParagraphSection.svelte` builds the ghost texts. `components/defaultComponents/*` are the built-in components.
 - i18n lives in `i18n/locales/en.ts`, `es.ts` and `types.ts`. Every new key goes in all three. Use `getI18n()` and `i18n.t('a.b')`.
 - Styling uses the `--scribe-*` CSS variables in `styles/scribe.css` (light and `.dark`). See "Styling rules" below.
@@ -38,7 +38,7 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 - **Ghost texts:** empty slots are synthetic texts (ids `__ghost_*`) that are not in the document. A text component is created on blur or when a component is inserted, and its `<span>` is recreated whenever the stored value changes (`{#key rawValue}`). The ghost of an empty section (no neighbours) is full width and always shows `editor.emptySectionPlaceholder`. `editStore.sectionToFocus` makes `ParagraphSection` put the caret in a section that has just been added.
 - **Insertion at the caret:** Ctrl+Space and the ribbon's Add share `captureInsertionAtCaret` in `TextComponentScribe.svelte`, which returns a `ToolbarInsertion`. A ghost with typed content is first created as a real text and then split.
 - **Selection:** a non-empty component is selected through its wrapper (`pointerdown` and `focusin`). A ghost or empty text is an insertion point. `Scribe.svelte` clears the selection on a document-level `pointerdown` (capture phase) unless the target matches `KEEP_SELECTION_SELECTOR`. The ribbon (`.scribe-top-toolbar`) cancels `mousedown` so the text keeps its focus and caret.
-- **z-index:** hover toolbar 1, top toolbar 3, section handles 10, add-component dropdown 30, bindings panel 40, dialogs 50.
+- **z-index:** top toolbar 3, section handles 10, add-component dropdown 30, bindings panel 40, dialogs 50.
 - **Buttons:** `Button.svelte` sizes are inline styles. Override them with its `style` prop (or `!important` from CSS).
 - **Whitespace:** working-tree files use CRLF and the `.svelte` files mix tabs and 4 spaces. Match the surrounding code. If a multi-line edit does not apply, suspect whitespace.
 

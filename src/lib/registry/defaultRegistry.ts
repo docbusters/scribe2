@@ -78,7 +78,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         valueTypes: ['empty', 'string'],
         options: [
             ...defaultComponentOptions,
-            { type: 'separator' },
             createTextFormatOption('bold', i18n.t('textFormat.bold'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold-icon lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>'),
             createTextFormatOption('italic', i18n.t('textFormat.italic'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic-icon lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>'),
             createTextFormatOption('underline', i18n.t('textFormat.underline'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline-icon lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>'),
@@ -103,7 +102,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         supportedBindingValueTypes: ['empty', 'string', 'number'],
         options: [
             ...defaultComponentOptions,
-            { type: 'separator' },
             {
                 type: 'expand-content',
                 name: 'Expand with content',
@@ -137,7 +135,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         },
         options: [
             ...defaultComponentOptions,
-            { type: 'separator' },
             {
                 type: 'align-left',
                 name: 'Align Left',
@@ -180,7 +177,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                     }
                 },
             },
-            { type: 'separator' },
             {
                 type: 'contain',
                 name: 'Set image fit to contain',
@@ -288,7 +284,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         },
         options: [
             ...defaultComponentOptions,
-            { type: 'separator' },
             {
                 type: 'toggle-readonly',
                 name: 'Toggle Read-only',
@@ -425,7 +420,6 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         },
         options: [
             ...defaultComponentOptions,
-            { type: 'separator' },
             {
                 type: 'chart-data-config',
                 name: 'Data Configuration',
@@ -440,10 +434,8 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                 },
                 props: {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers-icon lucide-layers"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>',
-                    onclick: () => {}
                 }
             },
-            { type: 'separator' },
             {
                 type: 'chart-type-bar',
                 name: 'Bar Chart',

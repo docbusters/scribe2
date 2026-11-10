@@ -36,14 +36,12 @@ export interface ComponentEditOptionContext {
     config: ComponentConfig | undefined;
 }
 
-export type ComponentEditOptions = BaseComponentEditOptions | SeparatorEditOption;
-
-export interface BaseComponentEditOptions {
+export interface ComponentEditOptions {
     type: string;
     name: string;
-    /** Only used by the top toolbar. Short text for the option: when present it is drawn as a large button (icon over text), otherwise as a small icon button */
+    /** Short text for the option: when present it is drawn as a large button (icon over text), otherwise as a small icon button */
     label?: string;
-    /** Only used by the top toolbar. Title of the group the option belongs to. Options sharing a group are drawn together, even when they are not consecutive */
+    /** Title of the group the option belongs to. Options sharing a group are drawn together, even when they are not consecutive */
     group?: string;
     /**
      * Function to determine if the option is selected. If not provided, the option will not be considered selected.
@@ -55,18 +53,15 @@ export interface BaseComponentEditOptions {
     /** Framework-agnostic render function to render custom HTML/elements. Can return a cleanup function */
     render?: (container: HTMLElement, data: ComponentEditProps) => (() => void) | void;
     /** Props passed to the default button or custom render function */
-    props?: {
+    props: {
         icon: string;
-        onclick: (data: ComponentEditOnClick) => void;
+        /** Not needed when the option renders itself and handles its own clicks */
+        onclick?: (data: ComponentEditOnClick) => void;
     };
 }
 
-export interface SeparatorEditOption {
-    type: 'separator';
-}
-
-/** Space in pixels between a ribbon group and the dropdown opened below it */
-const RIBBON_DROPDOWN_GAP = 4;
+/** Space in pixels between a group of the toolbar and the dropdown opened below it */
+const GROUP_DROPDOWN_GAP = 4;
 
 export const addComponentOption: ComponentEditOptions = {
     type: 'add',
@@ -78,9 +73,10 @@ export const addComponentOption: ComponentEditOptions = {
             const button = event.currentTarget as HTMLElement;
             const rect = button.getBoundingClientRect();
 
-            // In the ribbon the dropdown opens below the whole group (its title included), not just below the button
-            const groupRect = button.closest('.component-editor-group')?.getBoundingClientRect();
-            const bottom = groupRect ? groupRect.bottom + RIBBON_DROPDOWN_GAP : rect.bottom;
+            // The dropdown opens below the whole group (its title included), not just below the button.
+            // The group is the .component-editor-group element rendered by ComponentEditor
+            const group = button.closest('.component-editor-group') ?? button;
+            const bottom = group.getBoundingClientRect().bottom + GROUP_DROPDOWN_GAP;
 
             // With the caret in a text the component is inserted exactly there
             if (insertion) {
@@ -132,9 +128,6 @@ export const setValueOption: ComponentEditOptions = {
     },
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>',
-        onclick(data: ComponentEditOnClick) {
-            console.log('Set value clicked', data);
-        },
     }
 };
 

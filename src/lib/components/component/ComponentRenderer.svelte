@@ -23,7 +23,6 @@
 	import type { Action } from 'svelte/action';
 	import type { ScribeComponentProps } from "$lib/registry/ComponentRegistry.js";
 	import type { BaseComponent, ComponentConfig } from "$lib/domain/components/Component.js";
-	import ComponentEditor from "./ComponentEditor.svelte";
 	import Skeleton from "../utilComponents/Skeleton.svelte";
 	import EmptyContent from "../utilComponents/EmptyContent.svelte";
 	import { getI18n } from "$lib/i18n/i18n.svelte.js";
@@ -138,12 +137,8 @@
 		<Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
 	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
-			{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
-				<div class="component-editor" contenteditable="false">
-					<ComponentEditor layout="floating" isBinding={resolvedValuePromise.isBinding} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
-				</div>
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
@@ -153,14 +148,8 @@
 			<div style="display: contents;" use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolvedValuePromise.value, isBinding: resolvedValuePromise.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}></div>
 		{/if}
 	{:catch error}
-		{@const options = globalRegistry.getComponentOptions(componentData.type)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
-				{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
-					<div class="component-editor" contenteditable="false">
-						<ComponentEditor layout="floating" isBinding={false} componentType={componentData.type} componentValue={componentData.value} componentConfig={componentData.config} {sectionId} componentId={componentData.id} {options} {disabledOptions} />
-					</div>
-				{/if}
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
@@ -240,11 +229,6 @@
 		transition: opacity 0.2s ease;
 	}
 
-	/* Narrow inline-block components can be narrower than the hover toolbar, so the label gives way to it */
-	.component-edit-contents.is-inline-block:hover > .component-selection-label {
-		opacity: 0;
-	}
-
 	@keyframes scribe-selection-in {
 		from { opacity: 0; }
 		to { opacity: 1; }
@@ -257,40 +241,7 @@
 		border-radius: var(--scribe-radius-sm);
 	}
 
-	.component-edit-contents:hover > .component-editor,
-	.component-edit-contents:global(.is-line-hovered) > .component-editor {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
-	.component-editor {
-		position: absolute;
-		top: -0.5rem;
-		left: 0;
-		transform: translateY(-100%);
-		z-index: 1;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.3s ease;
-	}
-
-	/* Invisible bridge to prevent losing hover when moving mouse from component to editor */
-	.component-editor::after {
-		content: '';
-		position: absolute;
-		top: -15px;
-		bottom: -0.5rem;
-		right: -0.75rem;
-		left: 0;
-		z-index: -1;
-	}
-
-	/* Nesting prevention: if a nested component is hovered, suppress the parent highlight and editor */
-	.component-edit-contents:hover:has(:global(.component-edit-contents):hover) > .component-editor {
-		opacity: 0 !important;
-		pointer-events: none !important;
-	}
-
+	/* Nesting prevention: if a nested component is hovered, suppress the parent highlight */
 	.component-edit-contents:hover:has(:global(.component-edit-contents):hover) {
 		background-color: transparent !important;
 	}

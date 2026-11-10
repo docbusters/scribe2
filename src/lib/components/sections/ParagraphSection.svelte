@@ -100,7 +100,7 @@
         if (!target) return false;
 
         // Ignore clicks directly on interactive components or their inner controls
-        if (target.closest('input, textarea, button, [contenteditable="true"], .component-editor, .scribe-dropdown-content')) {
+        if (target.closest('input, textarea, button, [contenteditable="true"], .scribe-dropdown-content')) {
             return false;
         }
 
