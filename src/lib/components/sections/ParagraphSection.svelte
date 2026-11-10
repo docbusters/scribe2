@@ -7,7 +7,8 @@
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 	import { setCaretFromPoint, setCaretPosition } from '../../utils/focusNavigation.ts';
 	import { untrack } from 'svelte';
-	
+	import { editStore } from '../../stores/edit-store.svelte.ts';
+
     interface ParagraphSectionProps {
         data: ParagraphSection<DefaultComponents | C>;
         mode: ScribeMode;
@@ -74,6 +75,18 @@
         }
 
         return result;
+    });
+
+    // A section that has just been added gets the caret, so it can be written in right away
+    $effect(() => {
+        if (mode !== 'edit' || editStore.sectionToFocus !== data.id || !sectionContainer) return;
+
+        const firstText = sectionContainer.querySelector<HTMLElement>('.edit-text[data-scribe-focusable="true"]');
+        if (!firstText) return;
+
+        firstText.focus();
+        setCaretPosition(firstText, { direction: 'right' });
+        editStore.sectionToFocus = null;
     });
 
     /**

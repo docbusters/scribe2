@@ -12,7 +12,10 @@ import { calculateDocumentBindingUsages, extractBindingUsages, type CustomBindin
 class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
     document = $state<Document<C>>(null!);
     bindings = $state<Record<string, BindingsDefinition>>({});
-    
+
+    /** Section that has just been added and should receive the caret once it is rendered */
+    sectionToFocus = $state<string | null>(null);
+
     customBindingUsages: CustomBindingUsages = {};
 
     initialize(document: Document<C>, bindings: Record<string, BindingsDefinition>) {
@@ -58,6 +61,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         if (sectionId === null) {
             this.document.sections = { [newSectionId]: newSection, ...this.document.sections };
+            this.sectionToFocus = newSectionId;
             return true;
         } else {
             const target = this.findSection(sectionId);
@@ -72,6 +76,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         }
 
         this.document.sections = newSections;
+        this.sectionToFocus = newSectionId;
         return true;
     }
 

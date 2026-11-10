@@ -106,7 +106,7 @@ export const es: Translations = {
 		delete: 'Eliminar sección'
 	},
 	editor: {
-		insertComponentPlaceholder: 'Presiona Ctrl + Espacio para añadir un componente...'
+		emptySectionPlaceholder: 'Empieza a escribir o pulsa Ctrl + Espacio para añadir un componente'
 	},
 	componentToolbar: {
 		pressEnter: 'Presiona ENTER para añadir'

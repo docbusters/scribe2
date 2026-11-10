@@ -25,6 +25,9 @@
     // A ghost is a placeholder to write in, it is not part of the document until it has content
     let isGhost = $derived(componentData.id.startsWith('__ghost'));
 
+    // The ghost of an empty section has no neighbour, so it is the only place to write and always shows a hint
+    let isSectionPlaceholder = $derived(isGhost && !componentData.insertAfterId && !componentData.insertBeforeId);
+
     /**
      * Where a component is inserted when this text is empty. A ghost is not part of the document, so it inserts relative
      * to its neighbour (null when the section is empty), while an empty persisted text is replaced by the new component
@@ -351,36 +354,6 @@
 
     let isDirty = false;
 
-    function updateAvailableWidth() {
-        if (!textDiv || !isEmpty || mode !== 'edit') return;
-
-        // Temporarily reset CSS custom property to 0 so the element shrinks to its minimum size
-        // and sits at its natural inline position on the current line
-        textDiv.style.setProperty('--available-placeholder-width', '0px');
-
-        const container = textDiv.closest<HTMLElement>('.paragraph-section') 
-            || textDiv.closest<HTMLElement>('section') 
-            || textDiv.parentElement;
-
-        if (container) {
-            const containerRect = container.getBoundingClientRect();
-            const computed = window.getComputedStyle(container);
-            const paddingRight = parseFloat(computed.paddingRight) || 0;
-            const containerRight = containerRect.right - paddingRight;
-
-            const textRect = textDiv.getBoundingClientRect();
-            const available = containerRight - textRect.left - 4;
-
-            if (available < 40 && textRect.left > containerRect.left + 60) {
-                textDiv.style.setProperty('--available-placeholder-width', `${Math.max(0, containerRect.width - paddingRight - 8)}px`);
-            } else {
-                textDiv.style.setProperty('--available-placeholder-width', `${Math.max(0, Math.floor(available))}px`);
-            }
-        } else {
-            textDiv.style.removeProperty('--available-placeholder-width');
-        }
-    }
-
     /**
      * Whether an editable has no content. A single <br> is only the filler that browsers leave in an emptied
      * editable, but two or more mean the user has inserted a line break, which is content even without text.
@@ -392,15 +365,10 @@
     function handleInput(event: Event) {
         const target = event.target as HTMLSpanElement;
         isEmpty = isEditableEmpty(target);
-        if (isEmpty) {
-            updateAvailableWidth();
-        }
         isDirty = true;
     }
 
     function handleFocus() {
-        updateAvailableWidth();
-
         // Toolbars insert components at the caret of the text that has the focus
         selectionStore.setCaretSource(componentData.id, () => captureInsertionAtCaret()?.insertion ?? null);
 
@@ -469,21 +437,6 @@
     $effect(() => {
         if (!textDiv) return;
         return setupFocusListeners(textDiv);
-    });
-
-    $effect(() => {
-        if (isEmpty && mode === 'edit' && textDiv) {
-            updateAvailableWidth();
-        }
-    });
-
-    $effect(() => {
-        if (!textDiv || mode !== 'edit') return;
-        const handleResize = () => {
-            if (isEmpty) updateAvailableWidth();
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
     });
 
     /**
@@ -578,12 +531,12 @@
         role={mode === 'edit' ? 'textbox' : undefined}
         tabindex={mode === 'edit' ? 0 : undefined}
         class="edit-text" 
-        class:scribe-animation-pulse={isEmpty && mode === 'edit'}
         class:is-empty={isEmpty && mode === 'edit'}
+        class:is-section-placeholder={isSectionPlaceholder && mode === 'edit'}
         class:is-ghost={componentData.id.startsWith('__ghost') && mode === 'edit'}
         class:is-between-blocks={componentData.isBetweenBlocks}
         class:is-inline-slot={!!componentData.insertBeforeId && !componentData.isBetweenBlocks && mode === 'edit'}
-        data-placeholder={i18n.t('editor.insertComponentPlaceholder')}
+        data-placeholder={isSectionPlaceholder ? i18n.t('editor.emptySectionPlaceholder') : undefined}
         contenteditable={mode === 'edit'} 
         onfocus={mode === 'edit' ? handleFocus : undefined}
         onblur={handleTextChange} 
@@ -616,26 +569,10 @@
 
     .edit-text.is-empty {
         display: inline-block;
-        max-width: var(--available-placeholder-width, 100%);
         min-width: 1ch;
         min-height: 1em;
         vertical-align: middle;
         cursor: text;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .edit-text.is-empty:focus::before {
-        content: attr(data-placeholder);
-        color: var(--scribe-muted-foreground);
-        pointer-events: none;
-        user-select: none;
-        cursor: text;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0;
     }
 
     .edit-text.is-ghost {
@@ -651,14 +588,25 @@
         min-width: 2px;
     }
 
-    /* The placeholder of a slot before a component would push that component to the right */
-    .edit-text.is-inline-slot.is-empty:focus::before {
-        content: none;
+    /* The only place to write in an empty section: full width, with a hint that is visible even without focus */
+    .edit-text.is-section-placeholder.is-empty {
+        display: block;
+        width: 100%;
+        min-height: 1.5rem;
+    }
+
+    .edit-text.is-section-placeholder.is-empty::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        color: var(--scribe-muted-foreground);
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
     }
 
     .edit-text.is-between-blocks {
         width: 100%;
-        max-width: 100%;
         min-height: 1.75rem;
         display: flex;
         align-items: center;

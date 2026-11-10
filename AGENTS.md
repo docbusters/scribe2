@@ -34,7 +34,7 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 
 ## Behaviour that is easy to break
 
-- **Ghost texts:** empty slots are synthetic texts (ids `__ghost_*`) that are not in the document. A text component is created on blur or when a component is inserted, and its `<span>` is recreated whenever the stored value changes (`{#key rawValue}`).
+- **Ghost texts:** empty slots are synthetic texts (ids `__ghost_*`) that are not in the document. A text component is created on blur or when a component is inserted, and its `<span>` is recreated whenever the stored value changes (`{#key rawValue}`). The ghost of an empty section (no neighbours) is full width and always shows `editor.emptySectionPlaceholder`. `editStore.sectionToFocus` makes `ParagraphSection` put the caret in a section that has just been added.
 - **Insertion at the caret:** Ctrl+Space and the ribbon's Add share `captureInsertionAtCaret` in `TextComponentScribe.svelte`, which returns a `ToolbarInsertion`. A ghost with typed content is first created as a real text and then split.
 - **Selection:** a non-empty component is selected through its wrapper (`pointerdown` and `focusin`). A ghost or empty text is an insertion point. `Scribe.svelte` clears the selection on a document-level `pointerdown` (capture phase) unless the target matches `KEEP_SELECTION_SELECTOR`. The ribbon (`.scribe-top-toolbar`) cancels `mousedown` so the text keeps its focus and caret.
 - **z-index:** hover toolbar 1, top toolbar 3, section handles 10, add-component dropdown 30, bindings panel 40, dialogs 50.

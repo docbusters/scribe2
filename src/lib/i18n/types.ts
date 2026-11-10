@@ -106,7 +106,7 @@ export interface Translations {
 		delete: string;
 	};
 	editor: {
-		insertComponentPlaceholder: string;
+		emptySectionPlaceholder: string;
 	};
 	componentToolbar: {
 		pressEnter: string;
