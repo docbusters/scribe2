@@ -5,7 +5,7 @@
 	import { toolbarStore } from '../../stores/toolbar-store.svelte.js';
 	import { DropdownMenu } from 'bits-ui';
 	import ScrollArea from '../utilComponents/ScrollArea.svelte';
-	import { setCaretPosition } from '../../utils/focusNavigation.js';
+	import { findEditableText, setCaretPosition } from '../../utils/focusNavigation.js';
 	import { getI18n } from '../../i18n/i18n.svelte.js';
 
     const i18n = getI18n();
@@ -76,7 +76,7 @@
 
                     let targetEl: HTMLElement | null = null;
                     if (result.rightTextId) {
-                        targetEl = scope.querySelector(`[data-component-id="${result.rightTextId}"]`);
+                        targetEl = findEditableText(scope, result.rightTextId);
                     }
                     if (!targetEl && sectionEl) {
                         const sectionTexts = Array.from(sectionEl.querySelectorAll<HTMLElement>('.edit-text'));

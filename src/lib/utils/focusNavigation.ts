@@ -94,6 +94,14 @@ function getFocusScope(element: HTMLElement): ParentNode {
     return element.closest('.scribe-document') ?? (element.getRootNode() as Document | ShadowRoot);
 }
 
+/**
+ * Finds the editable of a text component. The wrapper that ComponentRenderer draws around the text has the same
+ * data-component-id and comes first in the document, so a query by that attribute alone finds a wrapper that cannot hold the focus
+ */
+export function findEditableText(scope: ParentNode, componentId: string): HTMLElement | null {
+    return scope.querySelector<HTMLElement>(`.edit-text[data-component-id="${CSS.escape(componentId)}"]`);
+}
+
 /** Whether the element can currently receive a caret (ignores read only content in view mode) */
 function isNavigable(element: HTMLElement): boolean {
     if (isTextField(element)) {

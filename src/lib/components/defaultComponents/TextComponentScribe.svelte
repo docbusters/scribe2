@@ -7,7 +7,7 @@
 	import { toolbarStore, type ToolbarInsertion, type ToolbarInsertionMode, type ToolbarSplitData } from '../../stores/toolbar-store.svelte.ts';
 	import { selectionStore } from '../../stores/selection-store.svelte.ts';
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
-    import { handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
+    import { findEditableText, handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
 	import { getFormatsInRange, toggleTextFormat, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
 	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
@@ -279,7 +279,7 @@
             targetId = newId;
 
             const scope: ParentNode = target.closest('.scribe-document') ?? document;
-            findCaretElement = () => scope.querySelector<HTMLElement>(`[data-component-id="${CSS.escape(newId)}"]`);
+            findCaretElement = () => findEditableText(scope, newId);
         }
 
         let insertionMode: ToolbarInsertionMode;
