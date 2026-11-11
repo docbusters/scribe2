@@ -5,7 +5,9 @@
 	import type { ComponentConfig } from "$lib/domain/components/Component.js";
 	import { getI18n } from "$lib/i18n/i18n.svelte.js";
 	import type { ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
-	import { fade } from "svelte/transition";
+	import { fly } from "svelte/transition";
+	import { flip } from "svelte/animate";
+	import { cubicOut } from "svelte/easing";
 
     interface ComponentEditorProps {
         componentType: string;
@@ -103,8 +105,8 @@
 <div class="component-editor">
 	{#each groups as group (group.title)}
 		<!-- ComponentEditOptions.ts finds this element by its class to open the add dropdown below the whole group -->
-		<div class="component-editor-group">
-			<div class="group-buttons" class:is-grid={isGrid(group)} in:fade>
+		<div class="component-editor-group" in:fly={{ y: 6, duration: 220, delay: 80, easing: cubicOut }} animate:flip={{ duration: 220, easing: cubicOut }}>
+			<div class="group-buttons" class:is-grid={isGrid(group)}>
 				{#each group.buttons as button (button.option)}
 					{#if button.option.render}
 						<div style="display: contents;" use:renderOption={button}></div>
@@ -166,13 +168,14 @@
         align-items: center;
         justify-content: center;
         gap: 0.125rem;
-        min-height: 3.5rem;
+        height: 3.5rem;
     }
 
-    /* Two rows of small buttons, filled column by column */
+    /* Two rows of small buttons, filled column by column. They shrink so the grid fits the height of the large buttons */
     .group-buttons.is-grid {
+        --editor-icon-button-size: 1.6875rem;
         display: grid;
-        grid-template-rows: repeat(2, 2rem);
+        grid-template-rows: repeat(2, 1fr);
         grid-auto-flow: column;
         align-content: center;
     }
