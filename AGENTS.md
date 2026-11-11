@@ -49,6 +49,7 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 ## Styling rules
 
 - The package must not depend on Tailwind. All styles under `src/lib` are plain CSS: `<style>` blocks in the components (with `:global(...)` where needed, as the custom element uses `shadow: 'none'`) and the `--scribe-*` variables in `styles/scribe.css`.
+- `styles/scribe.css` is the only global stylesheet: it holds the variables and the scoped reset that protects Scribe from host styles. `build:wc` copies it as is into `dist/` (Vite's own CSS output is overwritten), so global CSS must live there and never be imported from a component.
 - Tailwind classes are allowed only in the SvelteKit example pages under `src/routes`, which exist just to show the library. Never use them in `src/lib`, and never add a dependency from the library on `tailwindcss`.
 - New colours, radii, fonts and sizes should use the existing `--scribe-*` variables. Add a new variable (with its `.dark` value) only when none fits.
 

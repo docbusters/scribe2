@@ -42,6 +42,8 @@ class BindingStore {
     }
 
     initialize(bindings: Record<string, BindingsDefinition>) {
+        // The given bindings replace the current ones, so a binding that is no longer provided disappears
+        this.data = {};
         Object.entries(bindings).forEach(([id, binding]) => {
             this.addBinding(id, binding);
         });

@@ -21,7 +21,6 @@
 />
 
 <script lang="ts" generics="C extends BaseComponent<string, DataValue>">
-	import '$lib/styles/main.css';
 	import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 	import type { BaseComponent } from '../domain/components/Component.js';
 	import type { DataValue } from '../domain/data/DataValue.js';
