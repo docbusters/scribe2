@@ -18,10 +18,8 @@ export function calculateDocumentBindingUsages<C extends BaseComponent<string, D
     if (!document) return usages;
 
     for (const section of Object.values(document.sections)) {
-        if ('content' in section && section.content) {
-            for (const [componentId, component] of Object.entries(section.content)) {
-                extractBindingUsages(usages, componentId, (component as C).value, true);
-            }
+        for (const [componentId, component] of Object.entries(section.content)) {
+            extractBindingUsages(usages, componentId, (component as C).value, true);
         }
     }
 

@@ -58,7 +58,6 @@
 		sections: {
 			"example-binding-1": {
 				id: "example-binding-1",
-				type: 'paragraph-section',
 				title: "Example bindings",
 				content: {
 					"image-bind": {
@@ -85,7 +84,6 @@
 			},
 			"example-binding-2": {
 				id: "example-binding-2",
-				type: 'paragraph-section',
 				title: "Example live clock",
 				content: {
 					"latex-bind": {

@@ -4,7 +4,6 @@
     "section-1": {
       "id": "section-1",
       "title": "First section",
-      "type": "paragraph-section",
       "content": {
         "text-1": {
           "id": "text-1",
@@ -113,7 +112,6 @@
     "section-4": {
       "id": "section-4",
       "title": "Table section",
-      "type": "paragraph-section",
       "content": {
         "table-1": {
           "id": "table-1",
@@ -146,7 +144,6 @@
     "empty-section": {
       "id": "empty-section",
       "title": "Empty section",
-      "type": "paragraph-section",
       "content": {}
     }
   }

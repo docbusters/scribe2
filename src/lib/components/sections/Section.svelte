@@ -4,7 +4,6 @@
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
 	import type { Section } from '../../domain/Section.js';
 	import ParagraphSection from './ParagraphSection.svelte';
-	import GridSection from './GridSection.svelte';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import SectionEditor from './SectionEditor.svelte';
 	import { fade } from 'svelte/transition';
@@ -14,13 +13,12 @@
     interface SectionProps {
         data: Section<DefaultComponents | C>;
         mode: ScribeMode;
-        isNested?: boolean;
         isDarkMode: boolean;
     }
 
-    let { data, mode, isNested = false, isDarkMode }: SectionProps = $props();
+    let { data, mode, isDarkMode }: SectionProps = $props();
 
-    let isEditMode = $derived(mode === 'edit' && !isNested);
+    let isEditMode = $derived(mode === 'edit');
     let sectionTitle = $derived(parseStringForContentEditable(data.title));
 </script>
 
@@ -38,11 +36,7 @@
     <div class="section-title-container">
         <SectionTitle {isEditMode} sectionId={data.id} text={sectionTitle} />
     </div>
-    {#if data.type === 'paragraph-section'}
-        <ParagraphSection {data} {mode} {isDarkMode} />
-    {:else if data.type === 'grid-section'}
-        <GridSection {data} {mode} {isDarkMode} />
-    {/if}
+    <ParagraphSection {data} {mode} {isDarkMode} />
 </section>
 
 <style>

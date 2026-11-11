@@ -2,7 +2,7 @@
     import type { BaseComponent, GhostComponentMeta } from '../../domain/components/Component.ts';
     import type { DataValue, StringValue } from '../../domain/data/DataValue.ts';
     import { type DefaultComponents } from '../../registry/defaultRegistry.ts';
-	import type { ParagraphSection } from '../../domain/Section.js';
+	import type { Section } from '../../domain/Section.js';
 	import type { ScribeMode } from '../../types/ScribeProps.js';
 	import ComponentRenderer from '../component/ComponentRenderer.svelte';
 	import { setCaretFromPoint, setCaretPosition } from '../../utils/focusNavigation.ts';
@@ -10,7 +10,7 @@
 	import { editStore } from '../../stores/edit-store.svelte.ts';
 
     interface ParagraphSectionProps {
-        data: ParagraphSection<DefaultComponents | C>;
+        data: Section<DefaultComponents | C>;
         mode: ScribeMode;
         isDarkMode: boolean;
     }

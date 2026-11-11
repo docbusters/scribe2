@@ -9,7 +9,6 @@
 			"section-1": {
 				title: "Paragraph Section",
 				id: "section-1",
-				type: "paragraph-section",
 				content: {}
 			}
 		},

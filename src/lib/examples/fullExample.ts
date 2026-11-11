@@ -6,7 +6,6 @@ export const fullExampleDocument: Document = {
         'section-1': {
             id: 'section-1',
             title: 'First section',
-            type: 'paragraph-section',
             content: {
                 'text-1': {
                     id: 'text-1',
@@ -126,7 +125,6 @@ export const fullExampleDocument: Document = {
         'section-chart': {
             id: 'section-chart',
             title: 'Food that I hate',
-            type: 'paragraph-section',
             content: {
                 'chart-1': {
                     id: 'chart-1',
@@ -184,7 +182,6 @@ export const fullExampleDocument: Document = {
         'section-4': {
             id: 'section-4',
             title: 'Table section',
-            type: 'paragraph-section',
             content: {
                 'table-1': {
                     id: 'table-1',
@@ -261,117 +258,8 @@ export const fullExampleDocument: Document = {
         'empty-section': {
             id: 'empty-section',
             title: 'Empty section',
-            type: 'paragraph-section',
             content: {},
         },
-        'section-5': {
-            id: 'section-5',
-            title: 'Grid section',
-            type: 'grid-section',
-            columns: 2,
-            rows: 2,
-            gapX: 40,
-            gapY: 20,
-            content: [
-                {
-                    row: 1,
-                    column: 1,
-                    section: {
-                        id: 'section-5-1',
-                        title: 'Nested section 1',
-                        type: 'paragraph-section',
-                        content: {
-                            'text-4': {
-                                id: 'text-4',
-                                mode: 'inline',
-                                type: 'text',
-                                value: {
-                                    type: 'string',
-                                    value: 'This is a nested section inside the grid.'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    row: 2,
-                    column: 2,
-                    section: {
-                        id: 'section-5-2',
-                        title: 'Nested section 2',
-                        type: 'paragraph-section',
-                        content: {
-                            'text-5': {
-                                id: 'text-5',
-                                mode: 'inline',
-                                type: 'text',
-                                value: {
-                                    type: 'string',
-                                    value: 'This is another nested section inside the grid.'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    row: 1,
-                    column: 2,
-                    section: {
-                        id: 'section-5-3',
-                        title: 'I am a grid inside a grid (sectionception)',
-                        type: 'grid-section',
-                        columns: 2,
-                        rows: 2,
-                        gapX: 20,
-                        gapY: 20,
-                        content: [
-                            {
-                                row: 1,
-                                column: 1,
-                                colspan: 2,
-                                section: {
-                                    id: 'section-5-3',
-                                    title: 'Nested nested section 1',
-                                    type: 'paragraph-section',
-                                    content: {
-                                        'text-6': {
-                                            id: 'text-6',
-                                            mode: 'inline',
-                                            type: 'text',
-                                            value: {
-                                                type: 'string',
-                                                value:
-                                                    'This is a nested section inside the nested grid. I occupy 2 columns!'
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                row: 2,
-                                column: 2,
-                                section: {
-                                    id: 'section-5-4',
-                                    title: 'Nested nested section 2',
-                                    type: 'paragraph-section',
-                                    content: {
-                                       'text-7': {
-                                            id: 'text-7',
-                                            mode: 'inline',
-                                            type: 'text',
-                                            value: {
-                                                type: 'string',
-                                                value: 'This is another nested section inside the nested grid.'
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
     },
 };
 

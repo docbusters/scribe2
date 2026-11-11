@@ -1,7 +1,7 @@
 import type { BaseComponent, BlockComponent, ComponentConfig } from "../domain/components/Component.js";
 import type { CollectionValue, DataValue, PrimitiveValue, StringValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
-import type { ParagraphSection, Section } from "../domain/Section.js";
+import type { Section } from "../domain/Section.js";
 import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
 import { generateRandomId } from "../utils/generateRandomId.js";
 import { bindingStore } from "./binding-store.svelte.js";
@@ -52,7 +52,6 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const newSectionId = generateRandomId("section");
         const newSection = {
             id: newSectionId,
-            type: "paragraph-section",
             title,
             content: {}
         } as Document<C>["sections"][string];
@@ -134,10 +133,8 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const section = this.findSection(sectionId);
         if (!section) return false;
         
-        if ('content' in section && section.content) {
-            for (const [componentId, component] of Object.entries(section.content)) {
-                extractBindingUsages(this.customBindingUsages, componentId, (component as C).value, false);
-            }
+        for (const [componentId, component] of Object.entries(section.content)) {
+            extractBindingUsages(this.customBindingUsages, componentId, (component as C).value, false);
         }
 
         const newSections = { ...this.document.sections };
@@ -185,7 +182,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /** Finds a component within a section. This method will also find nested components */
     getComponent(sectionId: string, componentId: string) {
-        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return null;
 
         // First attempt to find the component at the top level of the section content
@@ -284,7 +281,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /** Duplicates a component within a section and adds it right after the original component */
     duplicateComponent(sectionId: string, componentId: string) {
-        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return false;
         const componentToDuplicate = this.getComponent(sectionId, componentId);
         if (!componentToDuplicate) return false;
@@ -307,7 +304,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /** Deletes a component from a section */
     deleteComponent(sectionId: string, componentId: string) {
-        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return false;
         
         const componentToDelete = section.content[componentId];
@@ -352,7 +349,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         }
     ): { newId: string; rightTextId: string } | null {
         const mode = options?.mode || 'after';
-        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return null;
 
         // If split mode is requested with valid split data and target component exists
@@ -471,7 +468,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /** Merges adjacent text components into a single text component and returns the ID of the merged component if targetId was merged into it */
     private mergeAdjacentTextComponents(sectionId: string, targetId?: string, separator: string = ''): string | undefined {
-        const section = this.findSection(sectionId) as ParagraphSection<C> | null;
+        const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return undefined;
 
         const entries = Object.entries(section.content);

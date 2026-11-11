@@ -35,7 +35,7 @@ export * from './i18n/index.js';
 
 // DOCUMENT STRUCTURE
 export type { Document, BindingsDefinition } from './domain/Document.js';
-export type { Section, ParagraphSection, GridSection, GridSectionContent } from './domain/Section.js';
+export type { Section } from './domain/Section.js';
 export type { CustomBindingUsages } from './utils/bindingUsages.js';
 
 // DATA VALUES
