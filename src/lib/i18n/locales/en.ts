@@ -172,6 +172,7 @@ export const en: Translations = {
 	},
 	errors: {
 		componentError: 'Component Error',
+		unknownComponent: 'Unknown component type "{type}". This page does not register it.',
 		tableConfigMissing: 'Table component is missing configuration',
 		latexUnrecognised: 'Unrecognised LaTeX expression',
 		latexEmpty: 'Set a LaTeX expression',

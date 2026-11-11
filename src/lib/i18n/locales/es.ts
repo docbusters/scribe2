@@ -172,6 +172,7 @@ export const es: Translations = {
 	},
 	errors: {
 		componentError: 'Error del componente',
+		unknownComponent: 'Tipo de componente desconocido "{type}". Esta página no lo registra.',
 		tableConfigMissing: 'El componente de tabla no tiene configuración',
 		latexUnrecognised: 'Expresión LaTeX no reconocida',
 		latexEmpty: 'Introduce una expresión LaTeX',

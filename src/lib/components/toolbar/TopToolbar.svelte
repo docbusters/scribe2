@@ -29,7 +29,7 @@
 					componentConfig: component.config,
 					sectionId: selected.sectionId,
 					componentId: component.id,
-					options: globalRegistry.getComponentOptions(component.type) ?? defaultComponentOptions,
+					options: globalRegistry.components[component.type]?.options ?? defaultComponentOptions,
 					disabledOptions: selected.disabledOptions,
 					getInsertion
 				};

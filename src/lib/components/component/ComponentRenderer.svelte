@@ -31,11 +31,17 @@
     let { mode, componentData, sectionId, disabledOptions = [], isDarkMode }: ComponentRendererProps = $props();
     const i18n = getI18n();
 
-	let componentSupportedTypes = $derived({ types: globalRegistry.getComponentValueTypes(componentData.type), bindingTypes: globalRegistry.getComponentSupportedBindingValueTypes(componentData.type) });
+	// Undefined when the page does not register this type. The registry getters throw for it, so every render path checks it first
+	let componentDef = $derived(globalRegistry.components[componentData.type]);
+	let componentSupportedTypes = $derived({ types: componentDef?.valueTypes ?? [], bindingTypes: componentDef?.supportedBindingValueTypes ?? [] });
 	let resolvedValue = $derived.by(() => {
 		const { types, bindingTypes } = componentSupportedTypes;
 
 		try {
+			if (!componentDef) {
+				throw new Error(i18n.t('errors.unknownComponent', { type: componentData.type }));
+			}
+
 			if (!types.includes(componentData.value.type)) {
 				throw new Error(`Unsupported value type: ${componentData.value.type}`);
 			}
@@ -103,14 +109,14 @@
 		if (mode !== 'edit') return;
 		const target = event.target as Element | null;
 		if (target?.closest('.component-edit-contents') !== event.currentTarget) return;
-		selectionStore.select(sectionId, componentData.id, $state.snapshot(disabledOptions));
+		selectionStore.select(sectionId, componentData.id, componentDef ? $state.snapshot(disabledOptions) : [...$state.snapshot(disabledOptions), 'setValue']); // An unknown type has no value types, so there is nothing to set
 	}
 
 	// Text components are selected too, but they show no indicator as their caret already marks them
 	let isSelected = $derived(mode === 'edit' && componentData.type !== 'text' && selectionStore.isSelected(sectionId, componentData.id));
 
 	// The registry names are already localized, as the registry is built with the i18n instance
-	let componentName = $derived(globalRegistry.components[componentData.type]?.name ?? componentData.type);
+	let componentName = $derived(componentDef?.name ?? componentData.type);
 
 	type AgnosticActionProps = ScribeComponentProps<BaseComponent<string, DataValue, ComponentConfig | undefined>>;
 
@@ -120,7 +126,7 @@
 	const KEY_STEP_LARGE = 50;
 
 	// A block whose registry entry defines a height is a box of that height, and its component fills it
-	let heightDefinition = $derived(componentData.mode === 'block' ? globalRegistry.getComponentHeight(componentData.type) : null);
+	let heightDefinition = $derived(componentData.mode === 'block' && componentDef ? globalRegistry.getComponentHeight(componentData.type) : null);
 
 	// The height while the handle is being dragged, saved when it is released
 	let previewHeight = $state<number | null>(null);
@@ -247,7 +253,7 @@
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
 				<EmptyContent
-					action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.changeValue'))}
+					action={componentDef ? valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.changeValue')) : undefined}
 					message={i18n.t('errors.componentError')}
 					description={error.message} 
 					icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-triangle-alert&quot;><path d=&quot;m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3&quot;/><path d=&quot;M12 9v4&quot;/><path d=&quot;M12 17h.01&quot;/></svg>" 

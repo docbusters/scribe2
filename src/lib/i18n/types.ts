@@ -172,6 +172,7 @@ export interface Translations {
 	};
 	errors: {
 		componentError: string;
+		unknownComponent: string;
 		tableConfigMissing: string;
 		latexUnrecognised: string;
 		latexEmpty: string;
