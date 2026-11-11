@@ -22,9 +22,22 @@ export interface BlockComponent<T extends string, V extends DataValue, P extends
     height?: number;
 }
 
+/**
+ * An editable area inside a component, filled with components like a section. The parent holds it in the record that is
+ * its value: the entry `slotKey` is a record of components keyed by their ids (see ComponentSlot)
+ */
+export interface SlotRef {
+    /** Id of the component that holds the slot */
+    parentId: string;
+    /** Key of the slot in the record value of the parent */
+    slotKey: string;
+}
+
 /** Metadata attached to synthetic ghost placeholder components during editing */
 export interface GhostComponentMeta {
     insertAfterId?: string | null;
     insertBeforeId?: string | null;
     isBetweenBlocks?: boolean;
+    /** The slot the ghost is in, or null when it is in the content of the section */
+    slot?: SlotRef | null;
 }

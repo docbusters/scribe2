@@ -1,4 +1,4 @@
-import type { BaseComponent, BlockComponent, ComponentConfig } from "../domain/components/Component.js";
+import type { BaseComponent, BlockComponent, ComponentConfig, SlotRef } from "../domain/components/Component.js";
 import type { CollectionValue, DataValue, PrimitiveValue, StringValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 import type { Section } from "../domain/Section.js";
@@ -7,6 +7,7 @@ import { generateRandomId } from "../utils/generateRandomId.js";
 import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
 import { calculateDocumentBindingUsages, extractBindingUsages, getDefaultBindingUsages, type CustomBindingUsages } from "../utils/bindingUsages.js";
+import { findSlotOf, readSlotEntries, rekeySlotContents, toSlotValue } from "../utils/componentSlots.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
@@ -226,7 +227,40 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const clonedComponent = structuredClone($state.snapshot(comp)) as BaseComponent<string, DataValue, ComponentConfig | undefined>;
         clonedComponent.id = generateRandomId(comp.type);
         this.reassignNestedIds(clonedComponent.value);
+        // The components of a slot are keyed by their ids, which have just changed
+        rekeySlotContents(clonedComponent.value);
         return clonedComponent;
+    }
+
+    /* * CONTAINERS * */
+    // The components of a section are in section.content, and the ones nested in a component are in its slots. Every
+    // operation that inserts, removes or moves components resolves the container first, so it works in both
+
+    /** Where a component is stored: null for the content of the section, the slot that holds it, or undefined if it is not found */
+    private locate(section: Section<C>, componentId: string): SlotRef | null | undefined {
+        return findSlotOf(section.content as Record<string, BaseComponent<string, DataValue, ComponentConfig | undefined>>, componentId);
+    }
+
+    /** The components of the content of a section (slot is null) or of a slot, in order. Null if the slot is not valid */
+    private readEntries(section: Section<C>, slot: SlotRef | null): [string, C][] | null {
+        if (!slot) return Object.entries(section.content);
+
+        const parent = this.getComponent(section.id, slot.parentId);
+        if (!parent) return null;
+        return readSlotEntries(parent.value, slot.slotKey) as [string, C][] | null;
+    }
+
+    /** Replaces the components of the content of a section (slot is null) or of a slot */
+    private writeEntries(section: Section<C>, slot: SlotRef | null, entries: [string, C][]): boolean {
+        if (!slot) {
+            section.content = Object.fromEntries(entries);
+            return true;
+        }
+
+        const parent = this.getComponent(section.id, slot.parentId);
+        if (!parent || parent.value.type !== 'record') return false;
+        parent.value.value[slot.slotKey] = toSlotValue(entries);
+        return true;
     }
 
     getComponentValue(sectionId: string, componentId: string) {
@@ -286,15 +320,19 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         const componentToDuplicate = this.getComponent(sectionId, componentId);
         if (!componentToDuplicate) return false;
 
+        const slot = this.locate(section, componentId);
+        if (slot === undefined) return null;
+        const entries = this.readEntries(section, slot);
+        if (!entries) return null;
+
         const dupComp = this.cloneComponent(componentToDuplicate);
 
-        const entries = Object.entries(section.content);
         const targetIndex = entries.findIndex(([key]) => key === componentId);
         if (targetIndex !== -1) {
             entries.splice(targetIndex + 1, 0, [dupComp.id, dupComp as C]);
-            section.content = Object.fromEntries(entries);
-            this.mergeAdjacentTextComponents(sectionId);
-            
+            this.writeEntries(section, slot, entries);
+            this.mergeAdjacentTextComponents(sectionId, slot);
+
             extractBindingUsages(this.customBindingUsages, dupComp.id, dupComp.value, true);
 
             return dupComp.id;
@@ -302,40 +340,36 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         return null;
     }
 
-    /** Deletes a component from a section */
+    /** Deletes a component from a section, or from the slot of a component that holds it */
     deleteComponent(sectionId: string, componentId: string) {
         const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return false;
-        
-        const componentToDelete = section.content[componentId];
-        const separator = componentToDelete?.mode === 'block' ? '\n' : ' ';
 
-        if (componentToDelete) {
-            extractBindingUsages(this.customBindingUsages, componentId, componentToDelete.value, false);
-        }
+        const slot = this.locate(section, componentId);
+        if (slot === undefined) return false;
+        const entries = this.readEntries(section, slot);
+        if (!entries) return false;
 
-        const newContent = { ...section.content };
-        delete newContent[componentId];
-        section.content = newContent;
-        
-        this.mergeAdjacentTextComponents(sectionId, undefined, separator);
-        
+        const index = entries.findIndex(([id]) => id === componentId);
+        if (index === -1) return false;
+
+        const [, componentToDelete] = entries[index];
+        const separator = componentToDelete.mode === 'block' ? '\n' : ' ';
+        extractBindingUsages(this.customBindingUsages, componentId, componentToDelete.value, false);
+
+        entries.splice(index, 1);
+        this.writeEntries(section, slot, entries);
+
+        this.mergeAdjacentTextComponents(sectionId, slot, undefined, separator);
+
         return true;
-    }
-
-
-    /** Add a new component to a section. If componentId is null, the component will be appended to the end */
-    addComponent(sectionId: string, componentId: string | null, componentType: string, replaceComponent: boolean = false, overrideValue?: DataValue) {
-        const result = this.insertComponent(sectionId, componentId, componentType, {
-            mode: replaceComponent ? 'replace' : 'after',
-            overrideValue
-        });
-        return result ? result.newId : null;
     }
 
     /**
      * Inserts a new component with support for positional placement (before, after, replace)
      * and text component splitting (splitting a text component into textBefore + newComponent + textAfter).
+     * The component goes next to componentId, in the section or the slot that holds it. If componentId is null it is appended to the end
+     * of options.slot (the content of the section when it is not given).
      * Returns an object with the new component ID and the ID of the text component immediately to its right (if any).
      */
     insertComponent(
@@ -346,15 +380,27 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
             mode?: 'after' | 'before' | 'replace' | 'split';
             splitData?: { textBefore: string; textAfter: string };
             overrideValue?: DataValue;
+            /** Where to append when there is no componentId */
+            slot?: SlotRef | null;
         }
     ): { newId: string; rightTextId: string } | null {
         const mode = options?.mode || 'after';
         const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return null;
 
+        const slot = componentId ? this.locate(section, componentId) : (options?.slot ?? null);
+        if (slot === undefined) {
+            console.warn("Component not found for insertion:", componentId);
+            return null;
+        }
+        const entries = this.readEntries(section, slot);
+        if (!entries) {
+            console.warn("Invalid slot for insertion:", slot);
+            return null;
+        }
+
         // If split mode is requested with valid split data and target component exists
         if (mode === 'split' && options?.splitData && componentId) {
-            const entries = Object.entries(section.content);
             const targetIndex = entries.findIndex(([key]) => key === componentId);
             if (targetIndex !== -1) {
                 const [targetId, targetComp] = entries[targetIndex];
@@ -388,7 +434,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
                 // 4. Splice both new components immediately after targetIndex
                 entries.splice(targetIndex + 1, 0, [newId, newComponent], [newTextId, newTextComp]);
-                section.content = Object.fromEntries(entries);
+                this.writeEntries(section, slot, entries);
 
                 // 5. Track bindings
                 extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
@@ -411,68 +457,64 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
         // If no target component is specified, append to the end
         if (!componentId) {
-            section.content[newId] = newComponent;
+            entries.push([newId, newComponent]);
+            this.writeEntries(section, slot, entries);
             extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            const resultingId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
+            const resultingId = this.mergeAdjacentTextComponents(sectionId, slot, newId) || newId;
             return { newId: resultingId, rightTextId: '' };
         }
 
-        const entries = Object.entries(section.content);
         const targetIndex = entries.findIndex(([key]) => key === componentId);
+        if (targetIndex === -1) return null;
 
-        if (targetIndex !== -1) {
-            if (mode === 'replace') {
-                const [oldId, oldComponent] = entries[targetIndex];
-                extractBindingUsages(this.customBindingUsages, oldId, oldComponent.value, false);
-                entries.splice(targetIndex, 1, [newId, newComponent]);
-            } else if (mode === 'before') {
-                if (options?.splitData?.textAfter !== undefined) {
-                    const [targetId, targetComp] = entries[targetIndex];
-                    entries[targetIndex] = [targetId, {
-                        ...targetComp,
-                        value: { type: 'string', value: options.splitData.textAfter }
-                    } as C];
-                }
-                entries.splice(targetIndex, 0, [newId, newComponent]);
-            } else {
-                if (options?.splitData?.textBefore !== undefined) {
-                    const [targetId, targetComp] = entries[targetIndex];
-                    entries[targetIndex] = [targetId, {
-                        ...targetComp,
-                        value: { type: 'string', value: options.splitData.textBefore }
-                    } as C];
-                }
-                entries.splice(targetIndex + 1, 0, [newId, newComponent]);
+        if (mode === 'replace') {
+            const [oldId, oldComponent] = entries[targetIndex];
+            extractBindingUsages(this.customBindingUsages, oldId, oldComponent.value, false);
+            entries.splice(targetIndex, 1, [newId, newComponent]);
+        } else if (mode === 'before') {
+            if (options?.splitData?.textAfter !== undefined) {
+                const [targetId, targetComp] = entries[targetIndex];
+                entries[targetIndex] = [targetId, {
+                    ...targetComp,
+                    value: { type: 'string', value: options.splitData.textAfter }
+                } as C];
             }
-            section.content = Object.fromEntries(entries);
-            extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            const resultingNewId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
-
-            // Find the first text component to the right of the newly inserted component
-            const updatedEntries = Object.entries(section.content);
-            const newIndex = updatedEntries.findIndex(([key]) => key === resultingNewId);
-            const rightTextEntry = newIndex !== -1
-                ? updatedEntries.slice(newIndex + 1).find(([, comp]) => comp.type === 'text')
-                : undefined;
-            const rightTextId = rightTextEntry ? rightTextEntry[0] : '';
-
-            return { newId: resultingNewId, rightTextId };
+            entries.splice(targetIndex, 0, [newId, newComponent]);
         } else {
-            console.warn("Insertion next to nested components is not fully supported yet or component not found. Appending to the end.");
-            section.content[newId] = newComponent;
-            extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
-            const resultingNewId = this.mergeAdjacentTextComponents(sectionId, newId) || newId;
-            return { newId: resultingNewId, rightTextId: '' };
+            if (options?.splitData?.textBefore !== undefined) {
+                const [targetId, targetComp] = entries[targetIndex];
+                entries[targetIndex] = [targetId, {
+                    ...targetComp,
+                    value: { type: 'string', value: options.splitData.textBefore }
+                } as C];
+            }
+            entries.splice(targetIndex + 1, 0, [newId, newComponent]);
         }
+        this.writeEntries(section, slot, entries);
+        extractBindingUsages(this.customBindingUsages, newId, newComponent.value, true);
+        const resultingNewId = this.mergeAdjacentTextComponents(sectionId, slot, newId) || newId;
+
+        // Find the first text component to the right of the newly inserted component
+        const updatedEntries = this.readEntries(section, slot) ?? [];
+        const newIndex = updatedEntries.findIndex(([key]) => key === resultingNewId);
+        const rightTextEntry = newIndex !== -1
+            ? updatedEntries.slice(newIndex + 1).find(([, comp]) => comp.type === 'text')
+            : undefined;
+        const rightTextId = rightTextEntry ? rightTextEntry[0] : '';
+
+        return { newId: resultingNewId, rightTextId };
     }
 
-    /** Merges adjacent text components into a single text component and returns the ID of the merged component if targetId was merged into it */
-    private mergeAdjacentTextComponents(sectionId: string, targetId?: string, separator: string = ''): string | undefined {
+    /**
+     * Merges adjacent text components of a section (slot is null) or of a slot into a single text component and returns
+     * the ID of the merged component if targetId was merged into it
+     */
+    private mergeAdjacentTextComponents(sectionId: string, slot: SlotRef | null, targetId?: string, separator: string = ''): string | undefined {
         const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return undefined;
 
-        const entries = Object.entries(section.content);
-        if (entries.length < 2) return undefined;
+        const entries = this.readEntries(section, slot);
+        if (!entries || entries.length < 2) return undefined;
 
         const newEntries: [string, C][] = [];
         let i = 0;
@@ -533,7 +575,7 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         }
 
         if (newEntries.length !== entries.length) {
-            section.content = Object.fromEntries(newEntries);
+            this.writeEntries(section, slot, newEntries);
         }
         
         return resultingTargetId;

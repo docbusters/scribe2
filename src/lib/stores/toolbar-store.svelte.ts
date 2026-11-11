@@ -1,3 +1,5 @@
+import type { SlotRef } from '../domain/components/Component.js';
+
 export type ToolbarInsertionMode = 'after' | 'before' | 'replace' | 'split';
 
 export interface ToolbarSplitData {
@@ -9,11 +11,13 @@ export interface ToolbarOpenOptions {
     insertionMode?: ToolbarInsertionMode;
     splitData?: ToolbarSplitData;
     restoreFocus?: () => void;
+    /** The slot the component is appended to when there is no target (the content of the section when null) */
+    slot?: SlotRef | null;
 }
 
 /** Where and how a new component is inserted, given the caret of a text */
 export interface ToolbarInsertion extends ToolbarOpenOptions {
-    /** Component the new one is placed relative to. Null means appending at the end of the section */
+    /** Component the new one is placed relative to. Null means appending at the end of the section, or of the slot */
     targetId: string | null;
     /** The text is empty, so the new component takes its place */
     isEmpty: boolean;
@@ -28,6 +32,7 @@ export class ToolbarStore {
     shouldReplaceComponent = $state(false);
     insertionMode = $state<ToolbarInsertionMode>('after');
     splitData = $state<ToolbarSplitData | null>(null);
+    slot = $state<SlotRef | null>(null);
     restoreFocus: (() => void) | null = null;
 
     open(
@@ -52,6 +57,7 @@ export class ToolbarStore {
         }
 
         this.splitData = options?.splitData || null;
+        this.slot = options?.slot ?? null;
         this.restoreFocus = options?.restoreFocus || null;
         this.isOpen = true;
     }
@@ -61,7 +67,8 @@ export class ToolbarStore {
         this.open(x, y, sectionId, insertion.targetId, insertion.isEmpty, {
             insertionMode: insertion.insertionMode,
             splitData: insertion.splitData,
-            restoreFocus: insertion.restoreFocus
+            restoreFocus: insertion.restoreFocus,
+            slot: insertion.slot
         });
     }
 
@@ -72,6 +79,7 @@ export class ToolbarStore {
         this.shouldReplaceComponent = false;
         this.insertionMode = 'after';
         this.splitData = null;
+        this.slot = null;
         this.restoreFocus = null;
     }
 }

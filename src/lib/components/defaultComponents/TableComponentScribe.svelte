@@ -1,31 +1,15 @@
 <script lang="ts">
     /* eslint-disable @typescript-eslint/no-unused-vars */
     import type { ScribeComponentProps } from '../../registry/ComponentRegistry.ts';
-	import type { TableCellIndex, TableComponent } from '../../domain/components/DefaultComponents.ts';
+	import type { TableComponent } from '../../domain/components/DefaultComponents.ts';
 	import EmptyContent from '../utilComponents/EmptyContent.svelte';
-	import ComponentRenderer from '../component/ComponentRenderer.svelte';
-	import type { ComponentValue, RecordValue } from '$lib/domain/data/DataValue.js';
+	import ComponentSlot from '../content/ComponentSlot.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
-    let { componentData, mode, sectionId, resolvedValue, isDarkMode }: ScribeComponentProps<TableComponent> = $props();
+    let { componentData, mode, sectionId, isDarkMode }: ScribeComponentProps<TableComponent> = $props();
     const i18n = getI18n();
 
-    const recordValue = $derived(resolvedValue as RecordValue<TableCellIndex, ComponentValue>);
     const config = $derived(componentData.config);
-
-    const getCellValue = (cell: TableCellIndex) => {
-        if (!recordValue) return null;
-        const cellValue = recordValue.value[cell];
-        if (!cellValue) return null;
-
-        if (cellValue.type !== 'component') {
-            throw new Error(i18n.t('errors.tableCellNotComponent', { cell }));
-        }
-
-        const componentValue = cellValue.value;
-
-        return componentValue;
-    };
 </script>
 
 {#if config}
@@ -34,11 +18,9 @@
             {#each Array.from({ length: config.rows }) as _, rowIndex (`row-${rowIndex}`)}
                 <tr>
                     {#each Array.from({ length: config.cols }) as _, colIndex (`col-${colIndex}`)}
-                        {@const componentData = getCellValue(`${rowIndex}:${colIndex}`)}
                         <td>
-                            {#if componentData}
-                                <ComponentRenderer {componentData} {sectionId} {mode} {isDarkMode} disabledOptions={['add', 'duplicate']} />
-                            {/if}
+                            <!-- Every cell is a slot: it holds components like a section does -->
+                            <ComponentSlot {componentData} slotKey={`${rowIndex}:${colIndex}`} {sectionId} {mode} {isDarkMode} />
                         </td>
                     {/each}
                 </tr>
@@ -69,6 +51,11 @@
         border-bottom: 1px solid var(--scribe-border-color);
         padding: 0.5rem;
         position: relative;
+        /* Cells hold a flow of components, and the one that is shorter than its neighbour must start at the same line */
+        vertical-align: top;
+        overflow-wrap: anywhere;
+        /* A height lets the slot of the cell fill it with a percentage height. A row is never shorter than its content */
+        height: 1px;
     }
     td:last-child {
         border-right: none;

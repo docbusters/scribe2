@@ -36,8 +36,9 @@
     // A ghost is a placeholder to write in, it is not part of the document until it has content
     let isGhost = $derived(componentData.id.startsWith('__ghost'));
 
-    // The ghost of an empty section has no neighbour, so it is the only place to write and always shows a hint
-    let isSectionPlaceholder = $derived(isGhost && !componentData.insertAfterId && !componentData.insertBeforeId);
+    // A ghost with no neighbour is alone in its flow (an empty section or an empty slot), so it is the only place to write: it is
+    // drawn as a full width line. Only the one of a section shows a hint, as a slot is a place to write inside a component
+    let isAloneInFlow = $derived(isGhost && !componentData.insertAfterId && !componentData.insertBeforeId);
 
     /**
      * Where a component is inserted when this text is empty. A ghost is not part of the document, so it inserts relative
@@ -91,21 +92,20 @@
     }
 
     /**
-     * Creates a text component with the value of a ghost, next to the neighbour the ghost is placed by.
-     * Returns the id of the new text, or null if it could not be created
+     * Creates a text component with the value of a ghost, next to the neighbour the ghost is placed by (in the slot of the ghost
+     * when it has no neighbour). Returns the id of the new text, or null if it could not be created
      */
     function createTextFromGhost(newValue: StringValue): string | null {
         const insertBeforeId = componentData.insertBeforeId ?? null;
-        const insertAfterId = componentData.insertAfterId ?? null;
 
-        if (insertBeforeId) {
-            const res = editStore.insertComponent(sectionId, insertBeforeId, 'text', {
-                mode: 'before',
-                overrideValue: newValue
+        const res = insertBeforeId
+            ? editStore.insertComponent(sectionId, insertBeforeId, 'text', { mode: 'before', overrideValue: newValue })
+            : editStore.insertComponent(sectionId, componentData.insertAfterId ?? null, 'text', {
+                mode: 'after',
+                overrideValue: newValue,
+                slot: componentData.slot
             });
-            return res?.newId ?? null;
-        }
-        return editStore.addComponent(sectionId, insertAfterId, 'text', false, newValue);
+        return res?.newId ?? null;
     }
 
     function handleTextChange(event: Event & { currentTarget: EventTarget & HTMLSpanElement; }) {
@@ -266,7 +266,7 @@
         };
 
         return {
-            insertion: { targetId, isEmpty: isActuallyEmpty, insertionMode, splitData, restoreFocus },
+            insertion: { targetId, isEmpty: isActuallyEmpty, insertionMode, splitData, restoreFocus, slot: componentData.slot ?? null },
             caretRect
         };
     }
@@ -724,11 +724,11 @@
         tabindex={mode === 'edit' ? 0 : undefined}
         class="edit-text" 
         class:is-empty={isEmpty && mode === 'edit'}
-        class:is-section-placeholder={isSectionPlaceholder && mode === 'edit'}
+        class:is-alone={isAloneInFlow && mode === 'edit'}
         class:is-ghost={componentData.id.startsWith('__ghost') && mode === 'edit'}
         class:is-between-blocks={componentData.isBetweenBlocks}
         class:is-inline-slot={!!componentData.insertBeforeId && !componentData.isBetweenBlocks && mode === 'edit'}
-        data-placeholder={isSectionPlaceholder ? i18n.t('editor.emptySectionPlaceholder') : undefined}
+        data-placeholder={isAloneInFlow && !componentData.slot ? i18n.t('editor.emptySectionPlaceholder') : undefined}
         contenteditable={mode === 'edit'} 
         onfocus={mode === 'edit' ? handleFocus : undefined}
         onblur={handleTextChange} 
@@ -770,7 +770,7 @@
     /* An empty inline-block has no line of its own, so its caret would not line up with the text around it and its height
        would not match a line. A zero-width space (generated, so it is not part of the content) gives it one line, with the
        baseline and height of the surrounding text. The other slots draw their own content or have their own height */
-    .edit-text.is-empty:not(.is-between-blocks):not(.is-section-placeholder)::before {
+    .edit-text.is-empty:not(.is-between-blocks):not(.is-alone)::before {
         content: '\200b';
     }
 
@@ -787,14 +787,15 @@
         min-width: 2px;
     }
 
-    /* The only place to write in an empty section: full width, with a hint that is visible even without focus */
-    .edit-text.is-section-placeholder.is-empty {
+    /* The only place to write in an empty section or slot: a full width line, as tall as a line of text so the text does not move
+       when it is typed, and saved as a text. The one of a section has a hint that is visible even without focus */
+    .edit-text.is-alone.is-empty {
         display: block;
         width: 100%;
         min-height: 1.5rem;
     }
 
-    .edit-text.is-section-placeholder.is-empty::before {
+    .edit-text.is-alone.is-empty[data-placeholder]::before {
         content: attr(data-placeholder);
         float: left;
         height: 0;

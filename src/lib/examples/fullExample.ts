@@ -190,59 +190,80 @@ export const fullExampleDocument: Document = {
                     value: {
                         type: 'record',
                         value: {
+                            // Every cell is a slot: its components are keyed by their ids. A cell that is not here is empty
                             '0:0': {
-                                type: 'component',
+                                type: 'record',
                                 value: {
-                                    type: 'text',
-                                    id: 'text-table',
-                                    mode: 'inline',
-                                    value: {
-                                        type: 'string',
-                                        value: 'I am normal text'
+                                    'text-table': {
+                                        type: 'component',
+                                        value: {
+                                            type: 'text',
+                                            id: 'text-table',
+                                            mode: 'inline',
+                                            value: {
+                                                type: 'string',
+                                                value: 'I am normal text'
+                                            }
+                                        }
                                     }
                                 }
                             },
                             '1:1': {
-                                type: 'component',
+                                type: 'record',
                                 value: {
-                                    id: 'image-table',
-                                    type: 'image',
-                                    mode: 'block',
-                                    value: {
-                                        type: 'string',
-                                        value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg',
-                                    },
-                                    config: {
-                                        height: '150px',
-                                        position: 'contain',
-                                        
-                                        align: 'center',
+                                    'image-table': {
+                                        type: 'component',
+                                        value: {
+                                            id: 'image-table',
+                                            type: 'image',
+                                            mode: 'block',
+                                            value: {
+                                                type: 'string',
+                                                value: 'https://sceps.es/wp-content/uploads/2017/08/Logo-UMU.jpg',
+                                            },
+                                            config: {
+                                                height: '150px',
+                                                position: 'contain',
+
+                                                align: 'center',
+                                            }
+                                        }
                                     }
                                 }
                             },
                             '0:2': {
-                                type: 'component',
+                                type: 'record',
                                 value: {
-                                    type: 'text-input',
-                                    id: 'input-table-1',
-                                    mode: 'inline',
-                                    value: {
-                                        type: 'binding',
-                                        bindingType: 'default',
-                                        value: 'table-latex-binding',
+                                    'input-table-1': {
+                                        type: 'component',
+                                        value: {
+                                            type: 'text-input',
+                                            id: 'input-table-1',
+                                            mode: 'inline',
+                                            value: {
+                                                type: 'binding',
+                                                bindingType: 'default',
+                                                value: 'table-latex-binding',
+                                            }
+                                        }
                                     }
                                 }
                             },
                             '1:2': {
-                                type: 'component',
+                                type: 'record',
                                 value: {
-                                    type: 'latex',
-                                    id: 'table-latex',
-                                    mode: 'inline',
-                                    value: {
-                                        type: 'binding',
-                                        bindingType: 'default',
-                                        value: 'table-latex-binding',
+                                    'table-latex': {
+                                        type: 'component',
+                                        value: {
+                                            type: 'latex',
+                                            id: 'table-latex',
+                                            mode: 'inline',
+                                            value: {
+                                                type: 'binding',
+                                                bindingType: 'default',
+                                                value: 'table-latex-binding',
+                                            }
+                                        }
                                     }
                                 }
                             }

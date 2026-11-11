@@ -121,14 +121,19 @@
             "type": "record",
             "value": {
               "0:0": {
-                "type": "component",
+                "type": "record",
                 "value": {
-                  "type": "text",
-                  "id": "text-table",
-                  "mode": "inline",
-                  "value": {
-                    "type": "string",
-                    "value": "I am normal text"
+                  "text-table": {
+                    "type": "component",
+                    "value": {
+                      "type": "text",
+                      "id": "text-table",
+                      "mode": "inline",
+                      "value": {
+                        "type": "string",
+                        "value": "I am normal text"
+                      }
+                    }
                   }
                 }
               }

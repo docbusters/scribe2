@@ -1,5 +1,11 @@
 import { getSelection } from './selection.js';
 
+/** The element ComponentSlot draws around the content of a slot */
+const SLOT_SELECTOR = '.scribe-component-slot';
+
+/** Larger than any distance between lines, so a penalised candidate loses to every other one */
+const OTHER_COLUMN_PENALTY = 1e9;
+
 export interface FocusNavigationDetail {
     direction: 'up' | 'down' | 'left' | 'right';
     x?: number;
@@ -600,6 +606,10 @@ export function navigateToAdjacentComponent(
     const currentLineBottom = caret.bottom;
     const currentLineCenter = caret.y;
 
+    // The horizontal span of the column the caret is in: the slot that holds it (a table cell...), or only the caret outside of any slot
+    const currentSlot = currentElement.closest(SLOT_SELECTOR);
+    const currentSpan = currentSlot ? currentSlot.getBoundingClientRect() : { left: currentX, right: currentX };
+
     // Measure each candidate once, keeping only those strictly above or below the current visual line
     const scoredCandidates: { el: HTMLElement; score: number }[] = [];
 
@@ -638,8 +648,22 @@ export function navigateToAdjacentComponent(
 
         const verticalDist = Math.abs(dyCenter);
 
+        // The lines of the slot of another column (the next cell of a row) can be nearer than the ones of the cell below or above,
+        // but they are not what the arrow means. From inside a slot they are skipped, so the caret goes to the cell of its column or
+        // out of the table. From outside, the slot of the column under the caret wins, and any other is a last resort (the caret may be
+        // beside the table, and still has to be able to enter it)
+        let columnPenalty = 0;
+        const candidateSlot = el.closest(SLOT_SELECTOR);
+        if (candidateSlot && candidateSlot !== currentSlot) {
+            const span = candidateSlot.getBoundingClientRect();
+            if (span.right < currentSpan.left || span.left > currentSpan.right) {
+                if (currentSlot) continue;
+                columnPenalty = OTHER_COLUMN_PENALTY;
+            }
+        }
+
         // Prioritize the nearest line vertically, then horizontal proximity
-        scoredCandidates.push({ el, score: verticalDist * 100 + dx });
+        scoredCandidates.push({ el, score: verticalDist * 100 + dx + columnPenalty });
     }
 
     // Focus the closest geometric candidate. Do NOT fall back to horizontal DOM neighbors

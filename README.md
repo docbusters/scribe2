@@ -63,6 +63,70 @@ Make sure it is intalled correctly in `package.json`
 
 - [**Simple html in edit mode**](/test/simple-webcomponent-test-edit.html): Shows the library usage in edit mode
 
+## Slots: editable areas inside a component
+
+A **slot** is an area inside a component that works like a section: the user types text in it, inserts any registered component with Add or <kbd>Ctrl</kbd>+<kbd>Space</kbd>, and moves through it with the arrow keys, leaving it into the next text or cell. The cells of the default table are slots. `ComponentSlot` draws one, so a custom component (a card, a two-column layout, a callout...) gets all of that without handling any of it.
+
+### How it is stored
+
+The component that holds slots keeps them in its value, which must be a **record**: every entry is one slot, and its value is a record of components keyed by their ids, in order. A slot that is not in the record is empty.
+
+```ts
+const callout = {
+	id: 'callout-1',
+	type: 'callout',
+	mode: 'block',
+	value: {
+		type: 'record',
+		value: {
+			// The slot "body": one text, keyed by its id
+			body: {
+				type: 'record',
+				value: {
+					'text-1': { type: 'component', value: { id: 'text-1', type: 'text', mode: 'inline', value: { type: 'string', value: 'Hello' } } }
+				}
+			}
+		}
+	}
+};
+```
+
+Register the type with `empty.value: 'record'` and `valueTypes: ['record']`. A new component starts with an empty record, as a slot is stored when something is written in it. The editor does the rest: inserting, deleting and duplicating components in a slot (the copy gets new ids, nested components included), splitting a text at the caret, and tracking the bindings of the nested components.
+
+### In a Svelte component
+
+```svelte
+<script lang="ts">
+	import { ComponentSlot, type ScribeComponentProps } from '@antonii22/scribe2';
+	let { componentData, sectionId, mode, isDarkMode }: ScribeComponentProps<CalloutComponent> = $props();
+</script>
+
+<aside class="callout">
+	<ComponentSlot {componentData} slotKey="body" {sectionId} {mode} {isDarkMode} />
+</aside>
+```
+
+| Prop | Description |
+| --- | --- |
+| `componentData` | The component that holds the slot. Its value must be a record. |
+| `slotKey` | The entry of that record where the slot is stored. Every key is a different slot, so a component can have as many as it needs (the table uses `row:col`). |
+| `sectionId`, `mode`, `isDarkMode` | The same ones every component receives. |
+
+### As a web component
+
+The same element is registered as `<scribe-component-slot>`, with the same props (`componentData` as an object, the others as attributes):
+
+```html
+<scribe-component-slot slotKey="body" sectionId="section-1" mode="edit"></scribe-component-slot>
+```
+
+### Good to know
+
+- A slot is not the whole component: clicking the padding around slots selects the component that holds them, and clicking inside a slot places the caret there. Set `padding` on the area that surrounds each slot (as the table does on its cells), so the component can be selected.
+- Slots can be nested: a table in a table cell works, and so does a callout in a callout.
+- An entry that is not a record of components (for example a document saved before the component used slots) shows an error box instead of the content.
+- `SlotRef` (`{ parentId, slotKey }`) is the type that says where a component is stored, and `ComponentSlotProps` the props above.
+
 ## Styling
 
 Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairline borders, a blue primary colour that doubles as the accent. Every colour comes from a CSS variable, so a host app can make it match its own palette by overriding the variables below. Load [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and set only what you need:

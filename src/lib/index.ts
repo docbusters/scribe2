@@ -1,6 +1,7 @@
 import type { ScribeProps, CustomBinding } from './types/ScribeProps.js';
 import ScribeComponent from './components/Scribe.svelte';
 import type { ComponentRendererProps } from './types/CustomRendererProps.js';
+import type { ComponentSlotProps } from './types/ComponentSlotProps.js';
 import type { EmptyContentProps } from './types/EmptyContentProps.js';
 import type { BindingsPanelProps } from './types/BindingsPanelProps.js';
 import type { Component } from 'svelte';
@@ -49,8 +50,13 @@ export type { ComponentRegistry, ScribeComponentProps };
 import type { DefaultComponents } from './registry/defaultRegistry.js';
 export type { DefaultComponents };
 
-import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig } from './domain/components/Component.js';
-export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig };
+import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef } from './domain/components/Component.js';
+export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef };
+
+// SLOTS
+import ComponentSlotSvelte from './components/content/ComponentSlot.svelte';
+export const ComponentSlot = ComponentSlotSvelte as Component<ComponentSlotProps>;
+export type { ComponentSlotProps };
 
 import type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
 export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
@@ -79,6 +85,7 @@ declare global {
     interface HTMLElementTagNameMap {
         'scribe-interpreter': ScribeInterpreterElement;
         'scribe-component-renderer': HTMLElement & ComponentRendererProps;
+        'scribe-component-slot': HTMLElement & ComponentSlotProps;
         'scribe-empty-content': HTMLElement & EmptyContentProps;
         'scribe-bindings-panel': HTMLElement & BindingsPanelProps;
     }
@@ -88,6 +95,7 @@ declare global {
         interface IntrinsicElements {
             'scribe-interpreter': ScribeProps;
             'scribe-component-renderer': ComponentRendererProps;
+            'scribe-component-slot': ComponentSlotProps;
             'scribe-empty-content': EmptyContentProps;
             'scribe-bindings-panel': BindingsPanelProps;
         }
@@ -104,6 +112,13 @@ declare global {
                 [key: string]: any;
             };
             'scribe-component-renderer': ComponentRendererProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                [key: string]: any;
+            };
+            'scribe-component-slot': ComponentSlotProps & {
                 id?: string;
                 class?: string;
                 style?: string;

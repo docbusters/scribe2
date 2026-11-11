@@ -151,6 +151,7 @@ scribe-interpreter,
 scribe-bindings-panel,
 scribe-empty-content,
 scribe-component-renderer,
+scribe-component-slot,
 .scribe-dialog-content,
 .scribe-dropdown-content {
 	--scribe-border-strong: color-mix(in oklab, var(--scribe-doc-foreground) 22%, var(--scribe-section-background)); /* Field borders, dashed borders */
@@ -298,7 +299,7 @@ scribe-interpreter, scribe-bindings-panel {
 	width: 100%;
 }
 
-.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-bindings-panel {
+.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-component-slot, scribe-bindings-panel {
 	/* Base typography and coloring to stop inheritance from host body */
 	color: var(--scribe-doc-foreground);
 	font-family: var(--scribe-font-sans);

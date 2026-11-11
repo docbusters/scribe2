@@ -208,7 +208,7 @@
 	// Selectors of the areas that must keep the current selection when interacted with.
 	// Inside a paragraph the selection is replaced by the text that receives the focus (a component or an insertion point),
 	// so the interaction does not need to clear it first
-	const KEEP_SELECTION_SELECTOR = '.component-edit-contents, .paragraph-section, .scribe-portal-target, .scribe-dropdown-content, .scribe-top-toolbar';
+	const KEEP_SELECTION_SELECTOR = '.component-edit-contents, .component-flow, .scribe-portal-target, .scribe-dropdown-content, .scribe-top-toolbar';
 
 	/**
 	 * Clears the selection when the interaction happens outside any component or selection-preserving area.

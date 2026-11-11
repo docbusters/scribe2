@@ -34,7 +34,7 @@ Scribe combines three things a generic rich-text editor does not:
 - Built-in components: text (bold/italic/underline/strikethrough), text binding, text input,
   table, chart, image, map (geocoding), LaTeX.
 - Published as `@antonii22/scribe2` on GitHub Packages. Companion elements:
-  `<scribe-bindings-panel>`, `<scribe-component-renderer>`, `<scribe-empty-content>`.
+  `<scribe-bindings-panel>`, `<scribe-component-renderer>`, `<scribe-component-slot>`, `<scribe-empty-content>`.
 
 ## Capabilities and Constraints
 - One Scribe instance per page (singleton stores).

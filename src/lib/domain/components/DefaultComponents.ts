@@ -17,8 +17,9 @@ export type ImageComponent = BlockComponent<'image', StringValue | BindingValue,
 /** Renders latex content */
 export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue, LatexComponentConfig>;
 
-/** Renders a table */
-export type TableComponent = BlockComponent<'table', RecordValue<TableCellIndex, ComponentValue>, TableComponentConfig>;
+/** Renders a table. Every cell is a slot: it holds components like a section, keyed by their ids */
+export type TableComponent = BlockComponent<'table', RecordValue<TableCellIndex, RecordValue<string, ComponentValue>>, TableComponentConfig>;
+/** Key of a cell, as `row:col` */
 export type TableCellIndex = `${number}:${number}`;
 
 /** Renders an interactive map */

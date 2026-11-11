@@ -251,7 +251,7 @@ export interface Translations {
 		unsupportedValueType: string;
 		unsupportedBindingType: string;
 		invalidMapValue: string;
-		tableCellNotComponent: string;
+		invalidSlotContent: string;
 	};
 }
 

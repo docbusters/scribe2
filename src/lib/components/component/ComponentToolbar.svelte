@@ -49,6 +49,7 @@
         const componentId = toolbarStore.componentId;
         const mode = toolbarStore.insertionMode;
         const splitData = toolbarStore.splitData || undefined;
+        const slot = toolbarStore.slot;
 
         // Clear restoreFocus so we don't refocus the previous text component on close
         toolbarStore.restoreFocus = null;
@@ -61,6 +62,7 @@
             {
                 mode,
                 splitData,
+                slot,
             }
         );
         toolbarStore.close();
@@ -72,7 +74,7 @@
                     // Only search inside the Scribe instance that owns this toolbar
                     const scope: ParentNode = anchorElement?.closest('.scribe-document') ?? document;
                     const sectionEl = scope.querySelector(`[data-section-id="${sectionId}"]`)
-                        || scope.querySelector('.paragraph-section');
+                        || scope.querySelector('.component-flow');
 
                     let targetEl: HTMLElement | null = null;
                     if (result.rightTextId) {

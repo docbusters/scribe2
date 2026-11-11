@@ -250,7 +250,7 @@ export const es: Translations = {
 		unsupportedValueType: 'Tipo de valor no admitido: {type}',
 		unsupportedBindingType: 'Tipo de valor de variable no admitido: {type}',
 		invalidMapValue: 'Valor no válido para el componente de mapa',
-		tableCellNotComponent: 'La celda {cell} de la tabla debe ser un componente'
+		invalidSlotContent: 'El hueco "{slot}" debe contener componentes, indexados por su id'
 	}
 };
 

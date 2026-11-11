@@ -250,7 +250,7 @@ export const en: Translations = {
 		unsupportedValueType: 'Unsupported value type: {type}',
 		unsupportedBindingType: 'Unsupported binding value type: {type}',
 		invalidMapValue: 'Invalid value for the map component',
-		tableCellNotComponent: 'Table cell {cell} must be a component value'
+		invalidSlotContent: 'Slot "{slot}" must hold components, keyed by their ids'
 	}
 };
 

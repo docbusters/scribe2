@@ -109,6 +109,12 @@
 		if (mode !== 'edit') return;
 		const target = event.target as Element | null;
 		if (target?.closest('.component-edit-contents') !== event.currentTarget) return;
+
+		// A slot of this component is a place to write, like a section. What is in it that has no wrapper of its own (an empty text,
+		// the blank space) must not select the component that holds the slot, as it would replace the insertion point the caret is in
+		const slotElement = target?.closest('.scribe-component-slot');
+		if (slotElement && (event.currentTarget as Element).contains(slotElement)) return;
+
 		selectionStore.select(sectionId, componentData.id, componentDef ? $state.snapshot(disabledOptions) : [...$state.snapshot(disabledOptions), 'setValue']); // An unknown type has no value types, so there is nothing to set
 	}
 
@@ -380,7 +386,8 @@
 	}
 
 	/* Nesting prevention: if a nested component is hovered, suppress the parent highlight */
-	.component-edit-contents:hover:has(:global(.component-edit-contents):hover) {
+	.component-edit-contents:hover:has(:global(.component-edit-contents):hover),
+	.component-edit-contents:hover:has(:global(.scribe-component-slot):hover) {
 		background-color: transparent !important;
 	}
 </style>
