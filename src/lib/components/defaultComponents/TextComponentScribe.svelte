@@ -9,7 +9,7 @@
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { findEditableText, handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
-	import { getFormatsInRange, toggleTextFormat, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
+	import { getFormatsInRange, toggleTextFormat, tokenizeFormattedText, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
 	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
@@ -54,55 +54,6 @@
     /** A ghost or an empty text holds no component, so toolbars need to know the caret is in a place where a component can be inserted */
     function selectInsertionPoint() {
         selectionStore.selectInsertionPoint(sectionId, componentData.id);
-    }
-
-    function parseTokens(text: string) {
-        const tokens = [];
-        let currentText = '';
-        let bold = false;
-        let italic = false;
-        let strikethrough = false;
-        let underline = false;
-
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            // If we find a backslash, we add the next character as a normal character to escape formatting
-            if (char === '\\') {
-                if (i + 1 < text.length) {
-                    currentText += text[i + 1];
-                    i++;
-                } else {
-                    currentText += char;
-                }
-                continue;
-            }
-
-            // Toggle formatting states when we encounter formatting characters
-            if (char === BOLD_CHAR) {
-                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
-                currentText = '';
-                bold = !bold;
-            } else if (char === ITALIC_CHAR) {
-                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
-                currentText = '';
-                italic = !italic;
-            } else if (char === STRIKETHROUGH_CHAR) {
-                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
-                currentText = '';
-                strikethrough = !strikethrough;
-            } else if (char === UNDERLINE_CHAR) {
-                if (currentText) tokens.push({ text: currentText, bold, italic, strikethrough, underline });
-                currentText = '';
-                underline = !underline;
-            } else {
-                currentText += char;
-            }
-        }
-        if (currentText || tokens.length === 0) {
-            tokens.push({ text: currentText, bold, italic, strikethrough, underline });
-        }
-
-        return tokens;
     }
 
     function parseDOM(node: Node): string {
@@ -477,7 +428,7 @@
                 continue;
             }
 
-            for (const token of parseTokens(line)) {
+            for (const token of tokenizeFormattedText(line).tokens) {
                 const span = document.createElement('span');
                 for (const key of FORMAT_KEYS) {
                     if (token[key]) span.classList.add(FORMAT_CLASSES[key]);
@@ -798,7 +749,7 @@
             {#if line === ''}
                 <br>
             {:else}
-                {#each parseTokens(line) as token, index (index)}
+                {#each tokenizeFormattedText(line).tokens as token, index (index)}
                     <span 
                         class:is-bold={token.bold} 
                         class:is-italic={token.italic} 

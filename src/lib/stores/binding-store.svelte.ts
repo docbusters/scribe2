@@ -42,23 +42,28 @@ class BindingStore {
     }
 
     initialize(bindings: Record<string, BindingsDefinition>) {
-        // The given bindings replace the current ones, so a binding that is no longer provided disappears
-        this.data = {};
-        Object.entries(bindings).forEach(([id, binding]) => {
-            this.addBinding(id, binding);
-        });
+        // The given bindings replace the current ones, so a binding that is no longer provided disappears. The map is built apart
+        // and assigned once: this runs inside an effect, and reading this.data there would make the effect depend on the state it writes
+        const data: typeof this.data = {};
+        for (const [id, binding] of Object.entries(bindings)) {
+            data[id] = this.createBindingValue(binding);
+        }
+        this.data = data;
     }
 
     // BINDINGS
 
-    addBinding(id: string, binding: BindingsDefinition) {
+    private createBindingValue(binding: BindingsDefinition) {
         // If no initial value is provided, use an empty value based on the type
-        const primitiveValue = (
+        return (
             binding.initialValue !== undefined
                 ? { type: binding.type, value: binding.initialValue }
                 : generateDefaultDataValue(binding.type)
         ) as CollectionValue | PrimitiveValue;
-        this.data[id] = primitiveValue;
+    }
+
+    addBinding(id: string, binding: BindingsDefinition) {
+        this.data[id] = this.createBindingValue(binding);
     }
 
     removeBinding(id: string) {

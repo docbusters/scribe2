@@ -21,47 +21,66 @@ const FORMAT_CHAR_SET = new Set(Object.values(FORMAT_CHARS));
 
 const isFormatChar = (char: string | null) => char !== null && FORMAT_CHAR_SET.has(char);
 
+const FORMAT_KEYS = Object.keys(FORMAT_CHARS) as TextFormatCommand[];
+
+const COMMAND_BY_CHAR = new Map<string, TextFormatCommand>(FORMAT_KEYS.map((command) => [FORMAT_CHARS[command], command]));
+
+/** A run of visible text that has the same formats all along */
+export type FormatToken = TextFormats & { text: string };
+
+/**
+ * Reads a stored text: the only place that tells format characters, escapes and visible text apart when reading.
+ * Escaped characters and format characters never end up in the text of a token, so the length of the tokens is the visible length.
+ * Without any visible character there is one empty token. `end` is the state of the formats after the last character
+ */
+export function tokenizeFormattedText(text: string): { tokens: FormatToken[]; end: TextFormats } {
+    const tokens: FormatToken[] = [];
+    const state: TextFormats = { bold: false, italic: false, strikethrough: false, underline: false };
+    let current = '';
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (char === ESCAPE_CHAR) {
+            // The next character is literal, and a trailing escape character is literal itself
+            current += i + 1 < text.length ? text[++i] : char;
+            continue;
+        }
+
+        const command = COMMAND_BY_CHAR.get(char);
+        if (command) {
+            if (current) tokens.push({ text: current, ...state });
+            current = '';
+            state[command] = !state[command];
+        } else {
+            current += char;
+        }
+    }
+
+    if (current || tokens.length === 0) tokens.push({ text: current, ...state });
+    return { tokens, end: { ...state } };
+}
+
 /**
  * The formats that the whole fragment of a text has. The fragment is given in visible characters, so format characters
  * do not count and an escaped character counts as one. A fragment without visible characters gets the format at the end of the text
  */
 export function getFormatsInRange(markdown: string, visualStart: number, visualEnd: number): TextFormats {
-    const active: TextFormats = { bold: false, italic: false, strikethrough: false, underline: false };
+    const { tokens, end } = tokenizeFormattedText(markdown);
     const shared: TextFormats = { bold: true, italic: true, strikethrough: true, underline: true };
-    let visualIndex = 0;
+    let offset = 0;
     let hasSelectedChars = false;
 
-    const countVisibleChar = () => {
-        if (visualIndex >= visualStart && visualIndex < visualEnd) {
+    for (const token of tokens) {
+        // The token takes part when it has at least one visible character inside the fragment
+        if (Math.max(offset, visualStart) < Math.min(offset + token.text.length, visualEnd)) {
             hasSelectedChars = true;
-            shared.bold &&= active.bold;
-            shared.italic &&= active.italic;
-            shared.strikethrough &&= active.strikethrough;
-            shared.underline &&= active.underline;
+            for (const key of FORMAT_KEYS) shared[key] &&= token[key];
         }
-        visualIndex++;
-    };
-
-    for (let i = 0; i < markdown.length; i++) {
-        const char = markdown[i];
-
-        if (char === ESCAPE_CHAR) {
-            i++; // skip the escaped character
-            countVisibleChar();
-        } else if (char === BOLD_CHAR) {
-            active.bold = !active.bold;
-        } else if (char === ITALIC_CHAR) {
-            active.italic = !active.italic;
-        } else if (char === STRIKETHROUGH_CHAR) {
-            active.strikethrough = !active.strikethrough;
-        } else if (char === UNDERLINE_CHAR) {
-            active.underline = !active.underline;
-        } else {
-            countVisibleChar();
-        }
+        offset += token.text.length;
     }
 
-    return hasSelectedChars ? shared : active;
+    return hasSelectedChars ? shared : end;
 }
 
 /**
