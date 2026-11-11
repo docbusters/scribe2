@@ -18,7 +18,7 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 
 - `src/lib/index.ts` is the public API (`Scribe`, `getDefaultRegistry`, `defaultRegistry`, types, i18n, focus helpers). Changing anything exported there changes a published API.
 - `components/Scribe.svelte` is the root and declares the custom element with `shadow: 'none'`, so styles are global. A new prop needs three edits: `types/ScribeProps.ts`, the `customElement.props` list and the `$props()` destructure. See `showBindingsPanel` and `showPrintButton`.
-- `stores/*.svelte.ts` are singletons built on `$state` classes:
+- `stores/*.svelte.ts` are singletons built on `$state` classes, so only one Scribe per page is supported (`Scribe.svelte` warns when a second one mounts):
   - `edit-store`: every document mutation. `insertComponent` modes are `after`, `before`, `replace` and `split`.
   - `selection-store`: selected component or insertion point, plus the caret source.
   - `toolbar-store`: the add-component dropdown.

@@ -146,3 +146,4 @@ To style the default components, CSS variables can be used. It is recommended us
 ## Important considerations
 
 - **Tailwind**: can be used when developing **ONLY** on the route pages. When developing the web component, if used, styles will not be applied (This is a limitation of web components).
+- **One Scribe per page**: the document, bindings, registry and selection are stored page-wide, so two Scribe instances on the same page overwrite each other. Scribe logs a console warning when a second one is mounted.

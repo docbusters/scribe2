@@ -20,6 +20,11 @@
 	}}
 />
 
+<script module lang="ts">
+	// The stores are page-wide singletons, so a second mounted instance would overwrite the state of the first one
+	let mountedInstances = 0;
+</script>
+
 <script lang="ts" generics="C extends BaseComponent<string, DataValue>">
 	import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 	import type { BaseComponent } from '../domain/components/Component.js';
@@ -30,7 +35,7 @@
 	import { bindingStore } from '../stores/binding-store.svelte.ts';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
 	import type { ScribeProps, CustomBinding } from '../types/ScribeProps.js';
-	import { setContext, onDestroy } from 'svelte';
+	import { setContext, onDestroy, onMount } from 'svelte';
 	import Sortable from 'sortablejs';
 	import type { Document, BindingsDefinition } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -169,6 +174,16 @@
 
 		return () => {
 			unsubscribe();
+		};
+	});
+
+	onMount(() => {
+		mountedInstances++;
+		if (mountedInstances > 1) {
+			console.warn('[Scribe] More than one Scribe instance is mounted on this page. Scribe keeps its state in page-wide stores, so the instances will overwrite each other\'s document, bindings and registry. Use one Scribe per page.');
+		}
+		return () => {
+			mountedInstances--;
 		};
 	});
 

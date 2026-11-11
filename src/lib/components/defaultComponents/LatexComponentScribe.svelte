@@ -31,8 +31,8 @@
     }
 </script>
 
-<!-- Necessary styles for KaTeX -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.css" integrity="sha384-DLNWBifkkOES5azVMtIZ7RYukF2HBwDMBcPyDl6VnXTdJKlv5aO1s6mnOLE0QUyP" crossorigin="anonymous">
+<!-- Necessary styles for KaTeX. The version (and its integrity hash) must match the katex package bundled in package.json -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.5/dist/katex.css" integrity="sha384-zfuvpaZ3OjmRVaLPkCCrb0YbSTd5NgPmLIum+Cmsr06+WhmECuyum4BEipwHyWW4" crossorigin="anonymous">
 
 {#key value}
     <div class="latex-container" in:fade>
