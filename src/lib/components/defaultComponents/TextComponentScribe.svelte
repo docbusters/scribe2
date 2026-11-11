@@ -26,8 +26,6 @@
     };
     const FORMAT_KEYS = Object.keys(FORMAT_CLASSES) as TextFormatCommand[];
 
-    const SHORTCUT_FORMATS: Record<string, TextFormatCommand> = { b: 'bold', i: 'italic', u: 'underline' };
-
     let { componentData, sectionId, mode }: ScribeComponentProps<GhostTextComponent> = $props();
     const i18n = getI18n();
 
@@ -284,16 +282,10 @@
             return;
         }
 
-        // Ctrl/Cmd + B, I and U do what the format buttons do. Left to the browser they would insert tags that are not part of the format
-        if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey) {
-            const command = SHORTCUT_FORMATS[event.key.toLowerCase()];
-            if (command) {
-                event.preventDefault();
-                // The state is read again, as the selection may have changed since the last selectionchange was handled
-                syncFormatState();
-                textFormatStore.toggle(command);
-                return;
-            }
+        // The shortcuts of the format options (Mod+B...) are run by the ribbon, see ComponentEditor. The state is read again here, as
+        // the selection may have changed since the last selectionchange was handled and the ribbon reads it to toggle the format
+        if (event.ctrlKey || event.metaKey) {
+            syncFormatState();
         }
 
         switch (event.key) {

@@ -7,6 +7,7 @@
 	import type { ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
 	import { fly } from "svelte/transition";
 	import { flip } from "svelte/animate";
+	import { isMacPlatform, matchesShortcut, parseShortcut } from "$lib/utils/shortcuts.js";
 	import { cubicOut } from "svelte/easing";
 
     interface ComponentEditorProps {
@@ -75,6 +76,46 @@
 		return group.buttons.filter(button => !button.label).length > MAX_SINGLE_ROW_BUTTONS;
 	}
 
+	const isMac = isMacPlatform();
+
+	// The options that have a valid shortcut. Invalid ones are reported when the registry is initialized
+	let shortcutOptions = $derived(options.flatMap(option => {
+		const parsed = option.shortcut ? parseShortcut(option.shortcut) : null;
+		return parsed ? [{ option, parsed }] : [];
+	}));
+
+	let editorElement: HTMLElement | undefined = $state();
+
+	/**
+	 * Whether typing happens in the target. A shortcut without Ctrl, Mod or Alt must leave its key to the field. Alt ones run: they type
+	 * nothing on Windows and Linux (and the text input can only be selected by focusing it), and on a Mac they win over the Option character
+	 */
+	const isTypingTarget = (target: HTMLElement) => target.isContentEditable || target.matches('input, textarea, select');
+
+	/**
+	 * Runs the option whose shortcut is pressed by clicking its button, so the shortcut behaves exactly as the mouse: it respects the
+	 * disabled state and the options read the caret and the position of the button as usual
+	 */
+	function handleShortcut(event: KeyboardEvent) {
+		// A component that handles the key itself (the text does with Ctrl+Space) calls preventDefault, and wins
+		if (disabled || event.defaultPrevented || event.isComposing || event.repeat || !editorElement) return;
+
+		const target = event.target instanceof HTMLElement ? event.target : null;
+		// Only the document and the page body count. Dialogs and menus have their own keys
+		if (!target || target.closest('[role="dialog"], [role="menu"], [role="listbox"]')) return;
+		if (target !== document.body && !target.closest('.scribe-document')) return;
+
+		const match = shortcutOptions.find(({ parsed }) => matchesShortcut(event, parsed, isMac));
+		if (!match) return;
+		if (!match.parsed.mod && !match.parsed.ctrl && !match.parsed.alt && isTypingTarget(target)) return;
+
+		// Prevented even when the option is disabled, so the browser does not do its own action (Ctrl+B or Ctrl+D)
+		event.preventDefault();
+		const element = editorElement.querySelector(`[data-option-type="${CSS.escape(match.option.type)}"]`);
+		const button = element instanceof HTMLButtonElement ? element : element?.querySelector('button');
+		if (button && !button.disabled) button.click();
+	}
+
 	const getContext = (): ComponentEditOptionContext => ({ sectionId, componentId, value: componentValue, config: componentConfig });
 	const isOptionDisabled = (option: ComponentEditOptions) => disabled || disabledOptions.includes(option.type) || (option.isDisabled?.(getContext()) ?? false);
 	const isOptionSelected = (option: ComponentEditOptions) => option.isSelected?.(getContext()) ?? false;
@@ -92,6 +133,7 @@
 			get isBinding() { return componentValue.type === 'binding'; },
 			get disabled() { return isOptionDisabled(option); },
 			get isSelected() { return isOptionSelected(option); },
+			shortcut: option.shortcut,
 			name,
 			label,
 			onclick: option.props.onclick,
@@ -102,16 +144,21 @@
 	}
 </script>
 
-<div class="component-editor">
+<svelte:document onkeydown={handleShortcut} />
+
+<div class="component-editor" bind:this={editorElement}>
 	{#each groups as group (group.title)}
 		<!-- ComponentEditOptions.ts finds this element by its class to open the add dropdown below the whole group -->
 		<div class="component-editor-group" in:fly={{ y: 6, duration: 220, delay: 80, easing: cubicOut }} animate:flip={{ duration: 220, easing: cubicOut }}>
 			<div class="group-buttons" class:is-grid={isGrid(group)}>
 				{#each group.buttons as button (button.option)}
 					{#if button.option.render}
-						<div style="display: contents;" use:renderOption={button}></div>
+						<!-- data-option-type lets the shortcuts find the button, which the option draws -->
+						<div style="display: contents;" data-option-type={button.option.type} use:renderOption={button}></div>
 					{:else}
 						<ComponentEditorButton
+							data-option-type={button.option.type}
+							shortcut={button.option.shortcut}
 							name={button.name}
 							label={button.label}
 							icon={button.option.props.icon}

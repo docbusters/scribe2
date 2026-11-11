@@ -244,6 +244,9 @@ White card, hairline, 14px corner, `shadow-sm`. Edit handles and the section edi
 ### Ribbon and add-component dropdown
 White sticky card; large buttons (icon over label) in titled groups, the chosen option shown as a soft blue pill (accent wash, accent text, accent hairline) through the `soft` button variant. The dropdown is a 264px popover card, 14px corner, `shadow-float`, 8px item corners.
 
+### Ribbon tooltip
+A compact label in the ink of the document on the section surface (inverted, so it stands out from the white ribbon in both themes), `shadow-float`, 8px corner, 12px medium text. It drops below the whole ribbon, not over the group title, with a small arrow at its button. The name is the title and the shortcut sits on a second line under it, drawn as quiet translucent key caps (symbols on a Mac), never as the bordered keys of the forms. It appears after 400ms in 140ms with exponential ease-out.
+
 ### Dialogs
 Popover card, 18px corner, `shadow-float`, scrim from `--scribe-overlay`. The footer is a muted band with right-aligned buttons.
 

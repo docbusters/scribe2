@@ -25,6 +25,8 @@ export interface ComponentEditProps {
     /** Short text for the option. When present the option is meant to be drawn as a large button (icon over text) */
     label?: string;
     isSelected: boolean;
+    /** Keyboard shortcut of the option as written in its definition (see `ComponentEditOptions.shortcut`), so a custom render can show it */
+    shortcut?: string;
 }
 
 /** What an option knows about the component it acts on, to decide whether it is selected or disabled */
@@ -42,6 +44,12 @@ export interface ComponentEditOptions {
     label?: string;
     /** Title of the group the option belongs to. Options sharing a group are drawn together, even when they are not consecutive */
     group?: string;
+    /**
+     * Keyboard shortcut that runs the option while its component is selected, for example `Mod+D`, `Mod+Shift+X`, `Ctrl+Space` or `Delete`.
+     * `Mod` is Ctrl on Windows and Linux and Command on Mac. The ribbon shows it in the tooltip of the button, and a console warning
+     * is logged when two options of the same component share one. Shortcuts without Ctrl, Mod or Alt do not run while typing in a text or a field
+     */
+    shortcut?: string;
     /**
      * Function to determine if the option is selected. If not provided, the option will not be considered selected.
      * It is evaluated reactively, so it can read stores and the buttons follow them without being mounted again
@@ -66,6 +74,7 @@ const GROUP_DROPDOWN_GAP = 4;
 export const addComponentOption: ComponentEditOptions = {
     type: 'add',
     name: 'Add component',
+    shortcut: 'Ctrl+Space',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
         onclick: (data: ComponentEditOnClick) => {
@@ -93,6 +102,7 @@ export const addComponentOption: ComponentEditOptions = {
 export const duplicateComponentOption: ComponentEditOptions = {
     type: 'duplicate',
     name: 'Duplicate component',
+    shortcut: 'Mod+D',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
         onclick: (data: ComponentEditOnClick) => {
@@ -105,6 +115,7 @@ export const duplicateComponentOption: ComponentEditOptions = {
 export const deleteComponentOption: ComponentEditOptions = {
     type: 'delete',
     name: 'Delete component',
+    shortcut: 'Delete',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-error-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
         onclick: (data: ComponentEditOnClick) => {
@@ -117,6 +128,7 @@ export const deleteComponentOption: ComponentEditOptions = {
 export const setValueOption: ComponentEditOptions = {
     type: 'setValue',
     name: 'Set value',
+    shortcut: 'Mod+K',
     props: {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>',
         onclick: (data: ComponentEditOnClick) => {

@@ -1,6 +1,7 @@
 import type { ComponentRegistry } from "../registry/ComponentRegistry.js";
 import type { BaseComponent, ComponentConfig } from "../domain/components/Component.js";
 import type { DataValue } from "../domain/data/DataValue.js";
+import { getShortcutWarnings } from "../utils/shortcuts.js";
 
 type UnknownComponent = BaseComponent<string, DataValue, ComponentConfig | undefined>;
 
@@ -9,6 +10,13 @@ class GlobalRegistry {
 
     initialize<T extends UnknownComponent>(customComponents: ComponentRegistry<T>) {
         this.components = customComponents as ComponentRegistry<UnknownComponent>;
+
+        // Reads the argument, not the state: the effect that initializes the registry must not depend on what it writes
+        for (const [type, component] of Object.entries(customComponents)) {
+            for (const warning of getShortcutWarnings(type, component.options ?? [])) {
+                console.warn(warning);
+            }
+        }
     }
 
     getComponent(type: string) {

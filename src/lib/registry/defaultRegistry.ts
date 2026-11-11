@@ -38,10 +38,11 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
      * Option that toggles a format. It acts on the text that holds the caret, which the store follows: it formats the marked
      * fragment, or the characters typed next when there is only a caret. It shows as selected when the format is active there
      */
-    function createTextFormatOption(command: TextFormatCommand, name: string, icon: string): ComponentEditOptions {
+    function createTextFormatOption(command: TextFormatCommand, name: string, shortcut: string, icon: string): ComponentEditOptions {
         return {
             type: `format-${command}`,
             name,
+            shortcut,
             group: groups.format,
             isSelected: () => textFormatStore.componentId !== null && textFormatStore.activeFormats[command],
             isDisabled: () => !textFormatStore.canFormat,
@@ -79,10 +80,10 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         valueTypes: ['empty', 'string'],
         options: [
             ...defaultComponentOptions,
-            createTextFormatOption('bold', i18n.t('textFormat.bold'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold-icon lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>'),
-            createTextFormatOption('italic', i18n.t('textFormat.italic'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic-icon lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>'),
-            createTextFormatOption('underline', i18n.t('textFormat.underline'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline-icon lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>'),
-            createTextFormatOption('strikethrough', i18n.t('textFormat.strikethrough'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-strikethrough-icon lucide-strikethrough"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" x2="20" y1="12" y2="12"/></svg>'),
+            createTextFormatOption('bold', i18n.t('textFormat.bold'), 'Mod+B', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold-icon lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>'),
+            createTextFormatOption('italic', i18n.t('textFormat.italic'), 'Mod+I', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic-icon lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>'),
+            createTextFormatOption('underline', i18n.t('textFormat.underline'), 'Mod+U', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline-icon lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>'),
+            createTextFormatOption('strikethrough', i18n.t('textFormat.strikethrough'), 'Mod+Shift+X', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-strikethrough-icon lucide-strikethrough"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" x2="20" y1="12" y2="12"/></svg>'),
         ],
     },
     'text-input': {
@@ -105,6 +106,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'expand-content',
+                shortcut: 'Alt+Shift+1',
                 name: i18n.t('options.expandWithContent'),
                 group: groups.layout,
                 isSelected: (data: { config?: TextInputComponentConfig }) => data.config?.expandWithContent === true,
@@ -138,6 +140,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'align-left',
+                shortcut: 'Mod+Shift+L',
                 name: i18n.t('options.alignLeft'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'left',
@@ -152,6 +155,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'align-center',
+                shortcut: 'Mod+Shift+E',
                 name: i18n.t('options.alignCenter'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align !== undefined ? data.config.align === 'center' : true, // If align is not set, center is default
@@ -166,6 +170,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'align-right',
+                shortcut: 'Mod+Shift+R',
                 name: i18n.t('options.alignRight'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'right',
@@ -180,6 +185,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'contain',
+                shortcut: 'Alt+Shift+1',
                 name: i18n.t('options.fitContain'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position !== undefined ? data.config?.position === 'contain' : true, // If position is not set, contain is default
@@ -194,6 +200,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'cover',
+                shortcut: 'Alt+Shift+2',
                 name: i18n.t('options.fitCover'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'cover',
@@ -208,6 +215,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'fill',
+                shortcut: 'Alt+Shift+3',
                 name: i18n.t('options.fitFill'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'fill',
@@ -289,6 +297,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'toggle-readonly',
+                shortcut: 'Alt+Shift+1',
                 name: i18n.t('options.mapReadOnly'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.readonly === true,
@@ -304,6 +313,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-searchbar',
+                shortcut: 'Alt+Shift+2',
                 name: i18n.t('options.mapSearchbar'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasSearchbar === true,
@@ -319,6 +329,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-globe',
+                shortcut: 'Alt+Shift+3',
                 name: i18n.t('options.mapGlobe'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasGlobeBtn !== false,
@@ -334,6 +345,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-zoom',
+                shortcut: 'Alt+Shift+4',
                 name: i18n.t('options.mapZoom'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasZoomBtn !== false,
@@ -349,6 +361,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-current-pos',
+                shortcut: 'Alt+Shift+5',
                 name: i18n.t('options.mapCurrentPosition'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasCurrentPosBtn !== false,
@@ -364,6 +377,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-draggable',
+                shortcut: 'Alt+Shift+6',
                 name: i18n.t('options.mapDraggableMarker'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) =>  data.config?.isMarkerDraggable === true,
@@ -427,6 +441,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'chart-data-config',
+                shortcut: 'Mod+Shift+K',
                 name: i18n.t('options.chartDataConfig'),
                 label: i18n.t('topToolbar.configureLabel'),
                 group: groups.data,
@@ -443,6 +458,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-bar',
+                shortcut: 'Alt+Shift+1',
                 name: i18n.t('options.chartBar'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'bar',
@@ -457,6 +473,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-line',
+                shortcut: 'Alt+Shift+2',
                 name: i18n.t('options.chartLine'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'line',
@@ -471,6 +488,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-area',
+                shortcut: 'Alt+Shift+3',
                 name: i18n.t('options.chartArea'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'area',
@@ -485,6 +503,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-pie',
+                shortcut: 'Alt+Shift+4',
                 name: i18n.t('options.chartPie'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'pie',
@@ -499,6 +518,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-arc',
+                shortcut: 'Alt+Shift+5',
                 name: i18n.t('options.chartArc'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'arc',

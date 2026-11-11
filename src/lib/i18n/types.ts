@@ -145,6 +145,20 @@ export interface Translations {
 		underline: string;
 		strikethrough: string;
 	};
+	shortcuts: {
+		/** Names of the keys that are not drawn as a symbol or a letter */
+		keys: {
+			ctrl: string;
+			alt: string;
+			shift: string;
+			space: string;
+			delete: string;
+			backspace: string;
+			enter: string;
+			escape: string;
+			tab: string;
+		};
+	};
 	components: {
 		'text-binding': {
 			name: string;

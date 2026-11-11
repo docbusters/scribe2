@@ -145,6 +145,19 @@ export const en: Translations = {
 		underline: 'Underline',
 		strikethrough: 'Strikethrough'
 	},
+	shortcuts: {
+		keys: {
+			ctrl: 'Ctrl',
+			alt: 'Alt',
+			shift: 'Shift',
+			space: 'Space',
+			delete: 'Del',
+			backspace: 'Backspace',
+			enter: 'Enter',
+			escape: 'Esc',
+			tab: 'Tab'
+		}
+	},
 	components: {
 		'text-binding': {
 			name: 'Text Binding',

@@ -145,6 +145,19 @@ export const es: Translations = {
 		underline: 'Subrayado',
 		strikethrough: 'Tachado'
 	},
+	shortcuts: {
+		keys: {
+			ctrl: 'Ctrl',
+			alt: 'Alt',
+			shift: 'Mayús',
+			space: 'Espacio',
+			delete: 'Supr',
+			backspace: 'Retroceso',
+			enter: 'Intro',
+			escape: 'Esc',
+			tab: 'Tab'
+		}
+	},
 	components: {
 		'text-binding': {
 			name: 'Texto Vinculado',

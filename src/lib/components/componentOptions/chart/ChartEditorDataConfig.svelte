@@ -14,7 +14,7 @@
     import { randomHexColor } from '$lib/utils/randomHexColor.js';
     import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
-    let { name, icon, label, sectionId, disabled, componentId, componentValue, isSelected, isBinding }: ComponentEditProps = $props();
+    let { name, icon, label, sectionId, disabled, componentId, componentValue, isSelected, isBinding, shortcut }: ComponentEditProps = $props();
 
     const i18n = getI18n();
 
@@ -144,6 +144,7 @@
     {label}
     {isSelected}
     {disabled}
+    {shortcut}
     onclick={() => {
         selectedKey = config?.xAxisKey;
         draftSeries = config?.series ? config.series.map(s => ({...s, color: s.color || 'var(--scribe-primary)'})) : [];
