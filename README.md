@@ -14,6 +14,8 @@ npm i
 npm run dev
 ```
 
+Unit tests (vitest) run with `npm test`.
+
 This will deploy a Sveltekit SPA that shows some examples making it easy to develop the library!
 
 ## Building the library

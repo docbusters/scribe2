@@ -10,6 +10,8 @@
 		"prepack": "npm run build:wc",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
@@ -70,7 +72,8 @@
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.60.1",
 		"uuid": "^14.0.2",
-		"vite": "^8.0.16"
+		"vite": "^8.0.16",
+		"vitest": "^5.1.0"
 	},
 	"keywords": [
 		"svelte"

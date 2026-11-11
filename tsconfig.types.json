@@ -12,6 +12,7 @@
   ],
   "exclude": [
     "src/lib/**/*.svelte",
+    "src/**/*.test.ts",
     "dist"
   ]
 }

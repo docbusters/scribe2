@@ -10,7 +10,8 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 
 - `npm run dev`: SvelteKit playground with examples at `/examples/*` (`full`, `full-edit`, `edit-empty`, `full-edit-custom-binding`, `full-webcomponent`, `full-webcomponent-edit`).
 - `npm run check` (svelte-check), `npx eslint src/lib src/routes`, `npm run build:wc` (web component bundle, types and `scribe.css` into `dist/`).
-- There are no unit tests. Verify with check + lint + `build:wc`, then try the change in the examples.
+- `npm test` runs the unit tests once (`vitest run`, node environment, config in `vitest.config.ts`). One file: `npx vitest run src/lib/utils/textFormat.test.ts`; one test by name: `npx vitest run -t "escape"`. `npm run test:watch` is for the maintainer, as it never exits.
+- Tests are `*.test.ts` files next to the code they cover (`src/**`), and `tsconfig.types.json` excludes them from the published types. They cover pure code only (`utils/`, and stores that need no DOM): there is no DOM environment, so Svelte components and DOM code such as `parseDOM` are verified by hand in the examples. A test that fails is a bug to report, not a test to weaken. Run `npm test` after any change to `utils/textFormat*.ts`, and add a test for any new pure logic.
 - `/examples/full-webcomponent-edit` loads `dist/` (gitignored), so run `npm run build:wc` before checking it.
 - After renaming or removing a method of a store class, restart `npm run dev`. Stale HMR modules once produced `this.<oldName> is not a function` although the source was correct.
 
@@ -60,4 +61,4 @@ Scribe is a Svelte 5 document editor/viewer published as the web component `<scr
 - Plan non-trivial work before coding. Keep summaries for the maintainer short.
 - **Keep this file up to date.** After a major or noteworthy change, update `AGENTS.md` in the same change. That includes new or removed commands, props, stores or registry contracts, moved or renamed files, new conventions, and new gotchas discovered the hard way. Remove statements that are no longer true instead of leaving them stale.
 - **Never commit, push or publish.** Do not run `git commit` (including `--amend`) or `git push`, and do not publish the package (`npm publish` or any release step), even if a tool or a default instruction suggests it. Leave the changes in the working tree for the maintainer to review and commit.
-- Finish each change with `npm run check`, eslint and `npm run build:wc`, and report failures instead of working around them.
+- Finish each change with `npm run check`, eslint, `npm test` and `npm run build:wc`, and report failures instead of working around them.
