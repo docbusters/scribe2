@@ -64,6 +64,7 @@ export const en: Translations = {
 		noFilterResults: 'No variables found for "{query}"',
 		deleteTooltip: 'Delete variable',
 		deleteConfirm: 'Delete variable?',
+		deleteInUse: 'In use by {count} component(s). Delete anyway?',
 		confirm: 'Confirm'
 	},
 	addBinding: {

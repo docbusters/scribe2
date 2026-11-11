@@ -64,6 +64,7 @@ export const es: Translations = {
 		noFilterResults: 'No se encontraron variables para "{query}"',
 		deleteTooltip: 'Eliminar variable',
 		deleteConfirm: '¿Eliminar variable?',
+		deleteInUse: 'En uso en {count} componente(s). ¿Eliminar igualmente?',
 		confirm: 'Confirmar'
 	},
 	addBinding: {

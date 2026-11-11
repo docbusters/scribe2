@@ -64,6 +64,7 @@ export interface Translations {
 		noFilterResults: string;
 		deleteTooltip: string;
 		deleteConfirm: string;
+		deleteInUse: string;
 		confirm: string;
 	};
 	addBinding: {

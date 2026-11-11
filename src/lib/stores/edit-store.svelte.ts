@@ -6,7 +6,7 @@ import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
 import { generateRandomId } from "../utils/generateRandomId.js";
 import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
-import { calculateDocumentBindingUsages, extractBindingUsages, type CustomBindingUsages } from "../utils/bindingUsages.js";
+import { calculateDocumentBindingUsages, extractBindingUsages, getDefaultBindingUsages, type CustomBindingUsages } from "../utils/bindingUsages.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
@@ -592,6 +592,11 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
         bindingStore.addBinding(id, definition);
         bindingStore.notifyBindingCreated(id, definition);
         return true;
+    }
+
+    /** Ids of the components that use a default binding, so deleting it can warn about what it would break */
+    getBindingUsages(bindingId: string): string[] {
+        return getDefaultBindingUsages(this.document, bindingId);
     }
 
     /** Deletes an existing default binding */

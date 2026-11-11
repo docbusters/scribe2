@@ -2,6 +2,7 @@
 	import type { UpdateType } from '$lib/types/ScribeProps.js';
 	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
 	import { bindingStore } from '$lib/stores/binding-store.svelte.js';
+	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import BindingSimpleInput from './BindingSimpleInput.svelte';
 	import BindingComplexPreview from './BindingComplexPreview.svelte';
 	import BindingComplexEditorDialog from './BindingComplexEditorDialog.svelte';
@@ -33,6 +34,8 @@
 
 	let isComplexModalOpen = $state(false);
 	let isConfirmingDelete = $state(false);
+	// How many components use this binding, read when the deletion is asked for, as deleting it breaks them
+	let usageCount = $state(0);
 
 	const isSimpleType = $derived(
 		type === 'string' || type === 'number' || type === 'boolean' || type === 'date'
@@ -55,6 +58,7 @@
 	}
 
 	function handleDeleteClick() {
+		usageCount = editStore.getBindingUsages(id).length;
 		isConfirmingDelete = true;
 	}
 
@@ -100,7 +104,7 @@
 
 	{#if isConfirmingDelete}
 		<div class="delete-warning-box">
-			<span class="warning-text">{i18n.t('bindingsPanel.deleteConfirm')}</span>
+			<span class="warning-text">{usageCount > 0 ? i18n.t('bindingsPanel.deleteInUse', { count: usageCount }) : i18n.t('bindingsPanel.deleteConfirm')}</span>
 			<div class="warning-actions">
 				<button
 					type="button"
