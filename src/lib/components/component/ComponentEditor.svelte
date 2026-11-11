@@ -126,7 +126,7 @@
 					{/if}
 				{/each}
 			</div>
-			<div class="group-title">{group.title}</div>
+			<div class="group-title scribe-caps-label">{group.title}</div>
 		</div>
 	{/each}
 </div>
@@ -144,7 +144,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.25rem;
+        gap: 0.375rem;
         padding: 0 0.75rem;
     }
 
@@ -166,7 +166,7 @@
         align-items: center;
         justify-content: center;
         gap: 0.125rem;
-        min-height: 3.75rem;
+        min-height: 3.5rem;
     }
 
     /* Two rows of small buttons, filled column by column */
@@ -178,10 +178,6 @@
     }
 
     .group-title {
-        font-size: var(--scribe-font-size-xs);
-        line-height: 1;
-        color: var(--scribe-muted-foreground);
         white-space: nowrap;
-        margin-top: 1rem;
     }
 </style>

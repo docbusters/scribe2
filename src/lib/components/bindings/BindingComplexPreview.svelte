@@ -40,18 +40,17 @@
 
 <button type="button" class="complex-trigger" onclick={onedit} title={i18n.t('bindingComplex.editElements')}>
 	<span class="trigger-summary">
-		<span class="trigger-dot"></span>
 		<span class="summary-text">{previewSummary}</span>
 	</span>
 	<span class="trigger-action">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="10"
-			height="10"
+			width="14"
+			height="14"
 			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"
-			stroke-width="2.5"
+			stroke-width="2"
 			stroke-linecap="round"
 			stroke-linejoin="round"
 			class="action-arrow"
@@ -64,51 +63,34 @@
 <style>
 	.complex-trigger {
 		width: 100%;
+		height: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.35rem 0.625rem;
-		background-color: var(--scribe-muted);
-		border: 1px solid color-mix(in srgb, var(--scribe-border-color) 50%, transparent);
+		gap: 0.5rem;
+		padding: 0 0.5rem 0 0.625rem;
+		background-color: var(--scribe-section-background);
+		border: 1px solid var(--scribe-border-strong);
 		border-radius: var(--scribe-radius-md);
 		cursor: pointer;
-		outline: none;
-		transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: background-color 150ms ease-out, border-color 150ms ease-out;
 		box-sizing: border-box;
 		text-align: left;
-		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
+		font-family: var(--scribe-font-sans);
 	}
 
 	.complex-trigger:hover {
-		background-color: color-mix(in srgb, var(--scribe-muted) 60%, var(--scribe-primary) 6%);
-		border-color: color-mix(in srgb, var(--scribe-border-color) 40%, var(--scribe-primary));
-	}
-
-	.complex-trigger:focus-visible {
-		border-color: var(--scribe-primary);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--scribe-primary) 15%, transparent);
+		background-color: var(--scribe-muted);
 	}
 
 	.trigger-summary {
 		display: flex;
 		align-items: center;
-		gap: 0.45rem;
 		min-width: 0;
 	}
 
-	.trigger-dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 9999px;
-		background-color: var(--scribe-primary);
-		flex-shrink: 0;
-		opacity: 0.75;
-	}
-
 	.summary-text {
-		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
-		font-size: 0.8125rem;
-		font-weight: 500;
+		font-size: var(--scribe-font-size-sm);
 		color: var(--scribe-doc-foreground);
 		white-space: nowrap;
 		overflow: hidden;
@@ -119,19 +101,13 @@
 	.trigger-action {
 		display: flex;
 		align-items: center;
-		gap: 0.2rem;
 		color: var(--scribe-muted-foreground);
 		flex-shrink: 0;
-		transition: color 0.15s ease;
 		line-height: 1;
 	}
 
-	.complex-trigger:hover .trigger-action {
-		color: var(--scribe-primary);
-	}
-
 	.action-arrow {
-		transition: transform 0.15s ease;
+		transition: transform 150ms ease-out;
 		color: inherit;
 	}
 

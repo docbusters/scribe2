@@ -18,13 +18,15 @@
 
 <style>
     .scribe-text-binding {
-        padding: 0em 0.5em;
-        margin: 0 0.5rem;
+        padding: 0 0.5em;
+        margin: 0 0.25rem;
         box-sizing: border-box;
     }
-    
+
     .is-editing {
-        border: 1px solid var(--scribe-border-color);
-        border-radius: var(--scribe-radius-lg);
+        background-color: var(--scribe-accent-wash);
+        border: 1px solid var(--scribe-accent-soft);
+        border-radius: var(--scribe-radius-sm);
+        color: var(--scribe-accent-text);
     }
 </style>

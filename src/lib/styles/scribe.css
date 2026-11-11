@@ -1,41 +1,66 @@
+/* ==========================================================================
+   SCRIBE DESIGN TOKENS
+   Hosts customise Scribe by overriding the BASE tokens below. The DERIVED
+   tokens further down are computed from them, so they follow any override.
+   ========================================================================== */
 :root {
-	/* Document-level variables */
-	--scribe-doc-background: oklch(0.9521 0 0); /* Document background color */
-	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
+	/* Page */
+	--scribe-doc-background: oklch(0.962 0.002 250); /* The desk the sections lie on */
+	--scribe-doc-foreground: oklch(0.2 0.005 260); /* Default text colour */
 
-	--scribe-primary: oklch(0.205 0 0); /* Primary background color for elements like buttons, etc. */
-  	--scribe-primary-foreground: oklch(0.985 0 0); /* Text color for elements with primary background */
-    --scribe-secondary: oklch(0.94 0 0); /* Secondary background color for elements like cards, modals, etc. */
-    --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
+	/* Primary: filled buttons and checked marks. It is a separate token from the accent (a host can split them) and starts as the same blue */
+	--scribe-primary: oklch(0.54 0.19 260);
+	--scribe-primary-foreground: oklch(0.99 0 0);
+	/* Secondary: soft fills (segmented tracks, count pills) */
+	--scribe-secondary: oklch(0.955 0.002 250);
+	--scribe-secondary-foreground: oklch(0.28 0.005 260);
 
-	/* Section-level variables */
-	--scribe-section-background: oklch(1 0 0); /* Background color for sections */
-	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
-	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
-	--scribe-section-separation: 0.75rem; /* Gap between sections */
-	--scribe-section-heading-gap: 1.5rem; /* Gap between section heading and content */
+	/* Cards */
+	--scribe-section-background: oklch(1 0 0); /* Section cards */
+	--scribe-section-foreground: oklch(0.2 0.005 260);
+	--scribe-section-radius: var(--scribe-radius-xl);
+	--scribe-section-separation: 0.875rem; /* Gap between sections */
+	--scribe-section-heading-gap: 1rem; /* Gap between section heading and content */
+	--scribe-popover: oklch(1 0 0); /* Dialogs, dropdowns, the variables panel */
+	--scribe-popover-foreground: oklch(0.2 0.005 260);
 
-	/* Misc. variables */
-	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
-	--scribe-selection-color: oklch(0.6194 0.2085 255.62 / 25%); /* Color for text selection */
-	--scribe-accent: oklch(0.55 0.22 255.62); /* Accent blue color for interactive handles and indicators */
-	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
-	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
-	--scribe-popover: oklch(1 0 0);
-  	--scribe-popover-foreground: oklch(0.145 0 0);
-	--scribe-muted: oklch(0.97 0 0); /* Background color for muted elements like disabled buttons, etc. */
-	--scribe-muted-foreground: oklch(0.556 0 0); /* Text color for muted elements */
-	--scribe-overlay: rgba(0, 0, 0, 0.5); /* Modal and overlay background color */
-	--scribe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-	--scribe-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-	--scribe-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	/* Lines and muted surfaces */
+	--scribe-border-color: oklch(0.915 0.003 250); /* Hairlines */
+	--scribe-muted: oklch(0.968 0.002 250); /* Hover fills, sunken boxes */
+	--scribe-muted-foreground: oklch(0.5 0.01 255); /* Secondary text, at least 4.5:1 on cards */
 
-    /** Font family variables */
-    --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
-	--scribe-font-sans: 'Segoe UI', sans-serif; /* Font for sans-serif text */
-	--scribe-font-mono: 'Segoe UI Mono', monospace; /* Font for monospace text */
+	/* Accent: selection, focus, bound values */
+	--scribe-accent: oklch(0.54 0.19 260);
+	--scribe-accent-foreground: oklch(0.99 0 0); /* Text on a solid accent */
+	--scribe-selection-color: oklch(0.54 0.19 260 / 18%); /* Text selection and hover highlight */
 
-	/* Font size variables */
+	/* Danger */
+	--scribe-error: oklch(0.55 0.22 27); /* Solid background of destructive buttons */
+	--scribe-error-foreground: oklch(0.5 0.21 27); /* Error text and icons on a light surface */
+	--scribe-on-error: oklch(0.99 0 0); /* Text on a solid error background */
+
+	/* Data types: one colour each, used by the type tiles and pills */
+	--scribe-type-string: oklch(0.55 0.17 300);
+	--scribe-type-number: oklch(0.52 0.14 155);
+	--scribe-type-boolean: oklch(0.58 0.14 65);
+	--scribe-type-date: oklch(0.55 0.11 200);
+	--scribe-type-array: oklch(0.54 0.17 250);
+	--scribe-type-record: oklch(0.55 0.19 345);
+	--scribe-type-empty: oklch(0.55 0.01 255);
+
+	/* Layers */
+	--scribe-overlay: oklch(0.2 0.01 260 / 35%); /* Scrim behind dialogs */
+	--scribe-shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 5%);
+	--scribe-shadow-md: 0 2px 8px -2px oklch(0 0 0 / 8%), 0 1px 2px 0 oklch(0 0 0 / 4%);
+	--scribe-shadow-lg: 0 8px 24px -6px oklch(0 0 0 / 12%), 0 2px 6px 0 oklch(0 0 0 / 5%);
+	--scribe-shadow-float: 0 12px 32px -8px oklch(0 0 0 / 16%), 0 2px 6px 0 oklch(0 0 0 / 6%); /* Layers that float over the page */
+
+	/* Font families */
+	--scribe-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--scribe-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--scribe-font-mono: ui-monospace, 'Cascadia Code', Menlo, monospace; /* Only for code-like content */
+
+	/* Font sizes */
 	--scribe-font-size-xs: 0.75rem;
 	--scribe-font-size-sm: 0.875rem;
 	--scribe-font-size-md: 1rem;
@@ -45,28 +70,26 @@
 	--scribe-font-size-3xl: 1.875rem;
 	--scribe-font-size-4xl: 2.25rem;
 
-	--scribe-font-size-h1: var(--scribe-font-size-4xl); /* Font size for h1 */
-	--scribe-font-size-h2: var(--scribe-font-size-2xl); /* Font size for h2 */
-	--scribe-font-size-h3: var(--scribe-font-size-xl); /* Font size for h3 */
-	--scribe-font-size-body: var(--scribe-font-size-md); /* Font size for body text */
+	--scribe-font-size-h1: var(--scribe-font-size-3xl); /* Document title */
+	--scribe-font-size-h2: var(--scribe-font-size-xl); /* Section title */
+	--scribe-font-size-h3: var(--scribe-font-size-lg);
+	--scribe-font-size-body: var(--scribe-font-size-md);
 
-	/* Font weight variables */
+	/* Font weights */
 	--scribe-font-weight-light: 300;
 	--scribe-font-weight-regular: 400;
 	--scribe-font-weight-medium: 500;
 	--scribe-font-weight-semibold: 600;
 	--scribe-font-weight-bold: 700;
 
-	--scribe-font-weight-h1: var(--scribe-font-weight-bold); /* Font weight for h1 */
-	--scribe-font-weight-h2: var(--scribe-font-weight-semibold); /* Font weight for h2 */
-	--scribe-font-weight-h3: var(--scribe-font-weight-semibold); /* Font weight for h3 */
-	--scribe-font-weight-body: var(--scribe-font-weight-regular); /* Font weight for body text */
+	--scribe-font-weight-h1: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-h2: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-h3: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-body: var(--scribe-font-weight-regular);
 
-    /* Radius variables */
-    --scribe-radius: 0.625rem; /** Base radius for all elements */
-
-    /* Scaled radius values for different sizes */
-	--scribe-radius-sm: calc(var(--scribe-radius) * 0.6); 
+	/* Radius: one base value, scaled for each size */
+	--scribe-radius: 0.625rem;
+	--scribe-radius-sm: calc(var(--scribe-radius) * 0.6);
 	--scribe-radius-md: calc(var(--scribe-radius) * 0.8);
 	--scribe-radius-lg: var(--scribe-radius);
 	--scribe-radius-xl: calc(var(--scribe-radius) * 1.4);
@@ -75,35 +98,194 @@
 	--scribe-radius-4xl: calc(var(--scribe-radius) * 2.6);
 }
 
-:root .dark {
-    /* Document-level variables */
-	--scribe-doc-background: oklch(0.1149 0 0); /* Document background color */
-	--scribe-doc-foreground: oklch(1 0 0); /* Default text color */
+/* Dark theme: add the `dark` class to <html>, to a wrapper, or to the Scribe element itself. */
+:root.dark,
+.dark {
+	--scribe-doc-background: oklch(0.15 0.004 260);
+	--scribe-doc-foreground: oklch(0.96 0.003 260);
 
-	--scribe-primary: oklch(0.922 0 0); /* Primary background color for elements like buttons, etc. */
-  	--scribe-primary-foreground: ooklch(0.205 0 0); /* Text color for elements with primary background */
-    --scribe-secondary: oklch(0.269 0 0); /* Secondary background color for elements like cards, modals, etc. */
-    --scribe-secondary-foreground: oklch(0.985 0 0); /* Text color for elements with secondary background */
+	--scribe-primary: oklch(0.68 0.16 255);
+	--scribe-primary-foreground: oklch(0.15 0.004 260);
+	--scribe-secondary: oklch(0.27 0.005 260);
+	--scribe-secondary-foreground: oklch(0.94 0.003 260);
 
-	/* Section-level variables */
-	--scribe-section-background: oklch(0.209 0 0); /* Background color for sections */
-	--scribe-section-foreground: oklch(0.922 0 0); /* Text color for sections */
+	--scribe-section-background: oklch(0.205 0.005 260);
+	--scribe-section-foreground: oklch(0.94 0.003 260);
+	--scribe-popover: oklch(0.225 0.005 260);
+	--scribe-popover-foreground: oklch(0.96 0.003 260);
 
-	/* Misc. variables */
-	--scribe-border-color: oklch(0.4568 0 0); /* Default border color for elements */
-	--scribe-selection-color: oklch(0.6792 0.1752 251.13 / 25%); /* Color for text selection */
-	--scribe-accent: oklch(0.62 0.22 255.62); /* Accent blue color for interactive handles and indicators */
-	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
-	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
-	--scribe-popover: oklch(0.205 0 0);
-  	--scribe-popover-foreground: oklch(0.985 0 0);
-	--scribe-muted: oklch(0.269 0 0); /* Background color for muted elements like disabled buttons, etc. */
-	--scribe-muted-foreground: oklch(0.708 0 0); /* Text color for muted elements */
-	--scribe-overlay: rgba(0, 0, 0, 0.7); /* Modal and overlay background color */
-	--scribe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-	--scribe-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-	--scribe-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+	--scribe-border-color: oklch(0.3 0.006 260);
+	--scribe-muted: oklch(0.26 0.005 260);
+	--scribe-muted-foreground: oklch(0.72 0.01 255);
+
+	--scribe-accent: oklch(0.68 0.16 255);
+	--scribe-accent-foreground: oklch(0.15 0.004 260);
+	--scribe-selection-color: oklch(0.68 0.16 255 / 28%);
+
+	--scribe-error: oklch(0.65 0.2 25);
+	--scribe-error-foreground: oklch(0.74 0.16 25);
+	--scribe-on-error: oklch(0.15 0.004 260);
+
+	--scribe-type-string: oklch(0.76 0.13 300);
+	--scribe-type-number: oklch(0.76 0.14 155);
+	--scribe-type-boolean: oklch(0.8 0.13 75);
+	--scribe-type-date: oklch(0.78 0.1 200);
+	--scribe-type-array: oklch(0.76 0.12 250);
+	--scribe-type-record: oklch(0.77 0.14 345);
+	--scribe-type-empty: oklch(0.72 0.01 255);
+
+	--scribe-overlay: oklch(0 0 0 / 60%);
+	--scribe-shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 30%);
+	--scribe-shadow-md: 0 2px 8px -2px oklch(0 0 0 / 40%), 0 1px 2px 0 oklch(0 0 0 / 25%);
+	--scribe-shadow-lg: 0 8px 24px -6px oklch(0 0 0 / 50%), 0 2px 6px 0 oklch(0 0 0 / 30%);
+	--scribe-shadow-float: 0 12px 32px -8px oklch(0 0 0 / 60%), 0 2px 6px 0 oklch(0 0 0 / 35%);
 }
+
+/* DERIVED tokens. They are declared on the elements that use them (and on the roots, for
+   content that is portalled out), so they are computed from whatever base value applies there,
+   including a `.dark` or host override. Keep this list of selectors in sync with the components. */
+:root,
+.dark,
+.scribe-document,
+scribe-interpreter,
+scribe-bindings-panel,
+scribe-empty-content,
+scribe-component-renderer,
+.scribe-dialog-content,
+.scribe-dropdown-content {
+	--scribe-border-strong: color-mix(in oklab, var(--scribe-doc-foreground) 22%, var(--scribe-section-background)); /* Field borders, dashed borders */
+	--scribe-accent-wash: color-mix(in oklab, var(--scribe-accent) 9%, var(--scribe-section-background)); /* Fill of bound values and hovered rows */
+	--scribe-accent-soft: color-mix(in oklab, var(--scribe-accent) 28%, var(--scribe-section-background)); /* Hairline of bound values */
+	--scribe-accent-text: color-mix(in oklab, var(--scribe-accent) 78%, var(--scribe-doc-foreground)); /* Accent text on a wash */
+	--scribe-error-wash: color-mix(in oklab, var(--scribe-error-foreground) 9%, var(--scribe-section-background));
+	--scribe-error-soft: color-mix(in oklab, var(--scribe-error-foreground) 28%, var(--scribe-section-background));
+}
+
+/* ==========================================================================
+   SHARED PRIMITIVES
+   Used by components, dialogs and the variables panel, so the look of a data
+   type, a count or a label is defined once.
+   ========================================================================== */
+
+/* A small uppercase label. It is the label of a field or group, never a kicker above a heading.
+   The second selector beats the reset above, which sets the size and colour of headings. */
+.scribe-caps-label,
+.scribe-document .scribe-caps-label {
+	font-size: 0.6875rem;
+	font-weight: var(--scribe-font-weight-semibold);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	line-height: 1.2;
+	color: var(--scribe-muted-foreground);
+}
+
+/* A count next to a group or panel title */
+.scribe-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.25rem;
+	height: 1.25rem;
+	padding: 0 0.4rem;
+	border-radius: 999px;
+	background: var(--scribe-secondary);
+	color: var(--scribe-muted-foreground);
+	font-size: 0.6875rem;
+	font-weight: var(--scribe-font-weight-semibold);
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+/* A keyboard shortcut */
+.scribe-kbd {
+	display: inline-flex;
+	align-items: center;
+	height: 1.25rem;
+	padding: 0 0.375rem;
+	border: 1px solid var(--scribe-border-color);
+	border-bottom-width: 2px;
+	border-radius: var(--scribe-radius-sm);
+	background: var(--scribe-muted);
+	color: var(--scribe-secondary-foreground);
+	font-family: inherit;
+	font-size: 0.6875rem;
+	font-weight: var(--scribe-font-weight-medium);
+	line-height: 1;
+}
+
+/* A tinted icon tile. With data-type it takes the colour of that data type, without it it is neutral. */
+.scribe-tile {
+	--tile: var(--scribe-secondary-foreground);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 2rem;
+	height: 2rem;
+	border-radius: var(--scribe-radius-md);
+	color: var(--tile);
+	background: color-mix(in oklab, var(--tile) 10%, var(--scribe-section-background));
+	border: 1px solid color-mix(in oklab, var(--tile) 22%, var(--scribe-section-background));
+}
+.scribe-tile svg {
+	width: 1rem;
+	height: 1rem;
+}
+.scribe-tile[data-size='sm'] {
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: var(--scribe-radius-sm);
+}
+.scribe-tile[data-size='sm'] svg {
+	width: 0.8125rem;
+	height: 0.8125rem;
+}
+
+/* A check box drawn by a card or row that is chosen as a whole. Add `is-checked` when chosen. */
+.scribe-check {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 1.125rem;
+	height: 1.125rem;
+	border: 1px solid var(--scribe-border-strong);
+	border-radius: var(--scribe-radius-sm);
+	background-color: var(--scribe-section-background);
+	color: var(--scribe-primary-foreground);
+}
+.scribe-check.is-checked {
+	background-color: var(--scribe-primary);
+	border-color: var(--scribe-primary);
+}
+
+/* A data type label */
+.scribe-pill {
+	--tile: var(--scribe-muted-foreground);
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	height: 1.25rem;
+	padding: 0 0.5rem;
+	border-radius: 999px;
+	color: color-mix(in oklab, var(--tile) 60%, var(--scribe-doc-foreground));
+	background: color-mix(in oklab, var(--tile) 11%, var(--scribe-section-background));
+	border: 1px solid color-mix(in oklab, var(--tile) 22%, var(--scribe-section-background));
+	font-size: 0.6875rem;
+	font-weight: var(--scribe-font-weight-semibold);
+	line-height: 1;
+	white-space: nowrap;
+}
+
+:where(.scribe-tile, .scribe-pill)[data-type='string'] { --tile: var(--scribe-type-string); }
+:where(.scribe-tile, .scribe-pill)[data-type='number'] { --tile: var(--scribe-type-number); }
+:where(.scribe-tile, .scribe-pill)[data-type='boolean'] { --tile: var(--scribe-type-boolean); }
+:where(.scribe-tile, .scribe-pill)[data-type='date'] { --tile: var(--scribe-type-date); }
+:where(.scribe-tile, .scribe-pill)[data-type='array'] { --tile: var(--scribe-type-array); }
+:where(.scribe-tile, .scribe-pill)[data-type='record'] { --tile: var(--scribe-type-record); }
+:where(.scribe-tile, .scribe-pill)[data-type='empty'] { --tile: var(--scribe-type-empty); }
+/* A variable bound to the document (as opposed to a type): drawn with the accent */
+:where(.scribe-tile, .scribe-pill)[data-type='binding'] { --tile: var(--scribe-accent); }
 
 /* ==========================================================================
    SCRIBE SCOPED CSS RESET (Light DOM Protection)
@@ -112,29 +294,32 @@
    ========================================================================== */
 
 scribe-interpreter, scribe-bindings-panel {
-    display: block;
-    width: 100%;
+	display: block;
+	width: 100%;
 }
 
 .scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-bindings-panel {
-    /* Base typography and coloring to stop inheritance from host body */
-    color: var(--scribe-doc-foreground);
-    font-family: var(--scribe-font-sans);
-    font-size: var(--scribe-font-size-body);
-    font-weight: var(--scribe-font-weight-body);
-    line-height: 1.5;
-    text-align: left;
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	/* Base typography and coloring to stop inheritance from host body */
+	color: var(--scribe-doc-foreground);
+	font-family: var(--scribe-font-sans);
+	font-size: var(--scribe-font-size-body);
+	font-weight: var(--scribe-font-weight-body);
+	line-height: 1.5;
+	text-align: left;
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* Override global selectors (e.g. *, p, h1) from host application with higher specificity */
-.scribe-document *, 
-.scribe-document *::before, 
-.scribe-document *::after {
-    box-sizing: border-box;
-    border-color: var(--scribe-border-color);
+.scribe-document *,
+.scribe-document *::before,
+.scribe-document *::after,
+scribe-bindings-panel *,
+scribe-bindings-panel *::before,
+scribe-bindings-panel *::after {
+	box-sizing: border-box;
+	border-color: var(--scribe-border-color);
 }
 
 .scribe-document p,
@@ -152,10 +337,10 @@ scribe-interpreter, scribe-bindings-panel {
 .scribe-document dl,
 .scribe-document dd,
 .scribe-document pre {
-    margin: 0;
-    padding: 0;
-    /* Force color inheritance so they don't pick up host tag styles */
-    color: inherit;
+	margin: 0;
+	padding: 0;
+	/* Force color inheritance so they don't pick up host tag styles */
+	color: inherit;
 }
 
 .scribe-document h1,
@@ -164,26 +349,59 @@ scribe-interpreter, scribe-bindings-panel {
 .scribe-document h4,
 .scribe-document h5,
 .scribe-document h6 {
-    /* Prevent host heading rules from affecting Scribe headings */
-    font-size: inherit;
-    font-weight: inherit;
+	/* Prevent host heading rules from affecting Scribe headings */
+	font-size: inherit;
+	font-weight: inherit;
 }
 
 .scribe-document a {
-    color: inherit;
-    text-decoration: inherit;
+	color: inherit;
+	text-decoration: inherit;
 }
 
-.scribe-document button, 
-.scribe-document input, 
-.scribe-document optgroup, 
-.scribe-document select, 
+.scribe-document button,
+.scribe-document input,
+.scribe-document optgroup,
+.scribe-document select,
 .scribe-document textarea {
-    font-family: inherit;
-    font-size: 100%;
-    font-weight: inherit;
-    line-height: inherit;
-    color: inherit;
-    margin: 0;
-    padding: 0;
+	font-family: inherit;
+	font-size: 100%;
+	font-weight: inherit;
+	line-height: inherit;
+	color: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+/* ==========================================================================
+   BROWSER SURFACES
+   Focus ring and scrollbars follow the palette. A text being typed shows its caret instead of a ring.
+   ========================================================================== */
+
+.scribe-document :focus-visible:not([contenteditable]),
+scribe-bindings-panel :focus-visible,
+.scribe-dialog-content :focus-visible,
+.scribe-dropdown-content :focus-visible {
+	outline: 2px solid var(--scribe-accent);
+	outline-offset: 2px;
+}
+
+/* scrollbar-width is not inherited, so it goes on the elements that scroll */
+.scribe-document,
+scribe-bindings-panel,
+.scribe-dialog-content,
+.scribe-dialog-body,
+.scribe-dropdown-content {
+	scrollbar-width: thin;
+	scrollbar-color: var(--scribe-border-strong) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.scribe-document *,
+	scribe-bindings-panel *,
+	.scribe-dialog-content,
+	.scribe-dialog-overlay {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
 }

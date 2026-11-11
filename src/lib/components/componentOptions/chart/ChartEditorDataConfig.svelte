@@ -150,14 +150,11 @@
         
         <div class="config-section">
             <div class="section-header">
-                <div class="title-with-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                    <h5>Data Source</h5>
-                </div>
+                <h3 class="section-title">Data Source</h3>
                 <p class="section-desc">Select the property that will serve as the X-axis for the chart.</p>
             </div>
             <Select
-                placeholder="X-Axis"
+                label="X-Axis"
                 type="single"
                 items={availableKeys}
                 bind:value={selectedKey}
@@ -168,10 +165,7 @@
 
         <div class="config-section">
             <div class="section-header">
-                <div class="title-with-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                    <h5>Data Series</h5>
-                </div>
+                <h3 class="section-title">Data Series</h3>
                 <p class="section-desc">Configure the metrics and data series to display on the chart.</p>
             </div>
             <div class="current-series">
@@ -181,7 +175,7 @@
                             <li class="series-card {s.hidden ? 'is-hidden' : ''}">
                                 <div class="series-info">
                                     <div class="color-picker-container">
-                                        <input type="color" bind:value={draftSeries[i].color} class="color-picker" title="Change color" />
+                                        <input type="color" bind:value={draftSeries[i].color} class="color-picker" title="Change color" aria-label="Change color" />
                                         <div class="color-picker-ring" style="border-color: {draftSeries[i].color};"></div>
                                     </div>
                                     <div class="series-text">
@@ -189,17 +183,19 @@
                                         <span class="series-key">{s.key}</span>
                                     </div>
                                 </div>
-                                <button class="delete-btn" onclick={() => toggleOrRemoveSeries(s.key)} title={isBinding ? (s.hidden ? "Show series" : "Hide series") : "Remove series"}>
-                                    {#if isBinding}
-                                        {#if s.hidden}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .69J12"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                                <span class="series-action">
+                                    <Button size="icon-sm" variant="ghost-destructive" title={isBinding ? (s.hidden ? "Show series" : "Hide series") : "Remove series"} aria-label={isBinding ? (s.hidden ? "Show series" : "Hide series") : "Remove series"} onclick={() => toggleOrRemoveSeries(s.key)}>
+                                        {#if isBinding}
+                                            {#if s.hidden}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .69J12"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                                            {:else}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                                            {/if}
                                         {:else}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                         {/if}
-                                    {:else}
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                    {/if}
-                                </button>
+                                    </Button>
+                                </span>
                             </li>
                         {/each}
                     </ul>
@@ -216,7 +212,7 @@
             <div class="add-series-card">
                 <p class="add-series-title">Add New Series</p>
                 <div class="add-form">
-                    <TextInput bind:value={newLabel} placeholder="Series Label" />
+                    <TextInput bind:value={newLabel} label="Series Label" />
                     <Button onclick={addSeries} disabled={!newLabel} variant="default">Add</Button>
                 </div>
             </div>
@@ -236,38 +232,26 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        padding: 0.5rem 0 0.5rem 0;
     }
-    
+
     .config-section {
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 0.875rem;
     }
 
     .section-header {
         display: flex;
         flex-direction: column;
-        gap: 0.375rem;
+        gap: 0.25rem;
     }
 
-    .title-with-icon {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .section-icon {
-        color: var(--scribe-primary);
-    }
-
-    h5 {
+    .section-title {
         margin: 0;
         font-family: var(--scribe-font-heading);
-        font-size: var(--scribe-font-size-md);
+        font-size: var(--scribe-font-size-sm);
         font-weight: var(--scribe-font-weight-semibold);
-        letter-spacing: -0.01em;
-        color: var(--scribe-text-color);
+        color: var(--scribe-doc-foreground);
     }
 
     .section-desc {
@@ -277,56 +261,38 @@
         line-height: 1.4;
     }
 
-    /* Series Cards */
+    /* Series rows */
     .current-series ul {
         list-style: none;
         padding: 0;
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
-    
+
     .series-card {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem 0.5rem 0.5rem 0.75rem;
         border: 1px solid var(--scribe-border-color);
-        border-radius: var(--scribe-radius-md);
-        background: linear-gradient(145deg, var(--scribe-background), var(--scribe-muted));
-        box-shadow: var(--scribe-shadow-sm);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
+        border-radius: var(--scribe-radius-lg);
+        background-color: var(--scribe-section-background);
+        transition: border-color 150ms ease-out;
+    }
+
+    .series-card:hover,
+    .series-card:focus-within {
+        border-color: var(--scribe-border-strong);
     }
 
     .series-card.is-hidden {
-        opacity: 0.5;
+        opacity: 0.55;
         border-style: dashed;
-        background: var(--scribe-muted);
+        background-color: var(--scribe-muted);
     }
 
-    .series-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 3px;
-        height: 100%;
-        background-color: transparent;
-        transition: background-color 0.3s;
-    }
-    .series-card:hover::before {
-        background-color: var(--scribe-primary);
-    }
-
-    .series-card:hover {
-        border-color: var(--scribe-border-color-hover, var(--scribe-muted-foreground));
-        transform: translateY(-1px);
-        box-shadow: var(--scribe-shadow-md);
-    }
-    
     .series-info {
         display: flex;
         align-items: center;
@@ -342,14 +308,14 @@
     .series-label {
         font-size: var(--scribe-font-size-sm);
         font-weight: var(--scribe-font-weight-medium);
-        color: var(--scribe-text-color);
+        color: var(--scribe-doc-foreground);
     }
 
     .series-key {
         font-size: var(--scribe-font-size-xs);
         color: var(--scribe-muted-foreground);
     }
-    
+
     .color-picker-container {
         position: relative;
         display: flex;
@@ -365,13 +331,12 @@
         border: 2px solid transparent;
         border-radius: 50%;
         opacity: 0;
-        transition: transform 0.3s, opacity 0.3s;
+        transition: opacity 150ms ease-out;
         pointer-events: none;
     }
 
     .series-card:hover .color-picker-ring {
-        transform: scale(1.1);
-        opacity: 0.3;
+        opacity: 0.35;
     }
 
     .color-picker {
@@ -387,55 +352,43 @@
         background: none;
         overflow: hidden;
         z-index: 1;
-        box-shadow: inset 0 0 0 1px var(--scribe-border-color);
-        transition: transform 0.2s;
-    }
-    .color-picker:hover {
-        transform: scale(1.1);
+        box-shadow: inset 0 0 0 1px var(--scribe-border-strong);
     }
 
     .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
     .color-picker::-webkit-color-swatch { border: none; border-radius: 50%; }
     .color-picker::-moz-color-swatch { border: none; border-radius: 50%; }
-    
-    .delete-btn {
+
+    .series-action {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        border: none;
-        background: transparent;
-        color: var(--scribe-muted-foreground);
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s;
-        opacity: 0;
-        transform: translateX(10px);
-    }
-    .series-card:hover .delete-btn {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    .delete-btn:hover {
-        margin-bottom: 0.5rem;
     }
 
-    /* Add Series Card */
+    /* Shown on hover or keyboard focus. Touch screens have no hover, so it stays visible there. */
+    @media (hover: hover) {
+        .series-action {
+            opacity: 0;
+            transition: opacity 150ms ease-out;
+        }
+
+        .series-card:hover .series-action,
+        .series-card:focus-within .series-action {
+            opacity: 1;
+        }
+    }
+
+    /* Add series */
     .add-series-card {
-        margin-top: 0.5rem;
-        padding: 1.25rem;
+        padding: 1rem;
         border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-radius-lg);
-        background-color: var(--scribe-background);
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        background-color: var(--scribe-muted);
     }
-    
+
     .add-series-title {
         margin: 0 0 0.75rem 0;
         font-size: var(--scribe-font-size-sm);
         font-weight: var(--scribe-font-weight-semibold);
-        color: var(--scribe-text-color);
+        color: var(--scribe-doc-foreground);
     }
 
     .add-form {

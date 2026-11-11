@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T00:00:00Z",
+  "title": "Design System: Scribe",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Signal Blue", "canonical": "oklch(0.54 0.19 260)", "tonalRamp": ["oklch(0.25 0.12 260)", "oklch(0.35 0.16 260)", "oklch(0.45 0.18 260)", "oklch(0.54 0.19 260)", "oklch(0.64 0.16 260)", "oklch(0.74 0.11 260)", "oklch(0.86 0.06 260)", "oklch(0.95 0.025 260)"] },
+      "accent": { "role": "tertiary", "displayName": "Canvas Blue", "canonical": "oklch(0.54 0.19 260)", "tonalRamp": ["oklch(0.25 0.1 260)", "oklch(0.35 0.14 260)", "oklch(0.45 0.17 260)", "oklch(0.54 0.19 260)", "oklch(0.65 0.16 260)", "oklch(0.77 0.1 260)", "oklch(0.88 0.05 260)", "oklch(0.95 0.02 260)"] },
+      "desk": { "role": "neutral", "displayName": "Desk", "canonical": "oklch(0.962 0.002 250)", "tonalRamp": ["oklch(0.15 0.004 260)", "oklch(0.3 0.006 260)", "oklch(0.5 0.01 255)", "oklch(0.72 0.006 252)", "oklch(0.85 0.004 250)", "oklch(0.915 0.003 250)", "oklch(0.962 0.002 250)", "oklch(1 0 0)"] },
+      "error": { "role": "error", "displayName": "Signal Red", "canonical": "oklch(0.55 0.22 27)", "tonalRamp": ["oklch(0.28 0.1 27)", "oklch(0.38 0.15 27)", "oklch(0.47 0.19 27)", "oklch(0.55 0.22 27)", "oklch(0.66 0.18 27)", "oklch(0.78 0.11 27)", "oklch(0.89 0.05 27)", "oklch(0.96 0.02 27)"] }
+    },
+    "typographyMeta": {
+      "h1": { "displayName": "Document title", "purpose": "Document title." },
+      "h2": { "displayName": "Section title", "purpose": "Section titles." },
+      "caps-label": { "displayName": "Caps label", "purpose": "Label of a field or group, never a kicker." }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px 0 oklch(0 0 0 / 5%)", "purpose": "Section cards and outline buttons at rest." },
+      { "name": "shadow-md", "value": "0 2px 8px -2px oklch(0 0 0 / 8%), 0 1px 2px 0 oklch(0 0 0 / 4%)", "purpose": "Token available for raised surfaces." },
+      { "name": "shadow-lg", "value": "0 8px 24px -6px oklch(0 0 0 / 12%), 0 2px 6px 0 oklch(0 0 0 / 5%)", "purpose": "Token available for large raised surfaces." },
+      { "name": "shadow-float", "value": "0 12px 32px -8px oklch(0 0 0 / 16%), 0 2px 6px 0 oklch(0 0 0 / 6%)", "purpose": "Layers that float: variables panel, dropdowns, dialogs." }
+    ],
+    "motion": [
+      { "name": "fade-150", "value": "150ms ease-out", "purpose": "Background, border and colour transitions; press scale 0.98." },
+      { "name": "dialog-in", "value": "160ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Dialog entrance (opacity and 0.98 scale); overlay fades in 160ms ease-out." },
+      { "name": "selection-in", "value": "150ms ease-out", "purpose": "Canvas selection ring and name tab." }
+    ],
+    "breakpoints": [
+      { "name": "sheet", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button", "kind": "button", "refersTo": "button-primary",
+      "description": "Default filled action.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Save</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;height:2.25rem;padding:0 .875rem;border:1px solid transparent;border-radius:var(--scribe-radius-md,8px);font:500 .875rem/1 Inter,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease-out,border-color 150ms ease-out}.ds-btn:active{transform:scale(.98)}.ds-btn:focus-visible{outline:2px solid var(--scribe-accent);outline-offset:2px}.ds-btn-primary{background:var(--scribe-primary);color:var(--scribe-primary-foreground)}.ds-btn-primary:hover{background:color-mix(in oklab,var(--scribe-primary) 86%,var(--scribe-section-background))}"
+    },
+    {
+      "name": "Outline Button", "kind": "button", "refersTo": "button-outline",
+      "description": "Secondary action on a card.",
+      "html": "<button class=\"ds-btn ds-btn-outline\">Add section</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;height:2.25rem;padding:0 .875rem;border:1px solid transparent;border-radius:var(--scribe-radius-md,8px);font:500 .875rem/1 Inter,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease-out,border-color 150ms ease-out}.ds-btn:focus-visible{outline:2px solid var(--scribe-accent);outline-offset:2px}.ds-btn-outline{background:var(--scribe-section-background);color:var(--scribe-doc-foreground);border-color:var(--scribe-border-color);box-shadow:var(--scribe-shadow-sm)}.ds-btn-outline:hover{background:var(--scribe-muted);border-color:var(--scribe-border-strong)}"
+    },
+    {
+      "name": "Text Input", "kind": "input", "refersTo": "input",
+      "description": "Label above a 38px field.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Name</span><input class=\"ds-input\" value=\"revenue\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:.375rem}.ds-label{font:500 .75rem/1.2 Inter,system-ui,sans-serif;color:var(--scribe-secondary-foreground)}.ds-input{height:2.375rem;padding:0 .75rem;border:1px solid var(--scribe-border-strong);border-radius:var(--scribe-radius-md,8px);background:var(--scribe-section-background);color:var(--scribe-doc-foreground);font:.875rem Inter,system-ui,sans-serif;transition:border-color 150ms ease-out}.ds-input:hover{border-color:color-mix(in oklab,var(--scribe-doc-foreground) 38%,var(--scribe-section-background))}.ds-input:focus{outline:1px solid var(--scribe-accent);border-color:var(--scribe-accent)}"
+    },
+    {
+      "name": "Choice Card", "kind": "card", "refersTo": "choice-card",
+      "description": "Chosen card: primary border plus check box.",
+      "html": "<div class=\"ds-choice selected\"><span class=\"ds-tile\">T</span><span><b>Text</b><br><small>A string value</small></span><span class=\"ds-check\">&#10003;</span></div>",
+      "css": ".ds-choice{display:flex;align-items:center;gap:.625rem;padding:.625rem .75rem;background:var(--scribe-section-background);border:1px solid var(--scribe-border-color);border-radius:var(--scribe-radius-lg,10px);font:.875rem Inter,system-ui,sans-serif;color:var(--scribe-doc-foreground)}.ds-choice small{font-size:.75rem;color:var(--scribe-muted-foreground)}.ds-choice.selected{border-color:var(--scribe-primary);outline:1px solid var(--scribe-primary)}.ds-tile{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:var(--scribe-radius-md,8px);color:var(--scribe-type-string);background:color-mix(in oklab,var(--scribe-type-string) 10%,var(--scribe-section-background));border:1px solid color-mix(in oklab,var(--scribe-type-string) 22%,var(--scribe-section-background))}.ds-check{margin-left:auto;display:flex;align-items:center;justify-content:center;width:1.125rem;height:1.125rem;border:1px solid var(--scribe-primary);border-radius:var(--scribe-radius-sm,6px);background:var(--scribe-primary);color:var(--scribe-primary-foreground);font-size:.7rem}"
+    },
+    {
+      "name": "Bound-value Chip", "kind": "chip", "refersTo": "bound-value-chip",
+      "description": "Signature: a bound value drawn like a calendar event chip.",
+      "html": "<span class=\"ds-chip\">customer.name</span>",
+      "css": ".ds-chip{padding:0 .5em;margin:0 .25rem;background:var(--scribe-accent-wash);border:1px solid var(--scribe-accent-soft);border-radius:var(--scribe-radius-sm,6px);color:var(--scribe-accent-text);font:1rem Inter,system-ui,sans-serif}"
+    },
+    {
+      "name": "Type Pill", "kind": "chip", "refersTo": "choice-card",
+      "description": "Data type label tinted by data-type.",
+      "html": "<span class=\"ds-pill\">number</span>",
+      "css": ".ds-pill{--tile:var(--scribe-type-number);display:inline-flex;align-items:center;height:1.25rem;padding:0 .5rem;border-radius:999px;color:color-mix(in oklab,var(--tile) 60%,var(--scribe-doc-foreground));background:color-mix(in oklab,var(--tile) 11%,var(--scribe-section-background));border:1px solid color-mix(in oklab,var(--tile) 22%,var(--scribe-section-background));font:600 .6875rem/1 Inter,system-ui,sans-serif}"
+    },
+    {
+      "name": "Section Card", "kind": "card", "refersTo": "section-card",
+      "description": "White card on the desk.",
+      "html": "<section class=\"ds-card\"><h2>Summary</h2><p>Revenue grew this quarter.</p></section>",
+      "css": ".ds-card{padding:1.25rem 1.5rem;background:var(--scribe-section-background);color:var(--scribe-section-foreground);border:1px solid var(--scribe-border-color);border-radius:var(--scribe-radius-xl,14px);box-shadow:var(--scribe-shadow-sm);font:1rem/1.5 Inter,system-ui,sans-serif}.ds-card h2{margin:0 0 1rem;font:600 1.25rem/1.5 Inter,system-ui,sans-serif}.ds-card p{margin:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Guest Panel",
+    "overview": "Scribe is a document editor that lives inside someone else's SaaS product, so it behaves like a well-mannered guest: a light grey desk, white section cards with 1px hairlines and a barely-there shadow, a blue primary (solid for actions, a soft wash for chosen toggles), and the same blue as the accent for selection, focus and data. Every dialog, row, panel and chip reuses the same card, row and tile language, so the host and Scribe read as one app.",
+    "keyCharacteristics": [
+      "Desk plus white cards, hairlines instead of heavy shadow.",
+      "Blue primary for actions (solid) and chosen state (soft wash); the accent for the canvas and for data.",
+      "One tile system marks every data type: tinted fill, tinted hairline, saturated glyph.",
+      "Radii scale from one base (10px): 6 / 8 / 10 / 14 / 18.",
+      "Light and dark themes through the same token names."
+    ],
+    "rules": [
+      { "name": "The Public Token Rule", "body": "Tokens are public API. Hosts set the base tokens; derived tokens are color-mix of base tokens and are never hand-set.", "section": "colors" },
+      { "name": "The Two Selection Languages Rule", "body": "Chosen cards and rows select with a primary (blue) border, an accent wash and a check box; the canvas selects with the blue accent ring. Intentional split.", "section": "colors" },
+      { "name": "The No Hard-Coded Colour Rule", "body": "No hex, rgb() or oklch() in components; use a token or a mix of tokens.", "section": "colors" },
+      { "name": "The Label Is The Label Rule", "body": "Uppercase tracked text is only the label of a field or group, never a kicker above a heading.", "section": "typography" },
+      { "name": "The Float Only Rule", "body": "Hairlines carry structure; shadow-float is only for layers that sit above the page.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep every colour a token or a color-mix of tokens, and give new base tokens a .dark value.",
+      "Do select chosen cards and rows with the primary border plus .scribe-check, and the canvas with the accent ring.",
+      "Do mark data types with .scribe-tile / .scribe-pill and data-type.",
+      "Do give every control a visible focus state and an accessible name.",
+      "Do keep transitions to 150ms ease-out and honour prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't use coloured pills for data types outside the tile system.",
+      "Don't use shadows for structure; hairlines do that.",
+      "Don't put Tailwind or monospace into src/lib.",
+      "Don't use floating labels or placeholder-as-label; the label sits above the field.",
+      "Don't use uppercase tracked text as a kicker above headings."
+    ]
+  }
+}

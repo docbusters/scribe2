@@ -127,7 +127,7 @@
                     }} onclick={() => {
                         insertChildComponent(componentType);
                     }}>
-                        <div class="dropdown-item-icon">
+                        <div class="scribe-tile">
                             {@html component.icon}
                         </div>
                         <div class="dropdown-item-content">
@@ -169,28 +169,19 @@
         flex-direction: column;
         gap: 0.25rem;
         padding-right: 0.5rem;
+        padding-bottom: 0.25rem;
     }
 
     .dropdown-item-content {
         display: flex;
         flex-direction: column;
+        gap: 0.125rem;
         overflow: hidden;
-    }
-
-    .dropdown-item-icon {
-        min-height: 2rem;
-        min-width: 2rem;
-        max-width: 2rem;
-        max-height: 2rem;
-        margin-right: 1rem;
-        border: 1px solid var(--scribe-border-color);
-        border-radius: var(--scribe-radius-lg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-weight: var(--scribe-font-weight-semibold);
     }
 
     .dropdown-item-content span {
+        font-weight: var(--scribe-font-weight-regular);
         font-size: var(--scribe-font-size-xs);
         color: var(--scribe-muted-foreground);
         white-space: nowrap;
@@ -200,7 +191,8 @@
 
     .help-container {
         flex-shrink: 0;
-        margin: 0.5rem 0.25rem 0.25rem 0.5rem;
+        padding: 0.5rem 0.5rem 0.125rem;
+        border-top: 1px solid var(--scribe-border-color);
         font-size: var(--scribe-font-size-xs);
         color: var(--scribe-muted-foreground);
         user-select: none;

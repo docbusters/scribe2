@@ -306,7 +306,7 @@
 		justify-content: center;
 		padding: 1rem;
 		border: 1px solid var(--scribe-border-color);
-		border-radius: var(--scribe-radius-2xl);
+		border-radius: var(--scribe-radius-xl);
 		background-color: var(--scribe-section-background);
 		font-family: var(--scribe-font-sans);
 	}
@@ -327,7 +327,7 @@
 	}
 	:global(.pie-chart-label) {
 		font-family: var(--scribe-font-sans);
-		color: var(--scribe-text-color);
+		color: var(--scribe-section-foreground);
 		font-size: var(--scribe-font-size-sm);
 	}
 	:global(.pie-chart-color) {

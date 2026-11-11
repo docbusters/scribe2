@@ -15,11 +15,11 @@
 
     // Buttons without a label are square icons, the ones with a label grow with their text
     const SMALL_STYLE = "width: 2rem; height: 2rem; min-width: 2rem; min-height: 2rem;";
-    const LARGE_STYLE = "height: auto; width: auto; min-width: 4.125rem; min-height: 4.125rem; padding: 0.375rem 0.625rem; flex-direction: column; gap: 0.25rem;";
+    const LARGE_STYLE = "height: auto; width: auto; min-width: 4rem; min-height: 3.5rem; padding: 0.375rem 0.625rem; flex-direction: column; gap: 0.25rem;";
 </script>
 
 
-<Button size="icon-sm" variant={isSelected ? "secondary" : "ghost"} title={name} {...buttonProps} style={label ? LARGE_STYLE : SMALL_STYLE}>
+<Button size="icon-sm" variant={isSelected ? "soft" : "ghost"} title={name} aria-label={label ? undefined : name} aria-pressed={isSelected || undefined} {...buttonProps} style={label ? LARGE_STYLE : SMALL_STYLE}>
     {#if label}
         <span class="large-icon">
             {#if icon}
@@ -38,13 +38,13 @@
     }
 
     .large-icon :global(svg) {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.25rem;
+        height: 1.25rem;
     }
 
     .large-label {
         font-size: var(--scribe-font-size-xs);
-        font-weight: var(--scribe-font-weight-regular);
+        font-weight: var(--scribe-font-weight-medium);
         line-height: 1;
     }
 </style>

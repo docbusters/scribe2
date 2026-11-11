@@ -83,9 +83,7 @@
 		width: 100%;
 		padding: 0.5rem 0.75rem;
 		overflow-x: auto;
-		background-color: color-mix(in srgb, var(--scribe-popover) 85%, transparent);
-		-webkit-backdrop-filter: blur(8px);
-		backdrop-filter: blur(8px);
+		background-color: var(--scribe-popover);
 		border: 1px solid var(--scribe-border-color);
 		border-radius: var(--scribe-radius-xl);
 		box-shadow: var(--scribe-shadow-md);

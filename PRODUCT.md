@@ -45,7 +45,7 @@ Scribe combines three things a generic rich-text editor does not:
 - The public API (`src/lib/index.ts`) is published, so changes to it are deliberate.
 
 ## Brand Commitments
-Name: Scribe. No other binding brand assets, voice or identity rules have been confirmed.
+Name: Scribe. The visual language matches modern SaaS host apps (grey desk, white hairline cards, a blue primary, one blue accent), and every colour must stay customisable through `--scribe-*` variables. No other binding brand assets, voice or identity rules have been confirmed.
 
 ## Evidence on Hand
 - Example documents: `src/lib/examples/` (`fullExampleDocument`, `fullExampleBindings`).

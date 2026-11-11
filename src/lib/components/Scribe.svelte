@@ -359,6 +359,8 @@
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h1);
 		font-size: var(--scribe-font-size-h1);
+		letter-spacing: -0.02em;
+		line-height: 1.2;
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
@@ -366,6 +368,8 @@
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h2);
 		font-size: var(--scribe-font-size-h2);
+		letter-spacing: -0.01em;
+		line-height: 1.3;
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
@@ -380,7 +384,7 @@
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
-	:global(.scribe-document span) {
+	:global(:where(.scribe-document) span) {
 		font-family: var(--scribe-font-sans);
 		font-weight: var(--scribe-font-weight-body);
 		font-size: var(--scribe-font-size-body);
@@ -397,13 +401,14 @@
 	/* Dropdown Styles */
 
 	:global(.scribe-dropdown-content) {
-        width: 229px;
-        max-height: min(var(--bits-dropdown-menu-content-available-height, 250px), 250px);
-        padding: 0.375rem 0.25rem;
+        width: 264px;
+        max-height: min(var(--bits-dropdown-menu-content-available-height, 320px), 320px);
+        padding: 0.375rem;
         background-color: var(--scribe-popover);
+        color: var(--scribe-popover-foreground);
         border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-radius-xl);
-        box-shadow: var(--scribe-shadow-md); /* shadow-popover */
+        box-shadow: var(--scribe-shadow-float);
         outline: none;
 		/* Above the top toolbar, the section handles and the component editors, but below the bindings panel and dialogs */
 		z-index: 30;
@@ -420,14 +425,16 @@
     :global(.scribe-dropdown-item) {
         display: flex;
         align-items: center;
-        padding: 0.2rem 0.5rem;
+        gap: 0.75rem;
+        padding: 0.375rem 0.5rem;
         font-size: var(--scribe-font-size-sm);
         font-weight: var(--scribe-font-weight-medium);
-        border-radius: var(--radius-button, 0.5rem);
+        border-radius: var(--scribe-radius-md);
         user-select: none;
         outline: none !important;
         box-shadow: none !important;
         scroll-margin: 0.25rem;
+        cursor: pointer;
     }
 
     :global(.scribe-dropdown-item[data-highlighted]) {

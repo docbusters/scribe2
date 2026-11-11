@@ -7,8 +7,7 @@
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
-	import Divider from '../utilComponents/Divider.svelte';
-	import ScrollArea from '../utilComponents/ScrollArea.svelte';
+		import ScrollArea from '../utilComponents/ScrollArea.svelte';
 	import DataTypeCard from '../utilComponents/DataTypeCard.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 	import { untrack } from 'svelte';
@@ -186,13 +185,7 @@
 	{#if component}
 		<div class="value-selector-container">
 			<div class="config-section">
-				<div class="section-header">
-					<div class="title-with-icon">
-						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-						<h5>{i18n.t('valueSelector.typeTitle')}</h5>
-					</div>
-					<p class="section-desc">{i18n.t('valueSelector.typeDesc')}</p>
-				</div>
+				<p class="section-desc">{i18n.t('valueSelector.typeDesc')}</p>
 
 				<div class="sources-grid">
 					{#each supportedValues as option (option.value)}
@@ -210,14 +203,9 @@
 			</div>
 
 			{#if parsedValueType}
-				<Divider />
-
 				<div class="config-section">
 					<div class="section-header">
-						<div class="title-with-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="section-icon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-							<h5>{i18n.t('valueSelector.configTitle')}</h5>
-						</div>
+						<h3 class="section-title">{i18n.t('valueSelector.configTitle')}</h3>
 						<p class="section-desc">{i18n.t('valueSelector.configDesc')}</p>
 					</div>
 
@@ -226,7 +214,7 @@
 						class="value-config-scrollarea"
 						viewportClasses="value-config-viewport"
 					>
-						<div class={parsedValueType.type === 'record' || parsedValueType.type === 'array' ? 'value-input-card' : 'input-wrapper'}>
+						<div class="input-wrapper">
 							<ComponentEditorValue
 								{parsedValueType}
 								bind:value={value}
@@ -250,38 +238,26 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		padding: 0.5rem 0;
 	}
 
 	.config-section {
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 0.875rem;
 	}
 
 	.section-header {
 		display: flex;
 		flex-direction: column;
-		gap: 0.375rem;
+		gap: 0.25rem;
 	}
 
-	.title-with-icon {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.section-icon {
-		color: var(--scribe-primary, #3b82f6);
-	}
-
-	h5 {
+	.section-title {
 		margin: 0;
 		font-family: var(--scribe-font-heading);
-		font-size: var(--scribe-font-size-md);
-		font-weight: 600;
-		letter-spacing: -0.01em;
-		color: var(--scribe-text-color);
+		font-size: var(--scribe-font-size-sm);
+		font-weight: var(--scribe-font-weight-semibold);
+		color: var(--scribe-doc-foreground);
 	}
 
 	.section-desc {
@@ -296,16 +272,8 @@
 		flex-direction: column;
 	}
 
-	.value-input-card {
-		padding: 1.25rem;
-		border: 1px solid var(--scribe-border-color);
-		border-radius: var(--scribe-radius-lg);
-		background-color: var(--scribe-background);
-		box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-	}
-
 	:global(.value-config-scrollarea) {
-		max-height: 280px;
+		max-height: min(340px, 45vh);
 		width: 100%;
 		overflow: hidden;
 		display: flex;

@@ -122,7 +122,7 @@
     <div class="image-container" in:fade>
         {#if resolvedValue.type === 'string' && !errorLoadingImage}
             {#if !imageLoaded}
-                <Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
+                <Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-xl);" />
             {/if}
             <div 
                 class="image-wrapper" 
@@ -168,7 +168,7 @@
         flex: 1;
         overflow: hidden;
         min-height: 133px;
-        border-radius: var(--scribe-radius-2xl);
+        border-radius: var(--scribe-radius-xl);
         padding: 0.25rem;
         align-items: center;
         display: flex;
@@ -179,7 +179,7 @@
         position: relative;
         display: inline-flex;
         max-width: 100%;
-        border-radius: var(--scribe-radius-2xl);
+        border-radius: var(--scribe-radius-xl);
     }
 
     .image-wrapper img {
@@ -193,7 +193,7 @@
     .resize-handle {
         position: absolute;
         background-color: var(--scribe-accent);
-        border: 1px solid var(--scribe-doc-background);
+        border: 1px solid var(--scribe-section-background);
         opacity: 0;
         transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
         z-index: 10;
@@ -217,7 +217,7 @@
         margin-top: -12px;
         width: 6px;
         height: 24px;
-        border-radius: 3px;
+        border-radius: var(--scribe-radius-sm);
         cursor: ew-resize;
     }
 
@@ -227,7 +227,7 @@
         margin-left: -12px;
         width: 24px;
         height: 6px;
-        border-radius: 3px;
+        border-radius: var(--scribe-radius-sm);
         cursor: ns-resize;
     }
 

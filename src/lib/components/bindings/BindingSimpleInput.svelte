@@ -61,6 +61,7 @@
 			<button
 				type="button"
 				class="bool-option {value === true ? 'is-selected' : ''}"
+				aria-pressed={value === true}
 				onclick={() => onupdate(true, 'onblur')}
 			>
 				{i18n.t('common.true')}
@@ -68,6 +69,7 @@
 			<button
 				type="button"
 				class="bool-option {value === false ? 'is-selected' : ''}"
+				aria-pressed={value === false}
 				onclick={() => onupdate(false, 'onblur')}
 			>
 				{i18n.t('common.false')}
@@ -92,40 +94,49 @@
 
 	.scribe-binding-input {
 		width: 100%;
-		padding: 0.35rem 0.55rem;
-		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
-		font-size: var(--scribe-font-size-xs, 0.8125rem);
+		height: 2rem;
+		padding: 0 0.625rem;
+		font-family: var(--scribe-font-sans);
+		font-size: var(--scribe-font-size-sm);
+		font-variant-numeric: tabular-nums;
 		color: var(--scribe-doc-foreground);
-		background-color: var(--scribe-muted);
-		border: 1px solid color-mix(in srgb, var(--scribe-border-color) 50%, transparent);
+		background-color: var(--scribe-section-background);
+		border: 1px solid var(--scribe-border-strong);
 		border-radius: var(--scribe-radius-md);
 		outline: none;
-		transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: border-color 150ms ease-out;
 		box-sizing: border-box;
 	}
 
+	.scribe-binding-input::placeholder {
+		color: var(--scribe-muted-foreground);
+	}
+
 	.scribe-binding-input:hover {
-		border-color: color-mix(in srgb, var(--scribe-border-color) 40%, var(--scribe-primary));
-		background-color: color-mix(in srgb, var(--scribe-muted) 80%, transparent);
+		border-color: color-mix(in oklab, var(--scribe-doc-foreground) 38%, var(--scribe-section-background));
 	}
 
 	.scribe-binding-input:focus {
-		background-color: var(--scribe-popover);
-		border-color: var(--scribe-primary);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--scribe-primary) 15%, transparent);
+		border-color: var(--scribe-accent);
+		outline: 1px solid var(--scribe-accent);
+	}
+
+	.scribe-binding-input.scribe-binding-input:focus-visible {
+		outline: 1px solid var(--scribe-accent);
+		outline-offset: 0;
 	}
 
 	.scribe-date-input {
 		cursor: pointer;
 	}
 
+	/* A segmented control: the chosen option is the primary pill */
 	.scribe-bool-toggle {
 		display: inline-flex;
 		align-items: center;
 		padding: 2px;
-		background-color: var(--scribe-muted);
+		background-color: var(--scribe-secondary);
 		border-radius: var(--scribe-radius-md);
-		border: 1px solid var(--scribe-border-color);
 		gap: 2px;
 		width: 100%;
 		box-sizing: border-box;
@@ -133,26 +144,27 @@
 
 	.bool-option {
 		flex: 1;
-		padding: 0.25rem 0.5rem;
-		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
-		font-size: var(--scribe-font-size-xs, 0.75rem);
-		font-weight: var(--scribe-font-weight-medium, 500);
+		height: 1.75rem;
+		padding: 0 0.5rem;
+		font-family: var(--scribe-font-sans);
+		font-size: var(--scribe-font-size-xs);
+		font-weight: var(--scribe-font-weight-medium);
 		border: none;
 		background: transparent;
-		color: var(--scribe-muted-foreground);
+		color: var(--scribe-secondary-foreground);
 		border-radius: var(--scribe-radius-sm);
 		cursor: pointer;
-		transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: background-color 150ms ease-out, color 150ms ease-out;
 	}
 
-	.bool-option:hover {
-		color: var(--scribe-doc-foreground);
+	.bool-option:hover:not(.is-selected) {
+		background-color: color-mix(in oklab, var(--scribe-secondary) 80%, var(--scribe-doc-foreground));
 	}
 
 	.bool-option.is-selected {
-		background-color: var(--scribe-popover);
-		color: var(--scribe-doc-foreground);
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-		font-weight: var(--scribe-font-weight-semibold, 600);
+		background-color: var(--scribe-accent-wash);
+		color: var(--scribe-accent-text);
+		box-shadow: inset 0 0 0 1px var(--scribe-accent-soft);
+		font-weight: var(--scribe-font-weight-semibold);
 	}
 </style>

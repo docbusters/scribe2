@@ -18,11 +18,12 @@
 		value: unknown;
 		componentType?: string;
 		initialDataValue?: DataValue;
-		placeholder?: string;
+		/** Text drawn above a text, number or yes/no field. */
+		label?: string;
 		isStrict?: boolean;
 	}
 
-	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, placeholder = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
+	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, label = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
 
 	const i18n = getI18n();
 
@@ -121,17 +122,17 @@
 </script>
 
 {#if parsedValueType?.type === 'string'}
-	<TextInput bind:value={value as string} {placeholder} />
+	<TextInput bind:value={value as string} {label} />
 {:else if parsedValueType?.type === 'number'}
 	<TextInput 
 		value={String(value ?? '')} 
 		oninput={(e) => value = Number((e.currentTarget as HTMLInputElement).value)} 
-		{placeholder}
+		{label}
 		type="number" 
 	/>
 {:else if parsedValueType?.type === 'boolean'}
 	<Select
-		{placeholder}
+		{label}
 		type="single"
 		value={String(value ?? '')}
 		onValueChange={(v) => value = (v === 'true')}
@@ -153,7 +154,7 @@
 					bind:value={(value as Record<string, DataValue>)[key].value}
 					componentType={componentType}
 					initialDataValue={initialVal ?? currentVal}
-					placeholder={capitalizeStrings(key)}
+					label={capitalizeStrings(key)}
 				/>
 			{/each}
 		{/if}
@@ -164,9 +165,9 @@
 			{#each value as _, index (index)}
 				<div class="array-container-item">
 					<div class="array-item-header">
-						<span class="array-item-badge">{i18n.t('common.itemIndex', { index: index + 1 })}</span>
-						<Button size="icon-sm" variant="ghost-destructive" title={i18n.t('common.removeItem')} onclick={() => removeArrayItem(index)}>
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+						<span class="array-item-badge scribe-caps-label">{i18n.t('common.itemIndex', { index: index + 1 })}</span>
+						<Button size="icon-sm" variant="ghost-destructive" title={i18n.t('common.removeItem')} aria-label={i18n.t('common.removeItem')} onclick={() => removeArrayItem(index)}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 						</Button>
 					</div>
 					<div class="array-item-content">
@@ -187,8 +188,8 @@
 				</div>
 			{/each}
 			<div class="array-actions">
-				<Button size="sm" variant="outline" class="array-add-btn" onclick={addArrayItem}>
-					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+				<Button size="sm" variant="outline" onclick={addArrayItem}>
+					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
 					{i18n.t('common.addItem')}
 				</Button>
 			</div>
@@ -206,7 +207,7 @@
 	.record-container {
 		display: flex;
 		flex-direction: column;
-		gap: 0.625rem;
+		gap: 0.875rem;
 		width: 100%;
 	}
 	.array-container {
@@ -218,31 +219,18 @@
 	.array-container-item {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0.75rem 0.875rem;
-		background-color: color-mix(in srgb, var(--scribe-muted) 40%, transparent);
-		border: 1px solid color-mix(in srgb, var(--scribe-border-color) 60%, transparent);
+		gap: 0.625rem;
+		padding: 0.5rem 0.75rem 0.75rem 0.875rem;
+		background-color: var(--scribe-muted);
+		border: 1px solid var(--scribe-border-color);
 		border-radius: var(--scribe-radius-lg);
-		transition: all 0.15s ease;
 		box-sizing: border-box;
-	}
-	.array-container-item:hover {
-		border-color: color-mix(in srgb, var(--scribe-border-color) 30%, var(--scribe-primary));
-		background-color: color-mix(in srgb, var(--scribe-muted) 60%, transparent);
 	}
 	.array-item-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding-bottom: 0.25rem;
-		border-bottom: 1px solid color-mix(in srgb, var(--scribe-border-color) 30%, transparent);
-	}
-	.array-item-badge {
-		font-family: var(--scribe-font-sans, system-ui, -apple-system, sans-serif);
-		font-size: 0.6875rem;
-		font-weight: 600;
-		color: var(--scribe-muted-foreground);
-		letter-spacing: 0.02em;
+		min-height: 1.75rem;
 	}
 	.array-item-content {
 		width: 100%;
@@ -250,6 +238,5 @@
 	.array-actions {
 		display: flex;
 		justify-content: flex-start;
-		margin-top: 0.25rem;
 	}
 </style>

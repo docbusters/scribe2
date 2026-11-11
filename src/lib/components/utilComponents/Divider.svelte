@@ -1,9 +1,9 @@
-<div class="divider"></div>
+<div class="divider" role="separator"></div>
 
 <style>
     .divider {
         height: 1px;
-        background: linear-gradient(to right, transparent, var(--scribe-border-color), transparent);
+        background-color: var(--scribe-border-color);
         margin: 0.25rem 0;
     }
 </style>

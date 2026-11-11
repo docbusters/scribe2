@@ -55,14 +55,25 @@
 
 <style>
     table {
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         flex: 1;
         table-layout: fixed;
         width: 100%;
+        border: 1px solid var(--scribe-border-color);
+        border-radius: var(--scribe-radius-lg);
+        overflow: hidden;
     }
     td {
-        border: 1px solid var(--scribe-border-color);
+        border-right: 1px solid var(--scribe-border-color);
+        border-bottom: 1px solid var(--scribe-border-color);
         padding: 0.5rem;
         position: relative;
+    }
+    td:last-child {
+        border-right: none;
+    }
+    tr:last-child td {
+        border-bottom: none;
     }
 </style>

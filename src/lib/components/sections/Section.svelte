@@ -25,7 +25,7 @@
 <section class={isEditMode ? 'section-edit' : ''} in:fade>
     {#if isEditMode}
         <div class="edit-handle">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
         </div>
 
         <div class="section-editor">
@@ -48,8 +48,10 @@
         flex-direction: column;
         background-color: var(--scribe-section-background);
         color: var(--scribe-section-foreground);
+        border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-section-radius);
-        padding: 0.75rem 1.25rem;
+        box-shadow: var(--scribe-shadow-sm);
+        padding: 1.25rem 1.5rem;
         margin: 0 0.5rem;
     }
 
@@ -58,36 +60,45 @@
     }
 
     .section-edit {
-        padding-left: 1.75rem;
+        padding-left: 2rem;
         margin-right: 3.25rem;
     }
 
-    :hover.section-edit .edit-handle, :hover.section-edit .section-editor {
+    /* The handle and the section toolbar show on hover, and when the keyboard reaches them */
+    .section-edit:hover .edit-handle,
+    .section-edit:hover .section-editor,
+    .section-edit:focus-within .edit-handle,
+    .section-edit:focus-within .section-editor {
         opacity: 1;
     }
 
     .edit-handle {
         opacity: 0;
         position: absolute;
-        left: 0.1rem;
+        left: 0.5rem;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
         cursor: grab;
+        color: var(--scribe-muted-foreground);
         border-radius: var(--scribe-radius-sm);
-        padding: 0.1rem;
-        transition: opacity 0.5s ease;
+        padding: 0.125rem;
+        transition: opacity 150ms ease-out;
+    }
+
+    .edit-handle:hover {
+        color: var(--scribe-doc-foreground);
+        background-color: var(--scribe-muted);
     }
 
     .section-editor {
         position: absolute;
         bottom: 0;
-        transform: translateY(0%) translateX(90%);
+        transform: translateX(90%);
         right: 0;
         z-index: 10;
         opacity: 0;
-        transition: opacity 0.5s ease;
+        transition: opacity 150ms ease-out;
         padding: 0.25rem 1rem;
-        border-radius: 1rem;
     }
 </style>
-

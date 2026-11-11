@@ -27,27 +27,32 @@
 </script>
 
 <div class={`section-editor-container ${className || ''}`} {...restProps}>
-    <Button {disabled} size="icon-sm" variant="ghost" title={i18n.t('sections.addBelow')} onclick={handleAdd}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    <Button {disabled} size="icon-sm" variant="ghost" title={i18n.t('sections.addBelow')} aria-label={i18n.t('sections.addBelow')} onclick={handleAdd}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
     </Button>
-    <Button {disabled} size="icon-sm" variant="ghost" title={i18n.t('sections.duplicate')} onclick={handleDuplicate}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-popover-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>    </Button>
-    <Button {disabled} size="icon-sm" variant="ghost" title={i18n.t('sections.delete')} onclick={handleDelete}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--scribe-error-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    <Button {disabled} size="icon-sm" variant="ghost" title={i18n.t('sections.duplicate')} aria-label={i18n.t('sections.duplicate')} onclick={handleDuplicate}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+    </Button>
+    <Button {disabled} size="icon-sm" variant="ghost-destructive" title={i18n.t('sections.delete')} aria-label={i18n.t('sections.delete')} onclick={handleDelete}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
     </Button>
 </div>
 
 <style>
     .section-editor-container {
         background-color: var(--scribe-popover);
+        color: var(--scribe-muted-foreground);
         border-radius: var(--scribe-radius-lg);
         border: 1px solid var(--scribe-border-color);
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.125rem;
         padding: 0.25rem;
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+        box-shadow: var(--scribe-shadow-md);
         width: fit-content;
     }
-</style>
 
+    .section-editor-container :global(.scribe-btn-ghost:hover:not(:disabled)) {
+        color: var(--scribe-doc-foreground);
+    }
+</style>

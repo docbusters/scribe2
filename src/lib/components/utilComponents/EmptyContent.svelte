@@ -23,13 +23,13 @@
 
 </script>
 
-<div class="empty-container" class:has-action={!!action} style={style}>
+<div class="empty-container" class:has-action={!!action} class:is-error={isError} style={style}>
     {#if icon}
-        <div class={`icon ${isError ? 'icon-error' : ''}`}>
+        <div class="scribe-tile icon">
             {@html icon}
         </div>
     {/if}
-    <span class={"message" + (isError ? " message-error" : "")}>
+    <span class="message">
         {message}
     </span>
     {#if description}
@@ -39,7 +39,7 @@
     {/if}
     {#if action}
         <div class="action">
-            <Button size="sm" style="border-radius: 50px; padding: 0 1.25rem; font-size: var(--scribe-font-size-sm);" onclick={() => action.onclick()}>{action.label}</Button>
+            <Button size="sm" variant="outline" onclick={() => action.onclick()}>{action.label}</Button>
         </div>
     {/if}
 </div>
@@ -56,50 +56,59 @@
         gap: 0.5rem;
         padding: 1rem;
         text-align: center;
-        border: 1px dashed var(--scribe-border-color);
-        border-radius: var(--scribe-radius-2xl);
-        background-color: var(--scribe-section-background);
+        border: 1px dashed var(--scribe-border-strong);
+        border-radius: var(--scribe-radius-xl);
+        background-color: var(--scribe-muted);
         flex: 1;
+    }
+
+    .empty-container.is-error {
+        border-color: var(--scribe-error-soft);
+        background-color: var(--scribe-error-wash);
     }
 
     /* The button needs room around it; a style given by the component still wins as it is inline */
     .empty-container.has-action {
-        padding-block: 1.75rem;
+        padding-block: 1.5rem;
     }
 
     /* On top of the gap of the card, so the button is clearly set apart from the message */
     .action {
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
     }
 
     .icon {
-        color: var(--scribe-secondary-foreground);
-        background-color: var(--scribe-secondary);
-        padding: 0.5rem;
-        border-radius: var(--scribe-radius-xl);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--scribe-radius-lg);
+        background-color: var(--scribe-section-background);
     }
 
-    .icon-error {
-        background-color: oklch(from var(--scribe-error-foreground) l c h / 15%);
-        color: var(--scribe-error-foreground);
+    .is-error .icon {
+        --tile: var(--scribe-error-foreground);
+    }
+
+    /* Icons come from the caller as 24px markup; the tile rule would shrink them */
+    .icon :global(svg) {
+        width: 1.25rem;
+        height: 1.25rem;
     }
 
     .message {
         color: var(--scribe-doc-foreground);
         font-weight: var(--scribe-font-weight-semibold);
         font-size: var(--scribe-font-size-sm);
+        line-height: 1.35;
     }
 
-    .message-error {
+    .is-error .message {
         color: var(--scribe-error-foreground);
     }
 
     .value {
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--scribe-radius-xl);
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--scribe-radius-md);
         font-size: var(--scribe-font-size-xs);
+        color: var(--scribe-muted-foreground);
     }
 </style>

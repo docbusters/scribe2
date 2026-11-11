@@ -78,7 +78,7 @@
 			id="binding-id-input"
 			type="text"
 			{error}
-			placeholder={i18n.t('addBinding.namePlaceholder')}
+			label={i18n.t('addBinding.nameLabel')}
 			bind:value={bindingId}
 			oninput={() => (error = null)}
 			onkeydown={(e) => {
@@ -90,7 +90,7 @@
 		/>
 
 		<div class="type-section">
-			<span class="type-section-label">{i18n.t('addBinding.typeLabel')}</span>
+			<span class="scribe-caps-label">{i18n.t('addBinding.typeLabel')}</span>
 			<div class="sources-grid">
 				{#each typeOptions as option (option.type)}
 					<DataTypeCard
@@ -116,22 +116,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
-		padding: 0.5rem 0 0.5rem 0;
 	}
 
 	.type-section {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-	}
-
-	.type-section-label {
-		font-family: var(--scribe-font-sans, system-ui, sans-serif);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--scribe-muted-foreground);
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
 	}
 
 	.sources-grid {

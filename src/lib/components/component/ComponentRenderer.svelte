@@ -212,7 +212,7 @@
 
 {#if componentData}
 	{#await resolvedValue}
-		<Skeleton style="flex: 1; width: 100%; height: {blockHeight !== null ? `${blockHeight}px` : '100%'}; min-height: 133px; border-radius: var(--scribe-radius-2xl);" />
+		<Skeleton style="flex: 1; width: 100%; height: {blockHeight !== null ? `${blockHeight}px` : '100%'}; min-height: 133px; border-radius: var(--scribe-radius-xl);" />
 	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -296,7 +296,7 @@
 		transform: translateX(-50%);
 		border-radius: 999px;
 		background-color: var(--scribe-accent);
-		border: 1px solid var(--scribe-doc-background);
+		border: 1px solid var(--scribe-section-background);
 		box-shadow: var(--scribe-shadow-sm);
 		cursor: ns-resize;
 		touch-action: none;
@@ -315,7 +315,7 @@
 		display: inline;
 	}
 	
-	/* The horizontal margin matches the reach of the selection ring and halo, so they never cover the adjacent
+	/* The horizontal margin matches the reach of the selection ring, so it never covers the adjacent
 	   text and selecting a component does not reflow the line */
 	.component-edit-contents.is-inline-block {
 		display: inline-block;
@@ -327,7 +327,7 @@
 		width: 100%;
 	}
 
-	/* Selection: a tinted background, an accent ring with a soft halo and a name label. None of it affects the
+	/* Selection: a tinted background, an accent ring and a name label. None of it affects the
 	   layout, and it stays visible when the pointer leaves the component */
 	.component-edit-contents.is-selected {
 		background-color: color-mix(in srgb, var(--scribe-accent) 6%, transparent);
@@ -341,7 +341,6 @@
 		inset: -3px;
 		border: 2px solid var(--scribe-accent);
 		border-radius: calc(var(--scribe-radius-sm) + 3px);
-		box-shadow: 0 0 0 3px color-mix(in srgb, var(--scribe-accent) 18%, transparent);
 		pointer-events: none;
 		z-index: 1;
 		animation: scribe-selection-in 150ms ease-out;
@@ -356,7 +355,7 @@
 		z-index: 1;
 		padding: 0.125rem 0.5rem;
 		background-color: var(--scribe-accent);
-		color: white;
+		color: var(--scribe-accent-foreground);
 		font-size: var(--scribe-font-size-xs);
 		font-weight: var(--scribe-font-weight-semibold);
 		line-height: 1.25;

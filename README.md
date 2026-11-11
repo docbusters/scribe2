@@ -65,82 +65,91 @@ Make sure it is intalled correctly in `package.json`
 
 ## Styling
 
-To style the default components, CSS variables can be used. It is recommended using the default styles [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and manually setting specific variables when necessary:
+Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairline borders, a near-black primary colour and one blue accent. Every colour comes from a CSS variable, so a host app can make it match its own palette by overriding the variables below. Load [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and set only what you need:
 
 ```css
 :root {
-	/* Document-level variables */
-	--scribe-doc-background: oklch(1 0 0); /* Document background color */
-	--scribe-doc-foreground: oklch(0.145 0 0); /* Default text color */
+	/* Page and cards */
+	--scribe-doc-background: oklch(0.962 0.002 250); /* The desk the sections lie on */
+	--scribe-doc-foreground: oklch(0.2 0.005 260); /* Default text colour */
+	--scribe-section-background: oklch(1 0 0); /* Section cards */
+	--scribe-section-foreground: oklch(0.2 0.005 260);
+	--scribe-popover: oklch(1 0 0); /* Dialogs, dropdowns, the variables panel */
+	--scribe-popover-foreground: oklch(0.2 0.005 260);
 
-	--scribe-primary: oklch(0.205 0 0); /* Primary background color for elements like buttons, etc. */
-  	--scribe-primary-foreground: oklch(0.985 0 0); /* Text color for elements with primary background */
-    --scribe-secondary: oklch(0.94 0 0); /* Secondary background color for elements like cards, modals, etc. */
-    --scribe-secondary-foreground: oklch(0.205 0 0); /* Text color for elements with secondary background */
+	/* Buttons and the chosen state */
+	--scribe-primary: oklch(0.2 0.005 260); /* Filled buttons, the chosen ribbon button, check marks */
+	--scribe-primary-foreground: oklch(0.99 0 0);
+	--scribe-secondary: oklch(0.955 0.002 250); /* Soft fills: count pills, segmented controls */
+	--scribe-secondary-foreground: oklch(0.28 0.005 260);
 
-	/* Section-level variables */
-	--scribe-section-background: oklch(0.97 0 0); /* Background color for sections */
-	--scribe-section-foreground: oklch(0.205 0 0); /* Text color for sections */
-	--scribe-section-radius: var(--scribe-radius-lg); /* Border radius for sections */
-	--scribe-section-separation: 0.75rem; /* Gap between sections */
-	--scribe-section-heading-gap: 1.5rem; /* Gap between section heading and content */
+	/* Lines and muted surfaces */
+	--scribe-border-color: oklch(0.915 0.003 250); /* Hairlines */
+	--scribe-muted: oklch(0.968 0.002 250); /* Hover fills, sunken boxes */
+	--scribe-muted-foreground: oklch(0.5 0.01 255); /* Secondary text (keep at least 4.5:1 on cards) */
 
-	/* Misc. variables */
-	--scribe-border-color: oklch(72.193% 0.00008 271.152); /* Default border color for elements */
-	--scribe-selection-color: oklch(0.6194 0.2085 255.62 / 25%); /* Color for text selection */
-	--scribe-error: oklch(0.577 0.245 27.325); /* Background color for error states */
-	--scribe-error-foreground: oklch(63.7% 0.237 25.331); /* Color for error text */
-	--scribe-popover: oklch(1 0 0);
-  	--scribe-popover-foreground: oklch(0.145 0 0);
-	--scribe-muted: oklch(0.97 0 0);
+	/* Accent: selection, focus and values bound to a variable */
+	--scribe-accent: oklch(0.54 0.19 260);
+	--scribe-accent-foreground: oklch(0.99 0 0); /* Text on a solid accent */
+	--scribe-selection-color: oklch(0.54 0.19 260 / 18%); /* Text selection and hover highlight */
 
-    /** Font family variables */
-    --scribe-font-heading: 'Segoe UI', sans-serif; /* Font for headings (h1, h2, etc.) */
-	--scribe-font-sans: 'Segoe UI', sans-serif; /* Font for sans-serif text */
-	--scribe-font-mono: 'Segoe UI Mono', monospace; /* Font for monospace text */
+	/* Danger */
+	--scribe-error: oklch(0.55 0.22 27); /* Background of destructive buttons */
+	--scribe-error-foreground: oklch(0.5 0.21 27); /* Error text and icons */
+	--scribe-on-error: oklch(0.99 0 0); /* Text on a solid error background */
 
-	/* Font size variables */
-	--scribe-font-size-xs: 0.75rem;
-	--scribe-font-size-sm: 0.875rem;
-	--scribe-font-size-md: 1rem;
-	--scribe-font-size-lg: 1.125rem;
-	--scribe-font-size-xl: 1.25rem;
-	--scribe-font-size-2xl: 1.5rem;
-	--scribe-font-size-3xl: 1.875rem;
-	--scribe-font-size-4xl: 2.25rem;
+	/* One colour per data type, used by the type icons and labels */
+	--scribe-type-string: oklch(0.55 0.17 300);
+	--scribe-type-number: oklch(0.52 0.14 155);
+	--scribe-type-boolean: oklch(0.58 0.14 65);
+	--scribe-type-date: oklch(0.55 0.11 200);
+	--scribe-type-array: oklch(0.54 0.17 250);
+	--scribe-type-record: oklch(0.55 0.19 345);
+	--scribe-type-empty: oklch(0.55 0.01 255);
 
-	--scribe-font-size-h1: var(--scribe-font-size-4xl); /* Font size for h1 */
-	--scribe-font-size-h2: var(--scribe-font-size-2xl); /* Font size for h2 */
-	--scribe-font-size-h3: var(--scribe-font-size-xl); /* Font size for h3 */
-	--scribe-font-size-body: var(--scribe-font-size-md); /* Font size for body text */
+	/* Layers */
+	--scribe-overlay: oklch(0.2 0.01 260 / 35%); /* Behind dialogs */
+	--scribe-shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 5%);
+	--scribe-shadow-md: 0 2px 8px -2px oklch(0 0 0 / 8%), 0 1px 2px 0 oklch(0 0 0 / 4%);
+	--scribe-shadow-lg: 0 8px 24px -6px oklch(0 0 0 / 12%), 0 2px 6px 0 oklch(0 0 0 / 5%);
+	--scribe-shadow-float: 0 12px 32px -8px oklch(0 0 0 / 16%), 0 2px 6px 0 oklch(0 0 0 / 6%); /* Layers that float over the page */
 
-	/* Font weight variables */
-	--scribe-font-weight-light: 300;
-	--scribe-font-weight-regular: 400;
-	--scribe-font-weight-medium: 500;
-	--scribe-font-weight-semibold: 600;
-	--scribe-font-weight-bold: 700;
+	/* Sections */
+	--scribe-section-radius: var(--scribe-radius-xl);
+	--scribe-section-separation: 0.875rem; /* Gap between sections */
+	--scribe-section-heading-gap: 1rem; /* Gap between section heading and content */
 
-	--scribe-font-weight-h1: var(--scribe-font-weight-bold); /* Font weight for h1 */
-	--scribe-font-weight-h2: var(--scribe-font-weight-semibold); /* Font weight for h2 */
-	--scribe-font-weight-h3: var(--scribe-font-weight-semibold); /* Font weight for h3 */
-	--scribe-font-weight-body: var(--scribe-font-weight-regular); /* Font weight for body text */
+	/* Fonts: Inter is used when the host loads it, otherwise the system font */
+	--scribe-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--scribe-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--scribe-font-mono: ui-monospace, 'Cascadia Code', Menlo, monospace; /* Only for code-like content */
 
-    /* Radius variables */
-    --scribe-radius: 0.625rem; /** Base radius for all elements */
+	/* Sizes: --scribe-font-size-xs ... 4xl, and the h1, h2, h3 and body sizes built from them */
+	--scribe-font-size-h1: var(--scribe-font-size-3xl);
+	--scribe-font-size-h2: var(--scribe-font-size-xl);
+	--scribe-font-size-h3: var(--scribe-font-size-lg);
+	--scribe-font-size-body: var(--scribe-font-size-md);
 
-    /* Scaled radius values for different sizes */
-	--scribe-radius-sm: calc(var(--scribe-radius) * 0.6); 
-	--scribe-radius-md: calc(var(--scribe-radius) * 0.8);
-	--scribe-radius-lg: var(--scribe-radius);
-	--scribe-radius-xl: calc(var(--scribe-radius) * 1.4);
-	--scribe-radius-2xl: calc(var(--scribe-radius) * 1.8);
-	--scribe-radius-3xl: calc(var(--scribe-radius) * 2.2);
-	--scribe-radius-4xl: calc(var(--scribe-radius) * 2.6);
+	/* Weights: --scribe-font-weight-light ... bold, and the h1, h2, h3 and body weights built from them */
+	--scribe-font-weight-h1: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-h2: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-h3: var(--scribe-font-weight-semibold);
+	--scribe-font-weight-body: var(--scribe-font-weight-regular);
+
+	/* Radius: one base value, scaled for sm, md, lg, xl, 2xl, 3xl and 4xl */
+	--scribe-radius: 0.625rem;
 }
+```
 
-:root .dark {
-	/* Overwrite the values as desired for dark mode */
+Some colours are derived from these with `color-mix` (field borders, the fill of a bound value, error washes), so they follow your overrides and the dark theme without being set.
+
+### Dark theme
+
+Add the `dark` class to `<html>`, to a wrapper or to the Scribe element, and override the variables for it:
+
+```css
+.dark {
+	/* Overwrite the values as desired for dark mode, see styles/scribe.css for the defaults */
 	/* ... */
 }
 ```

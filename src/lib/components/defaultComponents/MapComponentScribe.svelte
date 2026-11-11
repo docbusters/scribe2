@@ -78,7 +78,7 @@
                 ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
                 : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'}
             hasSearchbar={config?.hasSearchbar}
-            markerColor={config?.markerColor || 'var(--scribe-accent, #2563eb)'}
+            markerColor={config?.markerColor || 'var(--scribe-accent)'}
             hasCurrentPosBtn={config?.hasCurrentPosBtn}
             hasGlobeBtn={config?.hasGlobeBtn}
             hasZoomBtn={config?.hasZoomBtn}
@@ -98,7 +98,7 @@
         min-height: 0;
         min-width: 0;
         width: 100%;
-        border-radius: var(--scribe-radius-2xl);
+        border-radius: var(--scribe-radius-xl);
         padding: 0.5rem;
         align-items: center;
         display: flex;

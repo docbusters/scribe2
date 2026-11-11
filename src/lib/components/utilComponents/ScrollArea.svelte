@@ -81,7 +81,7 @@
 		width: 100% !important;
 		min-width: 6px;
 		border-radius: 9999px;
-		background-color: var(--scribe-border-color);
+		background-color: var(--scribe-border-strong);
 		cursor: pointer;
 		transition: background-color 150ms ease-out;
 	}
