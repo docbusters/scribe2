@@ -5,6 +5,9 @@
 	import { globalRegistry } from '../../stores/global-registry.svelte.js';
 	import { selectionStore } from '../../stores/selection-store.svelte.js';
 	import ComponentEditor from '../component/ComponentEditor.svelte';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+
+	const i18n = getI18n();
 
 	// When there is no component to act on the editor is rendered for a placeholder, so the toolbar keeps its layout.
 	// The text component always exists, as custom registries extend the default one
@@ -69,7 +72,7 @@
 </script>
 
 <!-- The scribe-top-toolbar class keeps the selection when the toolbar is clicked, see Scribe.svelte -->
-<div class="scribe-top-toolbar" role="toolbar" aria-label="Component toolbar" tabindex="-1" onmousedown={keepTextFocus}>
+<div class="scribe-top-toolbar" role="toolbar" aria-label={i18n.t('topToolbar.ariaLabel')} tabindex="-1" onmousedown={keepTextFocus}>
 	<ComponentEditor {...target} />
 </div>
 

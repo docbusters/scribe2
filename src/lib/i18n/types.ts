@@ -16,6 +16,12 @@ export interface Translations {
 		true: string;
 		false: string;
 		textPlaceholder: string;
+		value: string;
+		add: string;
+		unavailable: string;
+		showPassword: string;
+		hidePassword: string;
+		newText: string;
 	};
 	types: {
 		string: string;
@@ -113,6 +119,7 @@ export interface Translations {
 	editor: {
 		emptySectionPlaceholder: string;
 		resizeHeight: string;
+		printDocument: string;
 	};
 	componentToolbar: {
 		pressEnter: string;
@@ -130,6 +137,7 @@ export interface Translations {
 			options: string;
 		};
 		configureLabel: string;
+		ariaLabel: string;
 	};
 	textFormat: {
 		bold: string;
@@ -171,6 +179,48 @@ export interface Translations {
 			description: string;
 		};
 	};
+	chartConfig: {
+		title: string;
+		sourceTitle: string;
+		sourceDesc: string;
+		xAxis: string;
+		seriesTitle: string;
+		seriesDesc: string;
+		addSeries: string;
+		seriesLabel: string;
+		noSeries: string;
+		noSeriesDesc: string;
+		changeColor: string;
+		showSeries: string;
+		hideSeries: string;
+		removeSeries: string;
+	};
+	map: {
+		searchPlaceholder: string;
+		noAddressSelected: string;
+		noResults: string;
+	};
+	options: {
+		expandWithContent: string;
+		alignLeft: string;
+		alignCenter: string;
+		alignRight: string;
+		fitContain: string;
+		fitCover: string;
+		fitFill: string;
+		mapReadOnly: string;
+		mapSearchbar: string;
+		mapGlobe: string;
+		mapZoom: string;
+		mapCurrentPosition: string;
+		mapDraggableMarker: string;
+		chartDataConfig: string;
+		chartBar: string;
+		chartLine: string;
+		chartArea: string;
+		chartPie: string;
+		chartArc: string;
+	};
 	errors: {
 		componentError: string;
 		unknownComponent: string;
@@ -184,6 +234,10 @@ export interface Translations {
 		chartMissingXAxisDesc: string;
 		chartNoSeries: string;
 		chartNoSeriesDesc: string;
+		unsupportedValueType: string;
+		unsupportedBindingType: string;
+		invalidMapValue: string;
+		tableCellNotComponent: string;
 	};
 }
 

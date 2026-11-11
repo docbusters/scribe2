@@ -105,7 +105,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'expand-content',
-                name: 'Expand with content',
+                name: i18n.t('options.expandWithContent'),
                 group: groups.layout,
                 isSelected: (data: { config?: TextInputComponentConfig }) => data.config?.expandWithContent === true,
                 props: {
@@ -138,7 +138,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'align-left',
-                name: 'Align Left',
+                name: i18n.t('options.alignLeft'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'left',
                 props: {
@@ -152,7 +152,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'align-center',
-                name: 'Align Center',
+                name: i18n.t('options.alignCenter'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align !== undefined ? data.config.align === 'center' : true, // If align is not set, center is default
                 props: {
@@ -166,7 +166,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'align-right',
-                name: 'Align Right',
+                name: i18n.t('options.alignRight'),
                 group: groups.alignment,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.align === 'right',
                 props: {
@@ -180,7 +180,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'contain',
-                name: 'Set image fit to contain',
+                name: i18n.t('options.fitContain'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position !== undefined ? data.config?.position === 'contain' : true, // If position is not set, contain is default
                 props: {
@@ -194,7 +194,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'cover',
-                name: 'Set image fit to cover',
+                name: i18n.t('options.fitCover'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'cover',
                 props: {
@@ -208,7 +208,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'fill',
-                name: 'Set image fit to fill',
+                name: i18n.t('options.fitFill'),
                 group: groups.fit,
                 isSelected: (data: { config?: ImageComponentConfig }) => data.config?.position === 'fill',
                 props: {
@@ -289,7 +289,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'toggle-readonly',
-                name: 'Toggle Read-only',
+                name: i18n.t('options.mapReadOnly'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.readonly === true,
                 props: {
@@ -304,7 +304,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-searchbar',
-                name: 'Toggle Searchbar',
+                name: i18n.t('options.mapSearchbar'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasSearchbar === true,
                 props: {
@@ -319,7 +319,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-globe',
-                name: 'Toggle Globe Button',
+                name: i18n.t('options.mapGlobe'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasGlobeBtn !== false,
                 props: {
@@ -334,7 +334,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-zoom',
-                name: 'Toggle Zoom Buttons',
+                name: i18n.t('options.mapZoom'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasZoomBtn !== false,
                 props: {
@@ -349,7 +349,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-current-pos',
-                name: 'Toggle Current Position Button',
+                name: i18n.t('options.mapCurrentPosition'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) => data.config?.hasCurrentPosBtn !== false,
                 props: {
@@ -364,7 +364,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'toggle-draggable',
-                name: 'Toggle Draggable Marker',
+                name: i18n.t('options.mapDraggableMarker'),
                 group: groups.controls,
                 isSelected: (data: { config?: MapComponentConfig }) =>  data.config?.isMarkerDraggable === true,
                 props: {
@@ -427,7 +427,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             ...defaultComponentOptions,
             {
                 type: 'chart-data-config',
-                name: 'Data Configuration',
+                name: i18n.t('options.chartDataConfig'),
                 label: i18n.t('topToolbar.configureLabel'),
                 group: groups.data,
                 render: (container, props) => {
@@ -443,7 +443,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-bar',
-                name: 'Bar Chart',
+                name: i18n.t('options.chartBar'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'bar',
                 props: {
@@ -457,7 +457,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-line',
-                name: 'Line Chart',
+                name: i18n.t('options.chartLine'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'line',
                 props: {
@@ -471,7 +471,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-area',
-                name: 'Area Chart',
+                name: i18n.t('options.chartArea'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'area',
                 props: {
@@ -485,7 +485,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-pie',
-                name: 'Pie Chart',
+                name: i18n.t('options.chartPie'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'pie',
                 props: {
@@ -499,7 +499,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             },
             {
                 type: 'chart-type-arc',
-                name: 'Arc Chart',
+                name: i18n.t('options.chartArc'),
                 group: groups.chartType,
                 isSelected: (data) => (data.config as ChartComponentConfig)?.type === 'arc',
                 props: {

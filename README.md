@@ -65,7 +65,7 @@ Make sure it is intalled correctly in `package.json`
 
 ## Styling
 
-Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairline borders, a near-black primary colour and one blue accent. Every colour comes from a CSS variable, so a host app can make it match its own palette by overriding the variables below. Load [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and set only what you need:
+Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairline borders, a blue primary colour that doubles as the accent. Every colour comes from a CSS variable, so a host app can make it match its own palette by overriding the variables below. Load [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and set only what you need:
 
 ```css
 :root {
@@ -78,7 +78,7 @@ Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairli
 	--scribe-popover-foreground: oklch(0.2 0.005 260);
 
 	/* Buttons and the chosen state */
-	--scribe-primary: oklch(0.2 0.005 260); /* Filled buttons, the chosen ribbon button, check marks */
+	--scribe-primary: oklch(0.54 0.19 260); /* Filled buttons, check marks, the border of a chosen card. Separate from the accent, so a host can split them */
 	--scribe-primary-foreground: oklch(0.99 0 0);
 	--scribe-secondary: oklch(0.955 0.002 250); /* Soft fills: count pills, segmented controls */
 	--scribe-secondary-foreground: oklch(0.28 0.005 260);

@@ -23,9 +23,10 @@
 		isStrict?: boolean;
 	}
 
-	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, label = 'Value', isStrict = true }: ComponentEditorValueProps = $props();
+	let { parsedValueType, value = $bindable(), componentType = '', initialDataValue, label, isStrict = true }: ComponentEditorValueProps = $props();
 
 	const i18n = getI18n();
+	const fieldLabel = $derived(label ?? i18n.t('common.value'));
 
 	const componentInitialValue = $derived.by(() => {
 		if (initialDataValue) return initialDataValue;
@@ -122,17 +123,17 @@
 </script>
 
 {#if parsedValueType?.type === 'string'}
-	<TextInput bind:value={value as string} {label} />
+	<TextInput bind:value={value as string} label={fieldLabel} />
 {:else if parsedValueType?.type === 'number'}
 	<TextInput 
 		value={String(value ?? '')} 
 		oninput={(e) => value = Number((e.currentTarget as HTMLInputElement).value)} 
-		{label}
+		label={fieldLabel}
 		type="number" 
 	/>
 {:else if parsedValueType?.type === 'boolean'}
 	<Select
-		{label}
+		label={fieldLabel}
 		type="single"
 		value={String(value ?? '')}
 		onValueChange={(v) => value = (v === 'true')}

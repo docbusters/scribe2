@@ -65,7 +65,7 @@
 							}
 						})
 						.catch(() => {
-							customPreviewValues[item.value] = 'Unavailable';
+							customPreviewValues[item.value] = i18n.t('common.unavailable');
 						})
 						.finally(() => {
 							loadingIds[item.value] = false;

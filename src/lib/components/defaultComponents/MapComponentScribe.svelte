@@ -4,8 +4,11 @@
 	import { fade } from 'svelte/transition';
 	import MapLibreMap from '../utilComponents/MapLibreMap.svelte';
 	import { untrack } from 'svelte';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
     let { componentData, resolvedValue, updateComponentValue, isDarkMode }: ScribeComponentProps<MapComponent> = $props();
+
+    const i18n = getI18n();
 
     const value = $derived.by(() => {
         if (resolvedValue.type === 'empty') {
@@ -14,7 +17,7 @@
 
         // Verify it contains the correct arttributes
         if (resolvedValue.type !== 'record' || !resolvedValue.value.latitude || !resolvedValue.value.longitude || !resolvedValue.value.address) {
-            throw new Error(`Invalid value for MapComponent: ${$state.snapshot(resolvedValue)}`);
+            throw new Error(i18n.t('errors.invalidMapValue'));
         }
         const { latitude, longitude, address } = resolvedValue.value;
 

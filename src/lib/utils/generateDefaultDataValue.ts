@@ -2,6 +2,7 @@ import type { BindingsDefinition } from "../domain/Document.js";
 import type { DataValue } from "../domain/data/DataValue.js";
 import { editStore } from "../stores/edit-store.svelte.js";
 import { generateRandomId } from "./generateRandomId.js";
+import { i18n } from "../i18n/i18n.svelte.js";
 
 /**
  * Generates a default data value given a type. If specified, it will use the initialValue to generate the default value, but if the type of the initialValue does not match the specified type, it will throw an error.
@@ -85,7 +86,7 @@ export function generateDefaultDataValue(type: DataValue['type'], initialValue?:
                     type: 'text',
                     value: {
                         type: 'string',
-                        value: 'New text',
+                        value: i18n.t('common.newText'),
                     },
                 },
             };

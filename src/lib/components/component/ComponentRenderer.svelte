@@ -43,7 +43,7 @@
 			}
 
 			if (!types.includes(componentData.value.type)) {
-				throw new Error(`Unsupported value type: ${componentData.value.type}`);
+				throw new Error(i18n.t('errors.unsupportedValueType', { type: componentData.value.type }));
 			}
 
 			if (componentData.value.type === 'binding') {
@@ -53,14 +53,14 @@
 					return bindingResult.then(bindingValue => {
 						if (!bindingTypes.includes(bindingValue.type)) {
 							console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
-							throw new Error(`Unsupported binding value type: ${bindingValue.type}`);
+							throw new Error(i18n.t('errors.unsupportedBindingType', { type: bindingValue.type }));
 						}
 						return { value: bindingValue, isBinding: true };
 					});
 				} else {
 					if (!bindingTypes.includes(bindingResult.type)) {
 						console.error(`Component ${componentData.type} does not support binding value type ${bindingResult.type}`, { componentData, result: bindingResult });
-						throw new Error(`Unsupported binding value type: ${bindingResult.type}`);
+						throw new Error(i18n.t('errors.unsupportedBindingType', { type: bindingResult.type }));
 					}
 					return { value: bindingResult, isBinding: true };
 				}

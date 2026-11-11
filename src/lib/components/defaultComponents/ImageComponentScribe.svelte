@@ -132,7 +132,7 @@
                 style:width={tempWidth || config?.width || '100%'} 
                 style:height={tempHeight || config?.height || 'auto'}
             >
-                <img style={style} onload={() => imageLoaded = true} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={componentData.id} />   
+                <img style={style} onload={() => imageLoaded = true} onerror={() => errorLoadingImage = true} id={componentData.id} {src} alt={i18n.t('components.image.name')} />   
                 
                 {#if mode === 'edit'}
                     <div role="separator" aria-orientation="horizontal" class="resize-handle right" onpointerdown={(e) => onPointerDown(e, 'width')} onpointermove={onPointerMove} onpointerup={onPointerUp}></div>

@@ -11,6 +11,7 @@
 	import { fade } from 'svelte/transition';
 	import ScrollArea from './ScrollArea.svelte';
 	import { geocodingApi, reverseGeocodingApi, type GeocodingResult } from '$lib/api/geocoding.js';
+	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	export interface MapSelectorProps {
 		isMarkerDraggable?: boolean;
@@ -92,10 +93,14 @@
 		});
 	}
 
+	const i18n = getI18n();
+	// The language of the results follows the language of the interface
+	const geocodingLanguage = $derived(i18n.lang === 'es' ? 'es_ES' : 'en_US');
+
 	async function onUserSearchAddress() {
 		if (isSearchDisabled) return;
 		isLoading = true;
-		const result = await geocodingApi(searchBarValue, 'en_US');
+		const result = await geocodingApi(searchBarValue, geocodingLanguage);
 
 		if (result.status === 200 && result.data) {
 			searchBarResults = result.data;
@@ -119,7 +124,7 @@
 
 	async function getLocationInfo(lat: number, lng: number) {
 		isLoading = true;
-		const result = await reverseGeocodingApi(lat, lng, 'en_US');
+		const result = await reverseGeocodingApi(lat, lng, geocodingLanguage);
 
 		if (result.status === 200 && result.data) {
 			searchBarValue = result.data.formatted_address;
@@ -194,7 +199,7 @@
 					data-testid="map-search-input"
 					disabled={readonly}
 					bind:value={searchBarValue}
-					placeholder={readonly ? "No address selected" : "Search for an address..."}
+					placeholder={readonly ? i18n.t('map.noAddressSelected') : i18n.t('map.searchPlaceholder')}
 					class="search-input"
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
@@ -231,7 +236,7 @@
 								</span>
 							</Button>
 						{:else}
-							No results found
+							{i18n.t('map.noResults')}
 						{/each}
 					</div>
 				</ScrollArea>

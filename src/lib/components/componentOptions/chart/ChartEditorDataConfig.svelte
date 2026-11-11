@@ -12,10 +12,17 @@
     import Divider from '$lib/components/utilComponents/Divider.svelte';
 	import { SvelteSet } from 'svelte/reactivity';
     import { randomHexColor } from '$lib/utils/randomHexColor.js';
+    import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
     let { name, icon, label, sectionId, disabled, componentId, componentValue, isSelected, isBinding }: ComponentEditProps = $props();
 
+    const i18n = getI18n();
+
     let open = $state(false);
+
+    /** The action of a series row: hide or show a series of a variable, or remove one of a fixed value */
+    const seriesActionLabel = (hidden: boolean | undefined) =>
+        isBinding ? (hidden ? i18n.t('chartConfig.showSeries') : i18n.t('chartConfig.hideSeries')) : i18n.t('chartConfig.removeSeries');
 
     // Form states
     let draftSeries = $state<{key: string, label: string, color: string, hidden?: boolean}[]>([]);
@@ -145,16 +152,16 @@
     }}
 />
 
-<Dialog bind:open title="Chart Data Configuration">
+<Dialog bind:open title={i18n.t('chartConfig.title')}>
     <div class="data-config-container">
         
         <div class="config-section">
             <div class="section-header">
-                <h3 class="section-title">Data Source</h3>
-                <p class="section-desc">Select the property that will serve as the X-axis for the chart.</p>
+                <h3 class="section-title">{i18n.t('chartConfig.sourceTitle')}</h3>
+                <p class="section-desc">{i18n.t('chartConfig.sourceDesc')}</p>
             </div>
             <Select
-                label="X-Axis"
+                label={i18n.t('chartConfig.xAxis')}
                 type="single"
                 items={availableKeys}
                 bind:value={selectedKey}
@@ -165,8 +172,8 @@
 
         <div class="config-section">
             <div class="section-header">
-                <h3 class="section-title">Data Series</h3>
-                <p class="section-desc">Configure the metrics and data series to display on the chart.</p>
+                <h3 class="section-title">{i18n.t('chartConfig.seriesTitle')}</h3>
+                <p class="section-desc">{i18n.t('chartConfig.seriesDesc')}</p>
             </div>
             <div class="current-series">
                 {#if draftSeries.length > 0}
@@ -175,7 +182,7 @@
                             <li class="series-card {s.hidden ? 'is-hidden' : ''}">
                                 <div class="series-info">
                                     <div class="color-picker-container">
-                                        <input type="color" bind:value={draftSeries[i].color} class="color-picker" title="Change color" aria-label="Change color" />
+                                        <input type="color" bind:value={draftSeries[i].color} class="color-picker" title={i18n.t('chartConfig.changeColor')} aria-label={i18n.t('chartConfig.changeColor')} />
                                         <div class="color-picker-ring" style="border-color: {draftSeries[i].color};"></div>
                                     </div>
                                     <div class="series-text">
@@ -184,7 +191,7 @@
                                     </div>
                                 </div>
                                 <span class="series-action">
-                                    <Button size="icon-sm" variant="ghost-destructive" title={isBinding ? (s.hidden ? "Show series" : "Hide series") : "Remove series"} aria-label={isBinding ? (s.hidden ? "Show series" : "Hide series") : "Remove series"} onclick={() => toggleOrRemoveSeries(s.key)}>
+                                    <Button size="icon-sm" variant="ghost-destructive" title={seriesActionLabel(s.hidden)} aria-label={seriesActionLabel(s.hidden)} onclick={() => toggleOrRemoveSeries(s.key)}>
                                         {#if isBinding}
                                             {#if s.hidden}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .69J12"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
@@ -202,18 +209,18 @@
                 {:else}
                     <EmptyContent 
                         icon='<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>'
-                        message="No series defined"
-                        description="Add a new series below to get started."
+                        message={i18n.t('chartConfig.noSeries')}
+                        description={i18n.t('chartConfig.noSeriesDesc')}
                     />
                 {/if}
             </div>
 
             {#if !isBinding}
             <div class="add-series-card">
-                <p class="add-series-title">Add New Series</p>
+                <p class="add-series-title">{i18n.t('chartConfig.addSeries')}</p>
                 <div class="add-form">
-                    <TextInput bind:value={newLabel} label="Series Label" />
-                    <Button onclick={addSeries} disabled={!newLabel} variant="default">Add</Button>
+                    <TextInput bind:value={newLabel} label={i18n.t('chartConfig.seriesLabel')} />
+                    <Button onclick={addSeries} disabled={!newLabel} variant="default">{i18n.t('common.add')}</Button>
                 </div>
             </div>
             {/if}
@@ -222,8 +229,8 @@
     </div>
     
     {#snippet footer()}
-        <Button variant="ghost" onclick={() => (open = false)}>Cancel</Button>
-        <Button onclick={saveChanges} disabled={!selectedKey}>Save Changes</Button>
+        <Button variant="ghost" onclick={() => (open = false)}>{i18n.t('common.cancel')}</Button>
+        <Button onclick={saveChanges} disabled={!selectedKey}>{i18n.t('common.save')}</Button>
     {/snippet}
 </Dialog>
 

@@ -19,7 +19,7 @@
         if (!cellValue) return null;
 
         if (cellValue.type !== 'component') {
-            throw new Error(`Table cell ${cell} must be a component value!`);
+            throw new Error(i18n.t('errors.tableCellNotComponent', { cell }));
         }
 
         const componentValue = cellValue.value;

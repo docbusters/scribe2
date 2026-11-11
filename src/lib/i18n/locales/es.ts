@@ -15,7 +15,13 @@ export const es: Translations = {
 		incompatible: 'No compatible',
 		true: 'Sí',
 		false: 'No',
-		textPlaceholder: 'Escribe un texto...'
+		textPlaceholder: 'Escribe un texto...',
+		value: 'Valor',
+		add: 'Añadir',
+		unavailable: 'No disponible',
+		showPassword: 'Mostrar contraseña',
+		hidePassword: 'Ocultar contraseña',
+		newText: 'Texto nuevo'
 	},
 	types: {
 		string: 'Texto',
@@ -112,7 +118,8 @@ export const es: Translations = {
 	},
 	editor: {
 		emptySectionPlaceholder: 'Empieza a escribir o pulsa Ctrl + Espacio para añadir un componente',
-		resizeHeight: 'Cambiar la altura'
+		resizeHeight: 'Cambiar la altura',
+		printDocument: 'Imprimir documento (depuración)'
 	},
 	componentToolbar: {
 		pressEnter: 'Presiona ENTER para añadir'
@@ -129,7 +136,8 @@ export const es: Translations = {
 			format: 'Formato',
 			options: 'Opciones'
 		},
-		configureLabel: 'Configurar'
+		configureLabel: 'Configurar',
+		ariaLabel: 'Barra de herramientas del componente'
 	},
 	textFormat: {
 		bold: 'Negrita',
@@ -171,6 +179,48 @@ export const es: Translations = {
 			description: 'Crea gráficos para visualizar datos'
 		}
 	},
+	chartConfig: {
+		title: 'Configuración de datos del gráfico',
+		sourceTitle: 'Origen de datos',
+		sourceDesc: 'Selecciona la propiedad que se usará como eje X del gráfico.',
+		xAxis: 'Eje X',
+		seriesTitle: 'Series de datos',
+		seriesDesc: 'Configura las métricas y series de datos que se mostrarán en el gráfico.',
+		addSeries: 'Añadir nueva serie',
+		seriesLabel: 'Nombre de la serie',
+		noSeries: 'No hay series definidas',
+		noSeriesDesc: 'Añade una nueva serie abajo para empezar.',
+		changeColor: 'Cambiar color',
+		showSeries: 'Mostrar serie',
+		hideSeries: 'Ocultar serie',
+		removeSeries: 'Eliminar serie'
+	},
+	map: {
+		searchPlaceholder: 'Buscar una dirección...',
+		noAddressSelected: 'Ninguna dirección seleccionada',
+		noResults: 'No se encontraron resultados'
+	},
+	options: {
+		expandWithContent: 'Expandir con el contenido',
+		alignLeft: 'Alinear a la izquierda',
+		alignCenter: 'Alinear al centro',
+		alignRight: 'Alinear a la derecha',
+		fitContain: 'Ajustar la imagen para que quepa entera',
+		fitCover: 'Ajustar la imagen para cubrir el espacio',
+		fitFill: 'Ajustar la imagen para rellenar el espacio',
+		mapReadOnly: 'Activar o desactivar solo lectura',
+		mapSearchbar: 'Mostrar u ocultar la barra de búsqueda',
+		mapGlobe: 'Mostrar u ocultar el botón de globo',
+		mapZoom: 'Mostrar u ocultar los botones de zoom',
+		mapCurrentPosition: 'Mostrar u ocultar el botón de posición actual',
+		mapDraggableMarker: 'Activar o desactivar el marcador arrastrable',
+		chartDataConfig: 'Configuración de datos',
+		chartBar: 'Gráfico de barras',
+		chartLine: 'Gráfico de líneas',
+		chartArea: 'Gráfico de áreas',
+		chartPie: 'Gráfico circular',
+		chartArc: 'Gráfico de arcos'
+	},
 	errors: {
 		componentError: 'Error del componente',
 		unknownComponent: 'Tipo de componente desconocido "{type}". Esta página no lo registra.',
@@ -183,7 +233,11 @@ export const es: Translations = {
 		chartMissingXAxis: 'Falta el eje X',
 		chartMissingXAxisDesc: 'Por favor, configura el eje X en los ajustes del gráfico.',
 		chartNoSeries: 'No hay series definidas',
-		chartNoSeriesDesc: 'Añade al menos una serie de datos para visualizar el gráfico.'
+		chartNoSeriesDesc: 'Añade al menos una serie de datos para visualizar el gráfico.',
+		unsupportedValueType: 'Tipo de valor no admitido: {type}',
+		unsupportedBindingType: 'Tipo de valor de variable no admitido: {type}',
+		invalidMapValue: 'Valor no válido para el componente de mapa',
+		tableCellNotComponent: 'La celda {cell} de la tabla debe ser un componente'
 	}
 };
 

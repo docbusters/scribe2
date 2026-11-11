@@ -62,6 +62,7 @@ export interface ComponentEditOptions {
 /** Space in pixels between a group of the toolbar and the dropdown opened below it */
 const GROUP_DROPDOWN_GAP = 4;
 
+// The names of the four default options below are only a fallback: ComponentEditor shows the translated `toolbar.*` texts for them.
 export const addComponentOption: ComponentEditOptions = {
     type: 'add',
     name: 'Add component',

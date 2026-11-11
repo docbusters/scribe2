@@ -1,4 +1,5 @@
 import type { DataValue } from "../domain/data/DataValue.js";
+import { i18n } from "../i18n/i18n.svelte.js";
 
 export const stringifyDataValue = (value: DataValue): string => {
     switch (value.type) {
@@ -7,7 +8,7 @@ export const stringifyDataValue = (value: DataValue): string => {
         case 'number':
             return value.value.toString();
         case 'boolean':
-            return value.value ? 'True' : 'False';
+            return value.value ? i18n.t('common.true') : i18n.t('common.false');
         case 'date': {
             // JSON turns a Date into an ISO string, so a value loaded from a saved document is a string
             const date = new Date(value.value);

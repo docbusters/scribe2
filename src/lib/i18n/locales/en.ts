@@ -15,7 +15,13 @@ export const en: Translations = {
 		incompatible: 'Incompatible',
 		true: 'Yes',
 		false: 'No',
-		textPlaceholder: 'Enter text...'
+		textPlaceholder: 'Enter text...',
+		value: 'Value',
+		add: 'Add',
+		unavailable: 'Unavailable',
+		showPassword: 'Show password',
+		hidePassword: 'Hide password',
+		newText: 'New text'
 	},
 	types: {
 		string: 'Text',
@@ -112,7 +118,8 @@ export const en: Translations = {
 	},
 	editor: {
 		emptySectionPlaceholder: 'Start typing, or press Ctrl + Space to add a component',
-		resizeHeight: 'Resize height'
+		resizeHeight: 'Resize height',
+		printDocument: 'Print document (debugging)'
 	},
 	componentToolbar: {
 		pressEnter: 'Press ENTER to add'
@@ -129,7 +136,8 @@ export const en: Translations = {
 			format: 'Format',
 			options: 'Options'
 		},
-		configureLabel: 'Configure'
+		configureLabel: 'Configure',
+		ariaLabel: 'Component toolbar'
 	},
 	textFormat: {
 		bold: 'Bold',
@@ -171,6 +179,48 @@ export const en: Translations = {
 			description: 'Create charts to visualize your data'
 		}
 	},
+	chartConfig: {
+		title: 'Chart Data Configuration',
+		sourceTitle: 'Data Source',
+		sourceDesc: 'Select the property that will serve as the X-axis for the chart.',
+		xAxis: 'X-Axis',
+		seriesTitle: 'Data Series',
+		seriesDesc: 'Configure the metrics and data series to display on the chart.',
+		addSeries: 'Add New Series',
+		seriesLabel: 'Series Label',
+		noSeries: 'No series defined',
+		noSeriesDesc: 'Add a new series below to get started.',
+		changeColor: 'Change color',
+		showSeries: 'Show series',
+		hideSeries: 'Hide series',
+		removeSeries: 'Remove series'
+	},
+	map: {
+		searchPlaceholder: 'Search for an address...',
+		noAddressSelected: 'No address selected',
+		noResults: 'No results found'
+	},
+	options: {
+		expandWithContent: 'Expand with content',
+		alignLeft: 'Align Left',
+		alignCenter: 'Align Center',
+		alignRight: 'Align Right',
+		fitContain: 'Set image fit to contain',
+		fitCover: 'Set image fit to cover',
+		fitFill: 'Set image fit to fill',
+		mapReadOnly: 'Toggle Read-only',
+		mapSearchbar: 'Toggle Searchbar',
+		mapGlobe: 'Toggle Globe Button',
+		mapZoom: 'Toggle Zoom Buttons',
+		mapCurrentPosition: 'Toggle Current Position Button',
+		mapDraggableMarker: 'Toggle Draggable Marker',
+		chartDataConfig: 'Data Configuration',
+		chartBar: 'Bar Chart',
+		chartLine: 'Line Chart',
+		chartArea: 'Area Chart',
+		chartPie: 'Pie Chart',
+		chartArc: 'Arc Chart'
+	},
 	errors: {
 		componentError: 'Component Error',
 		unknownComponent: 'Unknown component type "{type}". This page does not register it.',
@@ -183,7 +233,11 @@ export const en: Translations = {
 		chartMissingXAxis: 'Missing X-Axis',
 		chartMissingXAxisDesc: 'Please configure the X-axis in the chart settings.',
 		chartNoSeries: 'No Series Defined',
-		chartNoSeriesDesc: 'Add at least one data series to visualize the chart.'
+		chartNoSeriesDesc: 'Add at least one data series to visualize the chart.',
+		unsupportedValueType: 'Unsupported value type: {type}',
+		unsupportedBindingType: 'Unsupported binding value type: {type}',
+		invalidMapValue: 'Invalid value for the map component',
+		tableCellNotComponent: 'Table cell {cell} must be a component value'
 	}
 };
 
