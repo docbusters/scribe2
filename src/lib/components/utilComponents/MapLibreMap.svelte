@@ -324,6 +324,16 @@
 		border: none;
 	}
 
+	/* The global focus ring would draw a square box inside the rounded bar. The focus shows on the bar instead (the container),
+	   and the selector has more specificity than the global rule in scribe.css */
+	.search-input-container .search-input:focus-visible {
+		outline: none;
+	}
+
+	.search-input-container:focus-within {
+		border-color: var(--scribe-accent);
+	}
+
 	.search-results-wrapper {
 		position: absolute;
 		top: 4rem;
