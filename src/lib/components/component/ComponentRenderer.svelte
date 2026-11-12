@@ -222,7 +222,7 @@
 	{:then resolvedValuePromise} 
 		{#if mode === 'edit' && !(componentData.type === 'text' && !componentData.value.value)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} class:is-resizing={previewHeight !== null} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
@@ -254,7 +254,7 @@
 		{/if}
 	{:catch error}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
+			<div class="component-edit-contents" class:is-inline={componentData.mode === 'inline' && componentData.type === 'text'} class:is-inline-block={componentData.mode === 'inline' && componentData.type !== 'text'} class:is-block={componentData.mode === 'block'} class:is-selected={isSelected} class:is-resizing={previewHeight !== null} data-section-id={sectionId} data-component-id={componentData.id} onpointerdown={handleSelect} onfocusin={handleSelect}>
 				{#if isSelected}
 					<span class="component-selection-label" contenteditable="false" aria-hidden="true">{componentName}</span>
 				{/if}
@@ -315,6 +315,12 @@
 	.component-resize-handle.is-dragging {
 		transform: translateX(-50%) scale(1.15);
 		box-shadow: var(--scribe-shadow-md);
+	}
+
+	/* An iframe (the video) takes the pointer events of the drag when the handle moves over it, even with the pointer captured,
+	   and the height stops following the pointer. While the height is dragged it lets them through */
+	.component-edit-contents.is-resizing :global(iframe) {
+		pointer-events: none;
 	}
 
 	.component-edit-contents.is-inline {

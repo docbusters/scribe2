@@ -181,6 +181,11 @@ export interface Translations {
 			name: string;
 			description: string;
 		};
+		video: {
+			name: string;
+			description: string;
+			providers: string;
+		};
 		table: {
 			name: string;
 			description: string;
@@ -249,6 +254,8 @@ export interface Translations {
 		latexEmpty: string;
 		imageLoadError: string;
 		imageEmpty: string;
+		videoEmpty: string;
+		videoUnsupported: string;
 		chartMissingData: string;
 		chartMissingXAxis: string;
 		chartMissingXAxisDesc: string;

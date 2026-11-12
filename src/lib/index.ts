@@ -58,8 +58,8 @@ import ComponentSlotSvelte from './components/content/ComponentSlot.svelte';
 export const ComponentSlot = ComponentSlotSvelte as Component<ComponentSlotProps>;
 export type { ComponentSlotProps };
 
-import type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
-export type { TextComponent, TextInputComponent, ImageComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
+import type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
+export type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
 
 import TextComponentSvelte from './components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentSvelte from './components/defaultComponents/TextInputComponentScribe.svelte';

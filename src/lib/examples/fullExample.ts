@@ -120,6 +120,12 @@ export const fullExampleDocument: Document = {
                         isMarkerDraggable: true,
                     }
                 },
+                'video-1': {
+                    id: 'video-1',
+                    type: 'video',
+                    mode: 'block',
+                    value: { type: 'string', value: 'https://www.youtube.com/watch?v=oHg5SJYRHA0' },
+                },
             },
         },
         'section-chart': {

@@ -2,9 +2,10 @@ import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistr
 import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
-import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent } from '../domain/components/DefaultComponents.js';
+import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent, VideoComponent } from '../domain/components/DefaultComponents.js';
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
+import VideoComponentScribe from '../components/defaultComponents/VideoComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
 import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick, type ComponentEditOptions } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
@@ -18,7 +19,7 @@ import ChartEditorDataConfig from '$lib/components/componentOptions/chart/ChartE
 import { mount, unmount } from 'svelte';
 import { defaultI18n, type I18nService } from '../i18n/i18n.svelte.js';
 
-export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
+export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | VideoComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
 /** Returns the default component implementations, localized with the given i18n service */
 export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
@@ -230,6 +231,21 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                 },
             },
         ],
+        valueTypes: ['string', 'binding'],
+        supportedBindingValueTypes: ['empty', 'string'],
+    },
+    'video': {
+        name: i18n.t('components.video.name'),
+        description: i18n.t('components.video.description'),
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play-icon lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>',
+        ...createSvelte5Mount<ScribeComponentProps<VideoComponent>>(VideoComponentScribe),
+        isResizeable: true,
+        height: { default: 360, min: 200, max: 800 },
+        empty: {
+            type: 'video',
+            mode: 'block',
+            value: 'string',
+        },
         valueTypes: ['string', 'binding'],
         supportedBindingValueTypes: ['empty', 'string'],
     },

@@ -180,6 +180,11 @@ export const es: Translations = {
 			name: 'LaTeX',
 			description: 'Renderiza fórmulas matemáticas en LaTeX'
 		},
+		video: {
+			name: 'Vídeo',
+			description: 'Inserta vídeos de YouTube y Vimeo',
+			providers: 'Proveedores admitidos'
+		},
 		table: {
 			name: 'Tabla',
 			description: 'Crea tablas para organizar tu contenido',
@@ -248,6 +253,8 @@ export const es: Translations = {
 		latexEmpty: 'Introduce una expresión LaTeX',
 		imageLoadError: 'Error al cargar la imagen',
 		imageEmpty: 'Introduce la URL de una imagen',
+		videoEmpty: 'Introduce la URL de un vídeo',
+		videoUnsupported: 'Enlace de vídeo no admitido. Usa un enlace de YouTube o Vimeo',
 		chartMissingData: 'El componente de gráfico no tiene configuración o datos',
 		chartMissingXAxis: 'Falta el eje X',
 		chartMissingXAxisDesc: 'Por favor, configura el eje X en los ajustes del gráfico.',

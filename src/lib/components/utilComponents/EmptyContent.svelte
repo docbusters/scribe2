@@ -17,9 +17,11 @@
 <script lang="ts">
 	import type { EmptyContentProps } from "$lib/types/EmptyContentProps.js";
 	import Button from "./Button.svelte";
+	import type { Snippet } from "svelte";
 
     /* eslint-disable svelte/no-at-html-tags */
-    let { message, description, icon, isError = false, valueStyle, style, action }: EmptyContentProps = $props();
+    // `children` is for Svelte use only (it goes between the description and the action): it is not a prop of <scribe-empty-content>
+    let { message, description, icon, isError = false, valueStyle, style, action, children }: EmptyContentProps & { children?: Snippet } = $props();
 
 </script>
 
@@ -37,6 +39,7 @@
             {description}
         </span>
     {/if}
+    {@render children?.()}
     {#if action}
         <div class="action">
             <Button size="sm" variant="outline" onclick={() => action.onclick()}>{action.label}</Button>
@@ -53,6 +56,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        /* Centred vertically when the card is taller than its content (a block with a height). `safe` keeps the top visible when it is shorter */
+        justify-content: center;
+        justify-content: safe center;
         gap: 0.5rem;
         padding: 1rem;
         text-align: center;

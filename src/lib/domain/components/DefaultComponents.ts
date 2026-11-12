@@ -14,6 +14,9 @@ export type TextInputComponent = InlineComponent<'text-input', BindingValue, Tex
 /** Shows an image from the web */
 export type ImageComponent = BlockComponent<'image', StringValue | BindingValue, ImageComponentConfig>;
 
+/** Embeds a video from a link to YouTube or Vimeo */
+export type VideoComponent = BlockComponent<'video', StringValue | BindingValue>;
+
 /** Renders latex content */
 export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue, LatexComponentConfig>;
 

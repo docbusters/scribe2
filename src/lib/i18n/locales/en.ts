@@ -180,6 +180,11 @@ export const en: Translations = {
 			name: 'LaTeX',
 			description: 'Render LaTeX formulas'
 		},
+		video: {
+			name: 'Video',
+			description: 'Embed videos from YouTube and Vimeo',
+			providers: 'Supported providers'
+		},
 		table: {
 			name: 'Table',
 			description: 'Create tables to organize your content',
@@ -248,6 +253,8 @@ export const en: Translations = {
 		latexEmpty: 'Set a LaTeX expression',
 		imageLoadError: 'Image failed to load',
 		imageEmpty: 'Set an image URL',
+		videoEmpty: 'Set a video URL',
+		videoUnsupported: 'Unsupported video link. Use a YouTube or Vimeo link',
 		chartMissingData: 'Chart component is missing configuration or data',
 		chartMissingXAxis: 'Missing X-Axis',
 		chartMissingXAxisDesc: 'Please configure the X-axis in the chart settings.',
