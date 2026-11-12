@@ -1,7 +1,7 @@
-import { BOLD_CHAR, ESCAPE_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../constants/DocumentConstants.js';
+import { BOLD_CHAR, COLOR_CHAR, ESCAPE_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../constants/DocumentConstants.js';
 
 // Built from the constants, so the characters that are escaped are always the ones that mean something in a text
-const SPECIAL_CHARS = new Set([ESCAPE_CHAR, BOLD_CHAR, ITALIC_CHAR, UNDERLINE_CHAR, STRIKETHROUGH_CHAR]);
+const SPECIAL_CHARS = new Set([ESCAPE_CHAR, BOLD_CHAR, ITALIC_CHAR, UNDERLINE_CHAR, STRIKETHROUGH_CHAR, COLOR_CHAR]);
 
 /** Makes the characters of a text literal, so none of them is read as a format character when the text is parsed */
 export function escapeSpecialChars(text: string): string {

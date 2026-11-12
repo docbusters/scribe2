@@ -13,7 +13,7 @@ export const fullExampleDocument: Document = {
                     type: 'text',
                     value: {
                         type: 'string',
-                        value: 'Hello! I am a full example document showcasing all the features of Scribe. Feel free to explore and test all the components and functionalities included in this document. Place in the following input an url to an image: '
+                        value: 'Hello! I am a full example document showcasing all the features of Scribe. {#2563eb}Feel free to explore{#} and test all the components and functionalities included in this document. Place in the following input an url to an image: '
                     },
                 },
                 'input-image': {

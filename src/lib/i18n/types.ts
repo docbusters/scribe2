@@ -148,6 +148,7 @@ export interface Translations {
 		italic: string;
 		underline: string;
 		strikethrough: string;
+		color: string;
 	};
 	shortcuts: {
 		/** Names of the keys that are not drawn as a symbol or a letter */
@@ -228,6 +229,9 @@ export interface Translations {
 	colorPicker: {
 		title: string;
 		more: string;
+		automatic: string;
+		/** What Automático means, shown when hovering its info icon */
+		automaticInfo: string;
 		/** A colour of the palette: its name and its hex code */
 		swatch: string;
 		names: {

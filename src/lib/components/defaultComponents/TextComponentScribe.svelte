@@ -9,7 +9,8 @@
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { findEditableText, handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
-	import { getFormatsInRange, toggleTextFormat, tokenizeFormattedText, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
+	import { colorMarker, getFormatsInRange, normalizeColorMarkers, setTextColor, toggleTextFormat, tokenizeFormattedText, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
+	import { isHexColor } from '../../utils/colorPalette.ts';
 	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
 	import { getSelection } from '../../utils/selection.ts';
@@ -74,15 +75,22 @@
                 const isItalic = el.classList.contains('is-italic');
                 const isStrikethrough = el.classList.contains('is-strikethrough');
                 const isUnderline = el.classList.contains('is-underline');
-                
-                // If the span has any class we wrap the text with the corresponding characters
-                if (isBold || isItalic || isStrikethrough || isUnderline) {
+                const color = isHexColor(el.dataset.color) ? el.dataset.color : null;
+
+                // If the span has any class or colour we wrap the text with the corresponding characters
+                if (isBold || isItalic || isStrikethrough || isUnderline || color) {
                     let prefix = '';
                     let suffix = '';
                     if (isBold) { prefix += BOLD_CHAR; suffix = BOLD_CHAR + suffix; }
                     if (isItalic) { prefix += ITALIC_CHAR; suffix = ITALIC_CHAR + suffix; }
                     if (isStrikethrough) { prefix += STRIKETHROUGH_CHAR; suffix = STRIKETHROUGH_CHAR + suffix; }
                     if (isUnderline) { prefix += UNDERLINE_CHAR; suffix = UNDERLINE_CHAR + suffix; }
+                    if (color) {
+                        prefix += colorMarker(color);
+                        suffix = colorMarker(null) + suffix;
+                        // A colour ends at the end of its line, and Enter inside a coloured span adds a line break there: the colour is set again after it
+                        return prefix + childText.replace(/\n(?!$)/g, '\n' + colorMarker(color)) + suffix;
+                    }
                     return prefix + childText + suffix;
                 }
             }
@@ -151,7 +159,8 @@
         for (const child of Array.from(element.childNodes)) {
             content += parseDOM(child);
         }
-        return content;
+        // Every coloured span writes its own markers, so the ones that change nothing are dropped
+        return normalizeColorMarkers(content);
     }
 
     /**
@@ -359,13 +368,15 @@
 
     /** The formats a character typed at the given node would inherit, which are the ones of the formatted spans around it */
     function getFormatsAt(node: Node | null): TextFormats {
-        const formats: TextFormats = { bold: false, italic: false, underline: false, strikethrough: false };
+        const formats: TextFormats = { bold: false, italic: false, underline: false, strikethrough: false, color: null };
         for (let current = node; current && current !== textDiv; current = current.parentNode) {
             if (current.nodeType !== Node.ELEMENT_NODE) continue;
-            const classList = (current as Element).classList;
+            const element = current as HTMLElement;
             for (const key of FORMAT_KEYS) {
-                if (classList.contains(FORMAT_CLASSES[key])) formats[key] = true;
+                if (element.classList.contains(FORMAT_CLASSES[key])) formats[key] = true;
             }
+            // The closest span with a colour is the one the characters typed there get
+            if (formats.color === null && isHexColor(element.dataset.color)) formats.color = element.dataset.color;
         }
         return formats;
     }
@@ -407,8 +418,15 @@
             componentData.id,
             { start: startIndex, end: endIndex, text: selectedText },
             getFormatsInRange(readEditableContent(textDiv), startIndex, endIndex),
-            formatSelection
+            { toggle: formatSelection, setColor: colorSelection }
         );
+    }
+
+    /** Colours a span made by hand. `data-color` is what parseDOM reads back, and the style is what draws it (the template does the same for a text it renders) */
+    function applyColor(span: HTMLElement, color: string | null) {
+        if (!color) return;
+        span.dataset.color = color;
+        span.style.color = color;
     }
 
     /** Replaces the content of the editable with what the template renders for a text, so it can be rewritten without recreating the editable */
@@ -425,6 +443,7 @@
                 for (const key of FORMAT_KEYS) {
                     if (token[key]) span.classList.add(FORMAT_CLASSES[key]);
                 }
+                applyColor(span, token.color);
                 span.textContent = token.text;
                 nodes.push(span);
             }
@@ -450,6 +469,19 @@
         syncFormatState();
     }
 
+    /** Sets the colour of the marked fragment (null for the colour of the theme), rewriting the editable like formatSelection does */
+    function colorSelection(color: string | null) {
+        const marked = textFormatStore.selectionRange;
+        if (!textDiv || !marked) return;
+
+        const content = setTextColor(readEditableContent(textDiv), marked.start, marked.end, color);
+        renderContent(textDiv, content);
+        restoreSelection(textDiv, marked.start, marked.end);
+        isDirty = true;
+
+        syncFormatState();
+    }
+
     /**
      * Types with a pending format: the first character is inserted as a formatted span, split from the text around it,
      * and the caret is left inside it so the rest is typed natively with the same format. The editable is the working copy
@@ -471,11 +503,12 @@
         const content = createTextNodes(text);
         const lastNode = content.lastChild;
         let inserted: Node = content;
-        if (FORMAT_KEYS.some(key => formats[key])) {
+        if (FORMAT_KEYS.some(key => formats[key]) || formats.color) {
             const span = document.createElement('span');
             for (const key of FORMAT_KEYS) {
                 if (formats[key]) span.classList.add(FORMAT_CLASSES[key]);
             }
+            applyColor(span, formats.color);
             span.append(content);
             inserted = span;
         }
@@ -592,7 +625,7 @@
 
     /** Joins a formatted span with the spans next to it that have exactly its format, so the saved text has no redundant toggles */
     function mergeWithSameFormat(span: HTMLElement) {
-        const getFormatKey = (el: Element) => FORMAT_KEYS.filter(key => el.classList.contains(FORMAT_CLASSES[key])).join();
+        const getFormatKey = (el: HTMLElement) => FORMAT_KEYS.filter(key => el.classList.contains(FORMAT_CLASSES[key])).join() + '|' + (el.dataset.color ?? '');
         const isSameFormat = (node: Node | null): node is HTMLElement =>
             node instanceof HTMLElement && node.tagName === 'SPAN' && getFormatKey(node) === getFormatKey(span);
 
@@ -742,11 +775,13 @@
                 <br>
             {:else}
                 {#each tokenizeFormattedText(line).tokens as token, index (index)}
-                    <span 
-                        class:is-bold={token.bold} 
-                        class:is-italic={token.italic} 
-                        class:is-underline={token.underline} 
+                    <span
+                        class:is-bold={token.bold}
+                        class:is-italic={token.italic}
+                        class:is-underline={token.underline}
                         class:is-strikethrough={token.strikethrough}
+                        data-color={token.color ?? undefined}
+                        style:color={token.color}
                     >{token.text}</span>
                 {/each}
             {/if}

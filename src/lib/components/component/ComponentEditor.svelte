@@ -218,9 +218,12 @@
         height: 3.5rem;
     }
 
-    /* Two rows of small buttons, filled column by column. They shrink so the grid fits the height of the large buttons */
+    /* Two rows of small buttons, filled column by column. They shrink so the grid fits the height of the large buttons. The side padding
+       gives the glyphs about the room that a large button has around its icon (a small glyph is otherwise close to the divider and the edge) */
     .group-buttons.is-grid {
         --editor-icon-button-size: 1.6875rem;
+        padding-inline: 0.5rem;
+        column-gap: 0.25rem;
         display: grid;
         grid-template-rows: repeat(2, 1fr);
         grid-auto-flow: column;

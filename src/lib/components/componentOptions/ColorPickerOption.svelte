@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Popover } from 'bits-ui';
+    import { Popover, Tooltip } from 'bits-ui';
     import type { ComponentEditProps } from '$lib/registry/ComponentEditOptions.js';
-    import { editStore } from '$lib/stores/edit-store.svelte.js';
+    import type { ColorTarget } from '$lib/registry/colorOption.js';
     import ComponentEditorButton from '$lib/components/component/ComponentEditorButton.svelte';
     import Button from '$lib/components/utilComponents/Button.svelte';
     import Divider from '$lib/components/utilComponents/Divider.svelte';
@@ -9,13 +9,22 @@
     import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
     interface ColorPickerOptionProps extends ComponentEditProps {
-        /** Key of the component config that stores the colour (`#rrggbb`) */
-        configKey: string;
-        /** Colour drawn when the config has none (`#rrggbb`) */
-        defaultColor: string;
+        /** The current colour (`#rrggbb`) of the selected component, or undefined when there is none. It is read where it is used, so it follows what it reads */
+        getColor: (target: ColorTarget) => string | undefined;
+        /** Saves the chosen colour for the selected component. Null (the Automático row) removes it */
+        setColor: (color: string | null, target: ColorTarget) => void;
+        /** Colour that the button shows while there is none (`#rrggbb`). Without it the button shows the ink of the theme */
+        defaultColor?: string;
+        /** Adds the Automático row, which removes the colour */
+        resettable?: boolean;
+        /**
+         * For a colour that acts on a marked fragment of a text: the panel must not take the focus from the text (opened with the mouse),
+         * or the text would blur, save and lose the fragment, and typing could not go on right after choosing
+         */
+        keepTextFocus?: boolean;
     }
 
-    let { name, label, sectionId, componentId, disabled, shortcut, configKey, defaultColor }: ColorPickerOptionProps = $props();
+    let { name, label, icon: optionIcon, sectionId, componentId, disabled, shortcut, getColor, setColor, defaultColor, resettable = false, keepTextFocus = false }: ColorPickerOptionProps = $props();
 
     const i18n = getI18n();
 
@@ -27,25 +36,33 @@
     let grid: HTMLElement | undefined = $state();
     let nativeInput: HTMLInputElement | undefined = $state();
 
-    // The colour is read from the document (checked, as it can come from anywhere) so the swatch follows undo, bindings and other editors
-    const config = $derived(editStore.getComponentConfig(sectionId, componentId) ?? undefined);
-    const stored = $derived(config?.[configKey]);
-    const current = $derived(isHexColor(stored) ? stored.toLowerCase() : defaultColor);
+    // The colour is checked, as it can come from anywhere (the document, a binding...). Undefined is the automatic colour
+    const stored = $derived(getColor({ sectionId, componentId }));
+    const current = $derived(isHexColor(stored) ? stored.toLowerCase() : undefined);
+    const shown = $derived(current ?? defaultColor);
+    // A hex when there is one, otherwise the ink of the theme. Both are safe in markup
+    const shownFill = $derived(shown ?? 'var(--scribe-section-foreground)');
 
     // The popover goes inside the Scribe element, so it gets the theme and the tokens, and a click in it keeps the selection. An option that
     // mounts itself has no Svelte context to ask for that element, so it is found from the button
     const portalTarget = $derived(root?.closest('.scribe-document')?.querySelector<HTMLElement>('.scribe-portal-target') ?? undefined);
 
-    // A rounded block of the colour, with a hairline so white shows on the ribbon. `current` is a checked hex, so it is safe in markup
-    const icon = $derived(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect x="0.5" y="0.5" width="27" height="19" rx="5" fill="${current}" style="stroke: var(--scribe-border-strong)"/></svg>`);
+    // With a label the button is a rounded block of the colour, with a hairline so white shows on the ribbon. Without one it is the icon of
+    // the option with a bar of the colour under it. `shownFill` is a checked hex or a variable, so it is safe in markup
+    const icon = $derived(label
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect x="0.5" y="0.5" width="27" height="19" rx="5" style="fill: ${shownFill}; stroke: var(--scribe-border-strong)"/></svg>`
+        : `<span style="display: inline-flex; flex-direction: column; align-items: center;">${optionIcon ?? ''}<span style="display: block; width: 14px; height: 3px; margin-top: 0px; border-radius: 100px; background: ${shownFill}; box-shadow: 0 0 0 1px color-mix(in oklab, currentColor 18%, transparent);"></span></span>`);
+
+    // Whether the panel was opened with the mouse, which is when a text keeps its focus. Opened from the keyboard it takes the focus, so it can be used
+    let openedByPointer = false;
+    const keepsFocus = () => keepTextFocus && openedByPointer;
 
     // Only one swatch is in the tab order (roving tabindex): the one last focused, or else the current colour
     let focused = $state('');
     const tabStop = $derived(allColors.some(c => c.hex === focused) ? focused : allColors.some(c => c.hex === current) ? current : allColors[0].hex);
 
-    function select(hex: string) {
-        const next = { ...editStore.getComponentConfig(sectionId, componentId), [configKey]: hex };
-        editStore.setComponentConfig(sectionId, componentId, next);
+    function select(hex: string | null) {
+        setColor(hex, { sectionId, componentId });
         open = false;
     }
 
@@ -84,7 +101,9 @@
     }
 </script>
 
-<span class="color-option" bind:this={root}>
+<!-- The events of the button bubble up to this wrapper, which tells how the panel was opened -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<span class="color-option" bind:this={root} onpointerdown={() => (openedByPointer = true)} onkeydown={() => (openedByPointer = false)}>
     <Popover.Root bind:open onOpenChange={handleOpenChange}>
         <Popover.Trigger>
             {#snippet child({ props })}
@@ -92,7 +111,16 @@
             {/snippet}
         </Popover.Trigger>
         <Popover.Portal to={portalTarget}>
-            <Popover.Content class="scribe-color-popover" side="bottom" align="start" sideOffset={6} collisionPadding={8}>
+            <Popover.Content
+                class="scribe-color-popover"
+                side="bottom"
+                align="start"
+                sideOffset={6}
+                collisionPadding={8}
+                onOpenAutoFocus={(event) => { if (keepsFocus()) event.preventDefault(); }}
+                onCloseAutoFocus={(event) => { if (keepsFocus()) event.preventDefault(); }}
+                onmousedown={(event) => { if (keepTextFocus) event.preventDefault(); }}
+            >
                 <p class="color-title">{i18n.t('colorPicker.title')}</p>
 
                 <!-- The keys come from the swatch buttons inside, which are the focusable elements -->
@@ -130,6 +158,34 @@
 
                 <Divider />
 
+                {#if resettable}
+                    <div class="color-auto-row">
+                        <Button variant="ghost" size="sm" class="color-more" aria-pressed={current === undefined} onclick={() => select(null)}>
+                            <span class="color-auto-check">
+                                {#if current === undefined}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                {/if}
+                            </span>
+                            {i18n.t('colorPicker.automatic')}
+                        </Button>
+
+                        <!-- Next to the row and not inside it, as a button cannot hold a button. It does nothing when clicked: it explains what Automático is -->
+                        <Tooltip.Provider delayDuration={150}>
+                            <Tooltip.Root>
+                                <Tooltip.Trigger class="color-info" type="button" aria-label={i18n.t('colorPicker.automaticInfo')}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal to={portalTarget}>
+                                    <Tooltip.Content class="scribe-tooltip-content color-info-tooltip" side="top" sideOffset={6} collisionPadding={8}>
+                                        <Tooltip.Arrow class="scribe-tooltip-arrow" width={10} height={5} />
+                                        <span class="scribe-tooltip-name">{i18n.t('colorPicker.automaticInfo')}</span>
+                                    </Tooltip.Content>
+                                </Tooltip.Portal>
+                            </Tooltip.Root>
+                        </Tooltip.Provider>
+                    </div>
+                {/if}
+
                 <Button variant="ghost" size="sm" class="color-more" onclick={openNativePicker}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
                     {i18n.t('colorPicker.more')}
@@ -143,7 +199,7 @@
         bind:this={nativeInput}
         class="native-input"
         type="color"
-        value={current}
+        value={shown ?? '#000000'}
         tabindex="-1"
         aria-hidden="true"
         onchange={(event) => select(event.currentTarget.value)}
@@ -244,6 +300,57 @@
         justify-content: flex-start;
         gap: 0.5rem;
         color: var(--scribe-muted-foreground);
+    }
+
+    /* The Automático button and the info that explains it, side by side */
+    :global(.scribe-color-popover .color-auto-row) {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    :global(.scribe-color-popover .color-auto-row .scribe-btn.color-more) {
+        flex: 1;
+        min-width: 0;
+    }
+
+    :global(.scribe-color-popover .color-info) {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        border: 0;
+        border-radius: var(--scribe-radius-sm);
+        background: transparent;
+        color: var(--scribe-muted-foreground);
+        cursor: help;
+    }
+
+    :global(.scribe-color-popover .color-info:hover),
+    :global(.scribe-color-popover .color-info:focus-visible),
+    :global(.scribe-color-popover .color-info[data-state="delayed-open"]),
+    :global(.scribe-color-popover .color-info[data-state="instant-open"]) {
+        background: var(--scribe-muted);
+        color: var(--scribe-doc-foreground);
+    }
+
+    /* The ribbon tooltip does not wrap, which would make this sentence a single very wide line */
+    :global(.scribe-tooltip-content.scribe-tooltip-content.color-info-tooltip) {
+        max-width: 16rem;
+        white-space: normal;
+    }
+
+    /* The row has the width of the palette icon of the other row, so both labels line up */
+    :global(.scribe-color-popover .color-auto-check) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1rem;
+        height: 1rem;
+        color: var(--scribe-doc-foreground);
     }
 
     :global(.scribe-color-popover .scribe-btn.color-more:hover:not(:disabled)) {

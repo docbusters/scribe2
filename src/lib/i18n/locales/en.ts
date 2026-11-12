@@ -147,7 +147,8 @@ export const en: Translations = {
 		bold: 'Bold',
 		italic: 'Italic',
 		underline: 'Underline',
-		strikethrough: 'Strikethrough'
+		strikethrough: 'Strikethrough',
+		color: 'Text color'
 	},
 	shortcuts: {
 		keys: {
@@ -226,6 +227,8 @@ export const en: Translations = {
 	},
 	colorPicker: {
 		title: 'Select a color',
+		automatic: 'Automatic',
+		automaticInfo: 'Shows the right color whether the page is in dark or light mode',
 		more: 'More colors...',
 		swatch: '{name} ({hex})',
 		names: {

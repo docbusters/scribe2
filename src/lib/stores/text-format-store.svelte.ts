@@ -6,10 +6,17 @@ export interface CaretKey {
     offset: number;
 }
 
-const NO_FORMATS: TextFormats = { bold: false, italic: false, strikethrough: false, underline: false };
+const NO_FORMATS: TextFormats = { bold: false, italic: false, strikethrough: false, underline: false, color: null };
 
 function areSameFormats(a: TextFormats, b: TextFormats): boolean {
-    return a.bold === b.bold && a.italic === b.italic && a.strikethrough === b.strikethrough && a.underline === b.underline;
+    return a.bold === b.bold && a.italic === b.italic && a.strikethrough === b.strikethrough && a.underline === b.underline && a.color === b.color;
+}
+
+/** What the text does with the marked fragment: the text rewrites its content, the store only calls it back */
+export interface TextFormatTarget {
+    toggle(command: TextFormatCommand): void;
+    /** Null goes back to the colour of the theme */
+    setColor(color: string | null): void;
 }
 
 function areSameCaret(a: CaretKey | null, b: CaretKey | null): boolean {
@@ -37,7 +44,7 @@ export class TextFormatStore {
     private caretFormats: TextFormats = { ...NO_FORMATS };
     private pendingCaretKey: CaretKey | null = null;
     /** Formats the marked fragment. It belongs to the text that holds it, which is the one that can rewrite its content */
-    private applyToSelection: ((command: TextFormatCommand) => void) | null = null;
+    private applyToSelection: TextFormatTarget | null = null;
 
     /** Whether the options can act, which is whenever a text holds the caret */
     get canFormat(): boolean {
@@ -83,7 +90,7 @@ export class TextFormatStore {
         componentId: string,
         selectionRange: { start: number, end: number, text: string },
         formats: TextFormats,
-        apply: (command: TextFormatCommand) => void
+        apply: TextFormatTarget
     ) {
         this.setOwner(sectionId, componentId);
         this.caretKey = null;
@@ -115,14 +122,32 @@ export class TextFormatStore {
         if (!this.canFormat) return;
 
         if (this.selectionRange) {
-            this.applyToSelection?.(command);
+            this.applyToSelection?.toggle(command);
             return;
         }
 
-        const next: TextFormats = { ...this.activeFormats, [command]: !this.activeFormats[command] };
+        this.setPending({ ...this.activeFormats, [command]: !this.activeFormats[command] });
+    }
+
+    /**
+     * Sets the colour (null for the colour of the theme). With a marked fragment it is applied to it. With only a caret it becomes
+     * part of the pending format, so the characters typed next at this same caret get it
+     */
+    setColor(color: string | null) {
+        if (!this.canFormat) return;
+
+        if (this.selectionRange) {
+            this.applyToSelection?.setColor(color);
+            return;
+        }
+
+        this.setPending({ ...this.activeFormats, color });
+    }
+
+    /** At the caret a change of format waits for the next typed character. Changing back to what the caret already has leaves nothing pending */
+    private setPending(next: TextFormats) {
         this.activeFormats = next;
 
-        // Toggling back to what the caret already has leaves nothing pending
         if (areSameFormats(next, this.caretFormats)) {
             this.dropPending();
         } else {

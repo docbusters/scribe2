@@ -143,11 +143,16 @@ const options = [
         group: 'Colour',          // title of the group of the ribbon
         configKey: 'color',       // the choice is saved in config.color of the component
         defaultColor: '#facc15',  // shown while the config has none
+        resettable: true,         // optional: adds an "Automatic" row that removes config.
     }),
 ];
 ```
 
-The colour is a `#rrggbb` string in `config[configKey]`. Your component reads it from `componentData.config`, and should ignore anything that is not `#rrggbb` (a document can hold any value). `shortcut` is optional, like in any option.
+The colour is a `#rrggbb` string in `config[configKey]`. Your component reads it from `componentData.config`, and should ignore anything that is not `#rrggbb` (a document can hold any value). `shortcut` and `isDisabled` are optional, like in any option.
+
+### Colour in a text
+
+The text component colours a fragment of its text, and stores it in the text itself: `{#rrggbb}` sets the colour of what follows and `{#}` goes back to the colour of the theme, for example `Hello {#ef4444}world{#}!`. A colour ends at the end of its line. Any other `{` is plain text (a literal `{` is written as `\{`), so existing texts are read as before. If you read the text of a document outside Scribe, remove these markers as you would the `*`, `_`, `~` and `-` of the other formats.
 
 ## Styling
 

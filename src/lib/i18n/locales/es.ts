@@ -147,7 +147,8 @@ export const es: Translations = {
 		bold: 'Negrita',
 		italic: 'Cursiva',
 		underline: 'Subrayado',
-		strikethrough: 'Tachado'
+		strikethrough: 'Tachado',
+		color: 'Color del texto'
 	},
 	shortcuts: {
 		keys: {
@@ -226,6 +227,8 @@ export const es: Translations = {
 	},
 	colorPicker: {
 		title: 'Selecciona un color',
+		automatic: 'Automático',
+		automaticInfo: 'Muestra el color adecuado sin importar si la página está en modo oscuro o claro',
 		more: 'Más colores...',
 		swatch: '{name} ({hex})',
 		names: {
