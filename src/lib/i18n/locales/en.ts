@@ -133,6 +133,7 @@ export const en: Translations = {
 			controls: 'Controls',
 			layout: 'Layout',
 			chartType: 'Chart type',
+			table: 'Table',
 			format: 'Format',
 			options: 'Options'
 		},
@@ -232,7 +233,10 @@ export const en: Translations = {
 		chartLine: 'Line Chart',
 		chartArea: 'Area Chart',
 		chartPie: 'Pie Chart',
-		chartArc: 'Arc Chart'
+		chartArc: 'Arc Chart',
+		tableAddRow: 'Add row',
+		tableAddColumn: 'Add column',
+		tableBorders: 'Toggle Borders'
 	},
 	errors: {
 		componentError: 'Component Error',

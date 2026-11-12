@@ -13,7 +13,7 @@
 </script>
 
 {#if config}
-    <table>
+    <table class:no-borders={config.showBorders === false}>
         <tbody>
             {#each Array.from({ length: config.rows }) as _, rowIndex (`row-${rowIndex}`)}
                 <tr>
@@ -62,5 +62,10 @@
     }
     tr:last-child td {
         border-bottom: none;
+    }
+    /* The borders keep their width, so toggling them never moves the content */
+    table.no-borders,
+    .no-borders td {
+        border-color: transparent;
     }
 </style>

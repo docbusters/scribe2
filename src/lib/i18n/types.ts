@@ -133,6 +133,7 @@ export interface Translations {
 			controls: string;
 			layout: string;
 			chartType: string;
+			table: string;
 			format: string;
 			options: string;
 		};
@@ -234,6 +235,9 @@ export interface Translations {
 		chartArea: string;
 		chartPie: string;
 		chartArc: string;
+		tableAddRow: string;
+		tableAddColumn: string;
+		tableBorders: string;
 	};
 	errors: {
 		componentError: string;

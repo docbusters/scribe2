@@ -26,6 +26,8 @@ export interface TableComponentConfig extends ComponentConfig {
     cols: number;
     /** Total number of rows */
     rows: number;
+    /** Draws the borders of the table and its cells. Borders are shown unless it is false */
+    showBorders?: boolean;
 }
 
 export interface MapComponentConfig extends ComponentConfig {

@@ -10,7 +10,7 @@ import { addComponentOption, defaultComponentOptions, deleteComponentOption, dup
 import { editStore } from '$lib/stores/edit-store.svelte.js';
 import { textFormatStore } from '$lib/stores/text-format-store.svelte.js';
 import type { TextFormatCommand } from '$lib/utils/textFormat.js';
-import type { ImageComponentConfig, MapComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import type { ImageComponentConfig, MapComponentConfig, TableComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
 import ChartComponentScribe from '$lib/components/defaultComponents/ChartComponentScribe.svelte';
@@ -29,6 +29,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         controls: i18n.t('topToolbar.groups.controls'),
         layout: i18n.t('topToolbar.groups.layout'),
         chartType: i18n.t('topToolbar.groups.chartType'),
+        table: i18n.t('topToolbar.groups.table'),
         // Same group as the default "set value" option, so both buttons are drawn together
         data: i18n.t('topToolbar.groups.data'),
         format: i18n.t('topToolbar.groups.format'),
@@ -263,6 +264,53 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             addComponentOption,
             duplicateComponentOption,
             deleteComponentOption,
+            {
+                type: 'table-add-row',
+                shortcut: 'Alt+Shift+1',
+                name: i18n.t('options.tableAddRow'),
+                group: groups.table,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-between-horizontal-end-icon lucide-between-horizontal-end"><rect width="13" height="7" x="3" y="3" rx="1"/><path d="m22 15-3-3 3-3"/><rect width="13" height="7" x="3" y="14" rx="1"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as TableComponentConfig | undefined;
+                        if (!config) return;
+                        // A missing cell is an empty slot, so the new row needs nothing in the value
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, rows: config.rows + 1 });
+                    }
+                },
+            },
+            {
+                type: 'table-add-col',
+                shortcut: 'Alt+Shift+2',
+                name: i18n.t('options.tableAddColumn'),
+                group: groups.table,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-between-vertical-end-icon lucide-between-vertical-end"><rect width="7" height="13" x="3" y="3" rx="1"/><path d="m9 22 3-3 3 3"/><rect width="7" height="13" x="14" y="3" rx="1"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as TableComponentConfig | undefined;
+                        if (!config) return;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, cols: config.cols + 1 });
+                    }
+                },
+            },
+            {
+                type: 'table-toggle-borders',
+                shortcut: 'Alt+Shift+3',
+                name: i18n.t('options.tableBorders'),
+                group: groups.table,
+                isSelected: (data) => (data.config as TableComponentConfig | undefined)?.showBorders !== false,
+                props: {
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grid-3x3-icon lucide-grid-3x3"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>',
+                    onclick: (data: ComponentEditOnClick) => {
+                        const { sectionId, componentId } = data;
+                        const config = editStore.getComponentConfig(sectionId, componentId) as TableComponentConfig | undefined;
+                        if (!config) return;
+                        editStore.setComponentConfig(sectionId, componentId, { ...config, showBorders: config.showBorders === false });
+                    }
+                },
+            },
         ],
         valueTypes: ['record'],
     },

@@ -133,6 +133,7 @@ export const es: Translations = {
 			controls: 'Controles',
 			layout: 'Diseño',
 			chartType: 'Tipo de gráfico',
+			table: 'Tabla',
 			format: 'Formato',
 			options: 'Opciones'
 		},
@@ -232,7 +233,10 @@ export const es: Translations = {
 		chartLine: 'Gráfico de líneas',
 		chartArea: 'Gráfico de áreas',
 		chartPie: 'Gráfico circular',
-		chartArc: 'Gráfico de arcos'
+		chartArc: 'Gráfico de arcos',
+		tableAddRow: 'Añadir fila',
+		tableAddColumn: 'Añadir columna',
+		tableBorders: 'Mostrar bordes'
 	},
 	errors: {
 		componentError: 'Error del componente',
