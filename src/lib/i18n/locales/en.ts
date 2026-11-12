@@ -134,6 +134,7 @@ export const en: Translations = {
 			layout: 'Layout',
 			chartType: 'Chart type',
 			table: 'Table',
+			dots: 'Dots',
 			format: 'Format',
 			options: 'Options'
 		},
@@ -184,6 +185,11 @@ export const en: Translations = {
 			name: 'Video',
 			description: 'Embed videos from YouTube and Vimeo',
 			providers: 'Supported providers'
+		},
+		qr: {
+			name: 'QR code',
+			description: 'Generate a QR code from a URL',
+			ariaLabel: 'QR code for {value}'
 		},
 		table: {
 			name: 'Table',
@@ -241,6 +247,10 @@ export const en: Translations = {
 		chartArea: 'Area Chart',
 		chartPie: 'Pie Chart',
 		chartArc: 'Arc Chart',
+		qrDotsSquare: 'Square dots',
+		qrDotsRounded: 'Rounded dots',
+		qrDotsCircular: 'Circular dots',
+		qrDotsClassy: 'Classy dots',
 		tableAddRow: 'Add row',
 		tableAddColumn: 'Add column',
 		tableBorders: 'Toggle Borders'
@@ -255,6 +265,8 @@ export const en: Translations = {
 		imageEmpty: 'Set an image URL',
 		videoEmpty: 'Set a video URL',
 		videoUnsupported: 'Unsupported video link. Use a YouTube or Vimeo link',
+		qrEmpty: 'Set a URL for the QR code',
+		qrTooLong: 'The text is too long for a QR code',
 		chartMissingData: 'Chart component is missing configuration or data',
 		chartMissingXAxis: 'Missing X-Axis',
 		chartMissingXAxisDesc: 'Please configure the X-axis in the chart settings.',

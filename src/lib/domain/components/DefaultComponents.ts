@@ -1,6 +1,6 @@
 import type { ArrayValue, BindingValue, ComponentValue, NumberValue, RecordValue, StringValue } from "../data/DataValue.ts";
 import type { BlockComponent, InlineComponent } from "./Component.ts";
-import type { ChartComponentConfig, ImageComponentConfig, LatexComponentConfig, MapComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
+import type { ChartComponentConfig, ImageComponentConfig, LatexComponentConfig, MapComponentConfig, QrComponentConfig, TableComponentConfig, TextInputComponentConfig } from "./DefaultComponentsConfig.ts";
 
 /** Shows a line of text accepting a string value */
 export type TextComponent = InlineComponent<'text', StringValue>;
@@ -16,6 +16,9 @@ export type ImageComponent = BlockComponent<'image', StringValue | BindingValue,
 
 /** Embeds a video from a link to YouTube or Vimeo */
 export type VideoComponent = BlockComponent<'video', StringValue | BindingValue>;
+
+/** Draws a QR code of a text, usually a URL */
+export type QrComponent = BlockComponent<'qr', StringValue | BindingValue, QrComponentConfig>;
 
 /** Renders latex content */
 export type LatexComponent = BlockComponent<'latex', StringValue | BindingValue, LatexComponentConfig>;

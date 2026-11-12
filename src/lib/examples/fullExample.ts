@@ -126,6 +126,12 @@ export const fullExampleDocument: Document = {
                     mode: 'block',
                     value: { type: 'string', value: 'https://www.youtube.com/watch?v=oHg5SJYRHA0' },
                 },
+                'qr-1': {
+                    id: 'qr-1',
+                    type: 'qr',
+                    mode: 'block',
+                    value: { type: 'string', value: 'https://www.youtube.com/watch?v=oHg5SJYRHA0' },
+                },
             },
         },
         'section-chart': {

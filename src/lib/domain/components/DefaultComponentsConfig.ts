@@ -30,6 +30,11 @@ export interface TableComponentConfig extends ComponentConfig {
     showBorders?: boolean;
 }
 
+export interface QrComponentConfig extends ComponentConfig {
+    /** The shape of the dots of the code: `dots` are circles. Square dots are drawn by default */
+    dotsType?: 'square' | 'rounded' | 'dots' | 'classy';
+}
+
 export interface MapComponentConfig extends ComponentConfig {
     initialZoom?: number;
     initialPosition?: { lat: number; lng: number };

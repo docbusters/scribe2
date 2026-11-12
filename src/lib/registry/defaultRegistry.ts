@@ -2,16 +2,17 @@ import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistr
 import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
-import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent, VideoComponent } from '../domain/components/DefaultComponents.js';
+import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, QrComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent, VideoComponent } from '../domain/components/DefaultComponents.js';
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import VideoComponentScribe from '../components/defaultComponents/VideoComponentScribe.svelte';
+import QrComponentScribe from '../components/defaultComponents/QrComponentScribe.svelte';
 import TableComponentScribe from '../components/defaultComponents/TableComponentScribe.svelte';
 import { addComponentOption, defaultComponentOptions, deleteComponentOption, duplicateComponentOption, type ComponentEditOnClick, type ComponentEditOptions } from './ComponentEditOptions.js';
 import { editStore } from '$lib/stores/edit-store.svelte.js';
 import { textFormatStore } from '$lib/stores/text-format-store.svelte.js';
 import type { TextFormatCommand } from '$lib/utils/textFormat.js';
-import type { ImageComponentConfig, MapComponentConfig, TableComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
+import type { ImageComponentConfig, MapComponentConfig, QrComponentConfig, TableComponentConfig, TextInputComponentConfig, ChartComponentConfig } from '$lib/domain/components/DefaultComponentsConfig.js';
 import MapComponentScribe from '$lib/components/defaultComponents/MapComponentScribe.svelte';
 import TextBindingComponentScribe from '$lib/components/defaultComponents/TextBindingComponentScribe.svelte';
 import ChartComponentScribe from '$lib/components/defaultComponents/ChartComponentScribe.svelte';
@@ -19,7 +20,7 @@ import ChartEditorDataConfig from '$lib/components/componentOptions/chart/ChartE
 import { mount, unmount } from 'svelte';
 import { defaultI18n, type I18nService } from '../i18n/i18n.svelte.js';
 
-export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | VideoComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
+export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | VideoComponent | QrComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
 /** Returns the default component implementations, localized with the given i18n service */
 export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
@@ -31,6 +32,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         layout: i18n.t('topToolbar.groups.layout'),
         chartType: i18n.t('topToolbar.groups.chartType'),
         table: i18n.t('topToolbar.groups.table'),
+        dots: i18n.t('topToolbar.groups.dots'),
         // Same group as the default "set value" option, so both buttons are drawn together
         data: i18n.t('topToolbar.groups.data'),
         format: i18n.t('topToolbar.groups.format'),
@@ -51,6 +53,25 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             props: {
                 icon,
                 onclick: () => textFormatStore.toggle(command),
+            },
+        };
+    }
+
+    /** Option that sets the shape of the dots of a QR code. Square is the one drawn when the config has none */
+    function createQrDotsOption(dotsType: NonNullable<QrComponentConfig['dotsType']>, name: string, shortcut: string, icon: string): ComponentEditOptions {
+        return {
+            type: `qr-dots-${dotsType}`,
+            name,
+            shortcut,
+            group: groups.dots,
+            isSelected: (data) => ((data.config as QrComponentConfig | undefined)?.dotsType ?? 'square') === dotsType,
+            props: {
+                icon,
+                onclick: (data: ComponentEditOnClick) => {
+                    const { sectionId, componentId } = data;
+                    const config = editStore.getComponentConfig(sectionId, componentId);
+                    editStore.setComponentConfig(sectionId, componentId, { ...config, dotsType });
+                }
             },
         };
     }
@@ -243,6 +264,29 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         height: { default: 360, min: 200, max: 800 },
         empty: {
             type: 'video',
+            mode: 'block',
+            value: 'string',
+        },
+        valueTypes: ['string', 'binding'],
+        supportedBindingValueTypes: ['empty', 'string'],
+    },
+    'qr': {
+        name: i18n.t('components.qr.name'),
+        description: i18n.t('components.qr.description'),
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code-icon lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>',
+        ...createSvelte5Mount<ScribeComponentProps<QrComponent>>(QrComponentScribe),
+        isResizeable: true,
+        height: { default: 240, min: 96, max: 600 },
+        options: [
+            ...defaultComponentOptions,
+            // Each icon is a 2x2 grid of dots drawn in the style it sets
+            createQrDotsOption('square', i18n.t('options.qrDotsSquare'), 'Alt+Shift+1', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>'),
+            createQrDotsOption('rounded', i18n.t('options.qrDotsRounded'), 'Alt+Shift+2', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="7" rx="2.5"/><rect x="13" y="4" width="7" height="7" rx="2.5"/><rect x="4" y="13" width="7" height="7" rx="2.5"/><rect x="13" y="13" width="7" height="7" rx="2.5"/></svg>'),
+            createQrDotsOption('dots', i18n.t('options.qrDotsCircular'), 'Alt+Shift+3', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="7.5" cy="7.5" r="3.5"/><circle cx="16.5" cy="7.5" r="3.5"/><circle cx="7.5" cy="16.5" r="3.5"/><circle cx="16.5" cy="16.5" r="3.5"/></svg>'),
+            createQrDotsOption('classy', i18n.t('options.qrDotsClassy'), 'Alt+Shift+4', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4 7.5a3.5 3.5 0 0 1 3.5-3.5H11v3.5a3.5 3.5 0 0 1-3.5 3.5H4z"/><path d="M13 7.5a3.5 3.5 0 0 1 3.5-3.5H20v3.5a3.5 3.5 0 0 1-3.5 3.5H13z"/><path d="M4 16.5a3.5 3.5 0 0 1 3.5-3.5H11v3.5a3.5 3.5 0 0 1-3.5 3.5H4z"/><path d="M13 16.5a3.5 3.5 0 0 1 3.5-3.5H20v3.5a3.5 3.5 0 0 1-3.5 3.5H13z"/></svg>'),
+        ],
+        empty: {
+            type: 'qr',
             mode: 'block',
             value: 'string',
         },

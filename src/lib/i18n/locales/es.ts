@@ -134,6 +134,7 @@ export const es: Translations = {
 			layout: 'Diseño',
 			chartType: 'Tipo de gráfico',
 			table: 'Tabla',
+			dots: 'Puntos',
 			format: 'Formato',
 			options: 'Opciones'
 		},
@@ -184,6 +185,11 @@ export const es: Translations = {
 			name: 'Vídeo',
 			description: 'Inserta vídeos de YouTube y Vimeo',
 			providers: 'Proveedores admitidos'
+		},
+		qr: {
+			name: 'Código QR',
+			description: 'Genera un código QR a partir de una URL',
+			ariaLabel: 'Código QR de {value}'
 		},
 		table: {
 			name: 'Tabla',
@@ -241,6 +247,10 @@ export const es: Translations = {
 		chartArea: 'Gráfico de áreas',
 		chartPie: 'Gráfico circular',
 		chartArc: 'Gráfico de arcos',
+		qrDotsSquare: 'Puntos cuadrados',
+		qrDotsRounded: 'Puntos redondeados',
+		qrDotsCircular: 'Puntos circulares',
+		qrDotsClassy: 'Puntos elegantes',
 		tableAddRow: 'Añadir fila',
 		tableAddColumn: 'Añadir columna',
 		tableBorders: 'Mostrar bordes'
@@ -255,6 +265,8 @@ export const es: Translations = {
 		imageEmpty: 'Introduce la URL de una imagen',
 		videoEmpty: 'Introduce la URL de un vídeo',
 		videoUnsupported: 'Enlace de vídeo no admitido. Usa un enlace de YouTube o Vimeo',
+		qrEmpty: 'Introduce la URL del código QR',
+		qrTooLong: 'El texto es demasiado largo para un código QR',
 		chartMissingData: 'El componente de gráfico no tiene configuración o datos',
 		chartMissingXAxis: 'Falta el eje X',
 		chartMissingXAxisDesc: 'Por favor, configura el eje X en los ajustes del gráfico.',

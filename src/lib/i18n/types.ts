@@ -134,6 +134,7 @@ export interface Translations {
 			layout: string;
 			chartType: string;
 			table: string;
+			dots: string;
 			format: string;
 			options: string;
 		};
@@ -185,6 +186,11 @@ export interface Translations {
 			name: string;
 			description: string;
 			providers: string;
+		};
+		qr: {
+			name: string;
+			description: string;
+			ariaLabel: string;
 		};
 		table: {
 			name: string;
@@ -242,6 +248,10 @@ export interface Translations {
 		chartArea: string;
 		chartPie: string;
 		chartArc: string;
+		qrDotsSquare: string;
+		qrDotsRounded: string;
+		qrDotsCircular: string;
+		qrDotsClassy: string;
 		tableAddRow: string;
 		tableAddColumn: string;
 		tableBorders: string;
@@ -256,6 +266,8 @@ export interface Translations {
 		imageEmpty: string;
 		videoEmpty: string;
 		videoUnsupported: string;
+		qrEmpty: string;
+		qrTooLong: string;
 		chartMissingData: string;
 		chartMissingXAxis: string;
 		chartMissingXAxisDesc: string;
