@@ -23,6 +23,8 @@ export interface ScribeConstructor {
 
 export const Scribe = ScribeComponent as unknown as ScribeConstructor;
 export { defaultRegistry, getDefaultRegistry } from './registry/defaultRegistry.js';
+export { createColorOption } from './registry/colorOption.js';
+export type { ColorOptionDefinition } from './registry/colorOption.js';
 import BindingsFloatingPanelSvelte from './components/bindings/BindingsFloatingPanel.svelte';
 export const BindingsFloatingPanel = BindingsFloatingPanelSvelte;
 export const BindingsPanel = BindingsFloatingPanelSvelte;

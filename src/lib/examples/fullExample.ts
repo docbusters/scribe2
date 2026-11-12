@@ -131,6 +131,7 @@ export const fullExampleDocument: Document = {
                     type: 'qr',
                     mode: 'block',
                     value: { type: 'string', value: 'https://www.youtube.com/watch?v=oHg5SJYRHA0' },
+                    config: { dotsColor: '#000000', cornersType: 'rounded', dotsType: 'dots' },
                 },
             },
         },

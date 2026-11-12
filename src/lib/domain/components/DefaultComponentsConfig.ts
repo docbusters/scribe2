@@ -33,6 +33,14 @@ export interface TableComponentConfig extends ComponentConfig {
 export interface QrComponentConfig extends ComponentConfig {
     /** The shape of the dots of the code: `dots` are circles. Square dots are drawn by default */
     dotsType?: 'square' | 'rounded' | 'dots' | 'classy';
+    /** Colour of the dots, as `#rrggbb`. Black by default. Anything else is ignored */
+    dotsColor?: string;
+    /** The shape of the three corners (frame and centre). `dots` is circular. The library has no classy corners. Square by default */
+    cornersType?: 'square' | 'rounded' | 'dots';
+    /** Colour of the corners, as `#rrggbb`. Black by default. Anything else is ignored */
+    cornersColor?: string;
+    /** Colour of the background of the code, quiet zone included, as `#rrggbb`. White by default. Anything else is ignored */
+    backgroundColor?: string;
 }
 
 export interface MapComponentConfig extends ComponentConfig {

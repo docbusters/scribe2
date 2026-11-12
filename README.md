@@ -127,6 +127,28 @@ The same element is registered as `<scribe-component-slot>`, with the same props
 - An entry that is not a record of components (for example a document saved before the component used slots) shows an error box instead of the content.
 - `SlotRef` (`{ parentId, slotKey }`) is the type that says where a component is stored, and `ComponentSlotProps` the props above.
 
+## Colour picker for the toolbar
+
+`createColorOption` makes a ribbon option that lets the user pick a colour: a button with a block of the current colour that opens a palette (with the native picker for any other colour). Put it in the `options` of a component of your registry:
+
+```ts
+import { createColorOption } from '@antonii22/scribe2';
+
+const options = [
+    ...defaultComponentOptions,
+    createColorOption({
+        type: 'highlight-color',
+        name: 'Highlight colour', // tooltip and accessible name
+        label: 'Colour',          // optional text under the block
+        group: 'Colour',          // title of the group of the ribbon
+        configKey: 'color',       // the choice is saved in config.color of the component
+        defaultColor: '#facc15',  // shown while the config has none
+    }),
+];
+```
+
+The colour is a `#rrggbb` string in `config[configKey]`. Your component reads it from `componentData.config`, and should ignore anything that is not `#rrggbb` (a document can hold any value). `shortcut` is optional, like in any option.
+
 ## Styling
 
 Scribe is drawn to sit inside a modern app: a grey desk, white cards with hairline borders, a blue primary colour that doubles as the accent. Every colour comes from a CSS variable, so a host app can make it match its own palette by overriding the variables below. Load [/src/lib/styles/scribe.css](/src/lib/styles/scribe.css) and set only what you need:

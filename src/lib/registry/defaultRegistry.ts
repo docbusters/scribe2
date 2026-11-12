@@ -19,6 +19,7 @@ import ChartComponentScribe from '$lib/components/defaultComponents/ChartCompone
 import ChartEditorDataConfig from '$lib/components/componentOptions/chart/ChartEditorDataConfig.svelte';
 import { mount, unmount } from 'svelte';
 import { defaultI18n, type I18nService } from '../i18n/i18n.svelte.js';
+import { createColorOption } from './colorOption.js';
 
 export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | VideoComponent | QrComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
@@ -33,6 +34,8 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
         chartType: i18n.t('topToolbar.groups.chartType'),
         table: i18n.t('topToolbar.groups.table'),
         dots: i18n.t('topToolbar.groups.dots'),
+        corners: i18n.t('topToolbar.groups.corners'),
+        color: i18n.t('topToolbar.groups.color'),
         // Same group as the default "set value" option, so both buttons are drawn together
         data: i18n.t('topToolbar.groups.data'),
         format: i18n.t('topToolbar.groups.format'),
@@ -71,6 +74,25 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                     const { sectionId, componentId } = data;
                     const config = editStore.getComponentConfig(sectionId, componentId);
                     editStore.setComponentConfig(sectionId, componentId, { ...config, dotsType });
+                }
+            },
+        };
+    }
+
+    /** Option that sets the shape of the corners of a QR code (frame and centre). Square is the one drawn when the config has none */
+    function createQrCornersOption(cornersType: NonNullable<QrComponentConfig['cornersType']>, name: string, shortcut: string, icon: string): ComponentEditOptions {
+        return {
+            type: `qr-corners-${cornersType}`,
+            name,
+            shortcut,
+            group: groups.corners,
+            isSelected: (data) => ((data.config as QrComponentConfig | undefined)?.cornersType ?? 'square') === cornersType,
+            props: {
+                icon,
+                onclick: (data: ComponentEditOnClick) => {
+                    const { sectionId, componentId } = data;
+                    const config = editStore.getComponentConfig(sectionId, componentId);
+                    editStore.setComponentConfig(sectionId, componentId, { ...config, cornersType });
                 }
             },
         };
@@ -284,6 +306,14 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
             createQrDotsOption('rounded', i18n.t('options.qrDotsRounded'), 'Alt+Shift+2', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="7" height="7" rx="2.5"/><rect x="13" y="4" width="7" height="7" rx="2.5"/><rect x="4" y="13" width="7" height="7" rx="2.5"/><rect x="13" y="13" width="7" height="7" rx="2.5"/></svg>'),
             createQrDotsOption('dots', i18n.t('options.qrDotsCircular'), 'Alt+Shift+3', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="7.5" cy="7.5" r="3.5"/><circle cx="16.5" cy="7.5" r="3.5"/><circle cx="7.5" cy="16.5" r="3.5"/><circle cx="16.5" cy="16.5" r="3.5"/></svg>'),
             createQrDotsOption('classy', i18n.t('options.qrDotsClassy'), 'Alt+Shift+4', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4 7.5a3.5 3.5 0 0 1 3.5-3.5H11v3.5a3.5 3.5 0 0 1-3.5 3.5H4z"/><path d="M13 7.5a3.5 3.5 0 0 1 3.5-3.5H20v3.5a3.5 3.5 0 0 1-3.5 3.5H13z"/><path d="M4 16.5a3.5 3.5 0 0 1 3.5-3.5H11v3.5a3.5 3.5 0 0 1-3.5 3.5H4z"/><path d="M13 16.5a3.5 3.5 0 0 1 3.5-3.5H20v3.5a3.5 3.5 0 0 1-3.5 3.5H13z"/></svg>'),
+            // Each icon is a frame with its centre, drawn in the shape it sets. Alt+Shift+1-4 are the dots, so these continue with 5-7
+            createQrCornersOption('square', i18n.t('options.qrCornersSquare'), 'Alt+Shift+5', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path fill-rule="evenodd" d="M3 3h18v18H3zM6 6v12h12V6z"/><rect x="9" y="9" width="6" height="6"/></svg>'),
+            createQrCornersOption('rounded', i18n.t('options.qrCornersRounded'), 'Alt+Shift+6', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path fill-rule="evenodd" d="M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5zM8 6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>'),
+            createQrCornersOption('dots', i18n.t('options.qrCornersCircular'), 'Alt+Shift+7', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path fill-rule="evenodd" d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 6a6 6 0 1 1 0 12a6 6 0 1 1 0-12z"/><circle cx="12" cy="12" r="3"/></svg>'),
+            // No shortcuts for the colours. Their labels are the titles of what they colour
+            createColorOption({ type: 'qr-dots-color', name: i18n.t('options.qrDotsColor'), label: groups.dots, group: groups.color, configKey: 'dotsColor', defaultColor: '#000000' }),
+            createColorOption({ type: 'qr-corners-color', name: i18n.t('options.qrCornersColor'), label: groups.corners, group: groups.color, configKey: 'cornersColor', defaultColor: '#000000' }),
+            createColorOption({ type: 'qr-background-color', name: i18n.t('options.qrBackgroundColor'), label: i18n.t('options.backgroundLabel'), group: groups.color, configKey: 'backgroundColor', defaultColor: '#ffffff' }),
         ],
         empty: {
             type: 'qr',

@@ -135,6 +135,8 @@ export const es: Translations = {
 			chartType: 'Tipo de gráfico',
 			table: 'Tabla',
 			dots: 'Puntos',
+			corners: 'Esquinas',
+			color: 'Color',
 			format: 'Formato',
 			options: 'Opciones'
 		},
@@ -222,6 +224,25 @@ export const es: Translations = {
 		hideSeries: 'Ocultar serie',
 		removeSeries: 'Eliminar serie'
 	},
+	colorPicker: {
+		title: 'Selecciona un color',
+		more: 'Más colores...',
+		swatch: '{name} ({hex})',
+		names: {
+			white: 'Blanco',
+			black: 'Negro',
+			gray: 'Gris',
+			red: 'Rojo',
+			orange: 'Naranja',
+			yellow: 'Amarillo',
+			green: 'Verde',
+			cyan: 'Cian',
+			blue: 'Azul',
+			indigo: 'Índigo',
+			purple: 'Morado',
+			pink: 'Rosa'
+		}
+	},
 	map: {
 		searchPlaceholder: 'Buscar una dirección...',
 		noAddressSelected: 'Ninguna dirección seleccionada',
@@ -251,6 +272,13 @@ export const es: Translations = {
 		qrDotsRounded: 'Puntos redondeados',
 		qrDotsCircular: 'Puntos circulares',
 		qrDotsClassy: 'Puntos elegantes',
+		qrCornersSquare: 'Esquinas cuadradas',
+		qrCornersRounded: 'Esquinas redondeadas',
+		qrCornersCircular: 'Esquinas circulares',
+		qrDotsColor: 'Color de los puntos del QR',
+		qrCornersColor: 'Color de las esquinas del QR',
+		qrBackgroundColor: 'Color de fondo del QR',
+		backgroundLabel: 'Fondo',
 		tableAddRow: 'Añadir fila',
 		tableAddColumn: 'Añadir columna',
 		tableBorders: 'Mostrar bordes'

@@ -7,6 +7,7 @@
     import EmptyContent from '../utilComponents/EmptyContent.svelte';
     import { getI18n } from '$lib/i18n/i18n.svelte.js';
     import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
+    import { isHexColor } from '$lib/utils/colorPalette.js';
 
     let { componentData, sectionId, mode, resolvedValue }: ScribeComponentProps<QrComponent> = $props();
     const i18n = getI18n();
@@ -14,13 +15,23 @@
     const text = $derived(resolvedValue.type === 'string' ? resolvedValue.value.trim() : '');
     // The values of the config are the dot types of the library
     const dotsType = $derived(componentData.config?.dotsType ?? 'square');
+    const cornersType = $derived(componentData.config?.cornersType ?? 'square');
+
+    // On white in both themes, and black unless the user picks a colour: a QR that follows the dark theme (light on dark) is not read by
+    // many scanners. These literal colours are the exception to the rule of no hard-coded colours. The size is fixed and the SVG is scaled
+    // with CSS, and the margin (in the units of that size) is the quiet zone that scanners need around the code
+    const DEFAULT_DARK = '#000000';
+    const DEFAULT_BACKGROUND = '#ffffff';
+
+    // The colours come from the document, so anything that is not #rrggbb is ignored
+    const colorOr = (value: unknown, fallback: string) => (isHexColor(value) ? value : fallback);
+    const dotsColor = $derived(colorOr(componentData.config?.dotsColor, DEFAULT_DARK));
+    const cornersColor = $derived(colorOr(componentData.config?.cornersColor, DEFAULT_DARK));
+    const backgroundColor = $derived(colorOr(componentData.config?.backgroundColor, DEFAULT_BACKGROUND));
 
     // The library cannot encode the text (it is too long)
     let failed = $state(false);
 
-    // Always black on white, in both themes: a QR that follows the dark theme (light on dark) is not read by many scanners. These literal
-    // colours are the exception to the rule of no hard-coded colours. The size is fixed and the SVG is scaled with CSS, and the margin
-    // (in the units of that size) is the quiet zone that scanners need around the code
     const QR_OPTIONS: Partial<Options> = {
         type: 'svg',
         shape: 'square',
@@ -28,13 +39,32 @@
         height: 300,
         margin: 32,
         qrOptions: { errorCorrectionLevel: 'Q' },
-        dotsOptions: { type: 'square', color: '#000000', roundSize: false },
-        cornersSquareOptions: { type: 'square', color: '#000000' },
-        cornersDotOptions: { type: 'square', color: '#000000' },
-        backgroundOptions: { color: '#ffffff' },
+        dotsOptions: { type: 'square', color: DEFAULT_DARK, roundSize: false },
+        cornersSquareOptions: { type: 'square', color: DEFAULT_DARK },
+        cornersDotOptions: { type: 'square', color: DEFAULT_DARK },
+        backgroundOptions: { color: DEFAULT_BACKGROUND },
     };
 
-    type QrParams = { data: string; dotsType: NonNullable<QrComponentConfig['dotsType']>; onFailed: (failed: boolean) => void };
+    type CornerSquareType = NonNullable<Options['cornersSquareOptions']>['type'];
+    type CornerDotType = NonNullable<Options['cornersDotOptions']>['type'];
+
+    // The library types say the corners take the dot types, but it only draws these: a frame of `square`, `extra-rounded` or `dot`, and a
+    // centre of `square` or `dot` (anything else is drawn as `dot`). So the corners have three shapes, and no classy one
+    const CORNER_SHAPES: Record<NonNullable<QrComponentConfig['cornersType']>, { frame: CornerSquareType; centre: CornerDotType }> = {
+        square: { frame: 'square', centre: 'square' },
+        rounded: { frame: 'extra-rounded', centre: 'dot' },
+        dots: { frame: 'dot', centre: 'dot' },
+    };
+
+    type QrParams = {
+        data: string;
+        dotsType: NonNullable<QrComponentConfig['dotsType']>;
+        dotsColor: string;
+        cornersType: NonNullable<QrComponentConfig['cornersType']>;
+        cornersColor: string;
+        backgroundColor: string;
+        onFailed: (failed: boolean) => void;
+    };
 
     // The part of the library that is used. Its types describe an ES module with a default export, but the package is a CommonJS file that
     // exports the class itself, so the types of the class are not used (see how the module is read below)
@@ -89,13 +119,20 @@
             const QRCodeStyling: QrCodeConstructor = exported.default ?? exported;
 
             // The whole object, so the colour and the other options of the dots never depend on how the library merges the update
-            const dotsOptions = { ...QR_OPTIONS.dotsOptions, type: params.dotsType };
+            const shape = CORNER_SHAPES[params.cornersType];
+            const style: Partial<Options> = {
+                data: params.data,
+                dotsOptions: { ...QR_OPTIONS.dotsOptions, type: params.dotsType, color: params.dotsColor },
+                cornersSquareOptions: { ...QR_OPTIONS.cornersSquareOptions, type: shape.frame, color: params.cornersColor },
+                cornersDotOptions: { ...QR_OPTIONS.cornersDotOptions, type: shape.centre, color: params.cornersColor },
+                backgroundOptions: { ...QR_OPTIONS.backgroundOptions, color: params.backgroundColor },
+            };
 
             try {
                 if (code) {
-                    code.update({ data: params.data, dotsOptions });
+                    code.update(style);
                 } else {
-                    code = new QRCodeStyling({ ...QR_OPTIONS, data: params.data, dotsOptions });
+                    code = new QRCodeStyling({ ...QR_OPTIONS, ...style });
                     code.applyExtension(closeSeams);
                     code.append(node);
                 }
@@ -135,7 +172,8 @@
             class:is-hidden={failed}
             role="img"
             aria-label={i18n.t('components.qr.ariaLabel', { value: text })}
-            use:qr={{ data: text, dotsType, onFailed: (value) => (failed = value) }}
+            style:background-color={backgroundColor}
+            use:qr={{ data: text, dotsType, dotsColor, cornersType, cornersColor, backgroundColor, onFailed: (value) => (failed = value) }}
         ></div>
         {#if failed}
             <EmptyContent
@@ -164,8 +202,7 @@
     }
 
     .qr-card {
-        /* Fixed white, like the code: the card is its quiet zone, and it must not follow the theme */
-        background-color: #ffffff;
+        /* The background colour of the code (set inline) does not follow the theme: the card is the quiet zone of the code */
         border: 1px solid var(--scribe-border-color);
         border-radius: var(--scribe-radius-lg);
         box-sizing: border-box;

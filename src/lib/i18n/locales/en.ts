@@ -135,6 +135,8 @@ export const en: Translations = {
 			chartType: 'Chart type',
 			table: 'Table',
 			dots: 'Dots',
+			corners: 'Corners',
+			color: 'Color',
 			format: 'Format',
 			options: 'Options'
 		},
@@ -222,6 +224,25 @@ export const en: Translations = {
 		hideSeries: 'Hide series',
 		removeSeries: 'Remove series'
 	},
+	colorPicker: {
+		title: 'Select a color',
+		more: 'More colors...',
+		swatch: '{name} ({hex})',
+		names: {
+			white: 'White',
+			black: 'Black',
+			gray: 'Gray',
+			red: 'Red',
+			orange: 'Orange',
+			yellow: 'Yellow',
+			green: 'Green',
+			cyan: 'Cyan',
+			blue: 'Blue',
+			indigo: 'Indigo',
+			purple: 'Purple',
+			pink: 'Pink'
+		}
+	},
 	map: {
 		searchPlaceholder: 'Search for an address...',
 		noAddressSelected: 'No address selected',
@@ -251,6 +272,13 @@ export const en: Translations = {
 		qrDotsRounded: 'Rounded dots',
 		qrDotsCircular: 'Circular dots',
 		qrDotsClassy: 'Classy dots',
+		qrCornersSquare: 'Square corners',
+		qrCornersRounded: 'Rounded corners',
+		qrCornersCircular: 'Circular corners',
+		qrDotsColor: 'QR dots color',
+		qrCornersColor: 'QR corners color',
+		qrBackgroundColor: 'QR background color',
+		backgroundLabel: 'Background',
 		tableAddRow: 'Add row',
 		tableAddColumn: 'Add column',
 		tableBorders: 'Toggle Borders'

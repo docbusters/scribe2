@@ -135,6 +135,8 @@ export interface Translations {
 			chartType: string;
 			table: string;
 			dots: string;
+			corners: string;
+			color: string;
 			format: string;
 			options: string;
 		};
@@ -223,6 +225,26 @@ export interface Translations {
 		hideSeries: string;
 		removeSeries: string;
 	};
+	colorPicker: {
+		title: string;
+		more: string;
+		/** A colour of the palette: its name and its hex code */
+		swatch: string;
+		names: {
+			white: string;
+			black: string;
+			gray: string;
+			red: string;
+			orange: string;
+			yellow: string;
+			green: string;
+			cyan: string;
+			blue: string;
+			indigo: string;
+			purple: string;
+			pink: string;
+		};
+	};
 	map: {
 		searchPlaceholder: string;
 		noAddressSelected: string;
@@ -252,6 +274,13 @@ export interface Translations {
 		qrDotsRounded: string;
 		qrDotsCircular: string;
 		qrDotsClassy: string;
+		qrCornersSquare: string;
+		qrCornersRounded: string;
+		qrCornersCircular: string;
+		qrDotsColor: string;
+		qrCornersColor: string;
+		qrBackgroundColor: string;
+		backgroundLabel: string;
 		tableAddRow: string;
 		tableAddColumn: string;
 		tableBorders: string;
