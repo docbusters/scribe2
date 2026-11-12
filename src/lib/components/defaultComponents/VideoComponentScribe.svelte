@@ -34,7 +34,6 @@
             title={i18n.t('components.video.name')}
             sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
             allow="fullscreen; picture-in-picture; encrypted-media"
-            allowfullscreen
             referrerpolicy="strict-origin-when-cross-origin"
             loading="lazy"
         ></iframe>
