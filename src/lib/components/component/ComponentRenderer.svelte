@@ -326,11 +326,15 @@
 	.component-edit-contents.is-inline-block {
 		display: inline-block;
 		margin-inline: 6px;
+		/* Never wider than its container (a table cell): 12px is the two margins. Without it the wrapper is as wide as its content */
+		max-width: calc(100% - 12px);
 	}
 
+	/* min-width: 0 lets a block shrink below its content, so in a narrow slot (a table cell) it does not stick out */
 	.component-edit-contents.is-block {
 		display: flex;
 		width: 100%;
+		min-width: 0;
 	}
 
 	/* Selection: a tinted background, an accent ring and a name label. None of it affects the

@@ -71,10 +71,12 @@
         display: flex;
         overflow: auto;
         align-items: center;
-        justify-content: center;
     }
 
+    /* Centred with auto margins and not justify-content: when the formula is wider than the container, it starts at the
+       left edge, so scrolling reaches all of it */
     .latex-expression {
         padding: 0.5rem 1rem;
+        margin-inline: auto;
     }
 </style>

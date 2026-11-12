@@ -15,7 +15,7 @@
         let styleString = '';
 
         if (config?.expandWithContent) {
-            styleString += 'field-sizing: content; max-width: calc(100% - 1rem);';
+            styleString += 'field-sizing: content;';
         }
 
         return styleString;
@@ -74,6 +74,8 @@
         border: 1px solid var(--scribe-border-strong);
         border-radius: var(--scribe-radius-md);
         min-width: 2.5rem;
+        /* Never wider than its container (a table cell): 1rem is its two horizontal margins */
+        max-width: calc(100% - 1rem);
         /* As tall as a line of text, so a row with an input is not taller than a row without one */
         height: 1lh;
         margin: 0 0.5rem;
