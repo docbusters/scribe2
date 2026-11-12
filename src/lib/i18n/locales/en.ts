@@ -182,7 +182,9 @@ export const en: Translations = {
 		},
 		table: {
 			name: 'Table',
-			description: 'Create tables to organize your content'
+			description: 'Create tables to organize your content',
+			deleteRow: 'Delete row',
+			deleteColumn: 'Delete column'
 		},
 		map: {
 			name: 'Map',

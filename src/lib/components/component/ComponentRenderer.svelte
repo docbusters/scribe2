@@ -370,7 +370,7 @@
 		font-weight: var(--scribe-font-weight-semibold);
 		line-height: 1.25;
 		white-space: nowrap;
-		border-radius: var(--scribe-radius-sm) var(--scribe-radius-sm) 0 0;
+		border-radius: var(--scribe-radius-sm) var(--scribe-radius-sm) 0 var(--scribe-radius-sm);
 		pointer-events: none;
 		user-select: none;
 		animation: scribe-selection-in 150ms ease-out;

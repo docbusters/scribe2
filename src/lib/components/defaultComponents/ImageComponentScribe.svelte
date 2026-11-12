@@ -27,6 +27,8 @@
 
     const src = $derived(resolvedValue.value as string);
     const config = $derived(componentData.config);
+    // An empty string is a new image with no URL yet: it would fire `error` as an <img src=""> and look like a load failure
+    const hasSource = $derived(resolvedValue.type === 'string' && src.trim() !== '');
 
     $effect(() => {
         // We interact with value so that error state is reset when it changes
@@ -120,7 +122,7 @@
 
 {#key resolvedValue}
     <div class="image-container" in:fade>
-        {#if resolvedValue.type === 'string' && !errorLoadingImage}
+        {#if hasSource && !errorLoadingImage}
             {#if !imageLoaded}
                 <Skeleton style="flex: 1; width: 100%; height: 100%; min-height: 133px; border-radius: var(--scribe-radius-xl);" />
             {/if}
@@ -149,12 +151,12 @@
                 isError
             />   
         {:else}
+            <!-- No source: the neutral empty state, as in the LaTeX component (no isError) -->
             <EmptyContent
-                style="padding: 2rem;"
                 action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.setValue'))}
                 message={config?.emptyText || i18n.t('errors.imageEmpty')}
                 icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; class=&quot;lucide lucide-image-icon lucide-image&quot;><rect width=&quot;18&quot; height=&quot;18&quot; x=&quot;3&quot; y=&quot;3&quot; rx=&quot;2&quot; ry=&quot;2&quot;/><circle cx=&quot;9&quot; cy=&quot;9&quot; r=&quot;2&quot;/><path d=&quot;m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21&quot;/></svg>"
-            /> 
+            />
         {/if}
     </div>
 {/key}

@@ -182,7 +182,9 @@ export const es: Translations = {
 		},
 		table: {
 			name: 'Tabla',
-			description: 'Crea tablas para organizar tu contenido'
+			description: 'Crea tablas para organizar tu contenido',
+			deleteRow: 'Eliminar fila',
+			deleteColumn: 'Eliminar columna'
 		},
 		map: {
 			name: 'Mapa',

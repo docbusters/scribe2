@@ -184,6 +184,8 @@ export interface Translations {
 		table: {
 			name: string;
 			description: string;
+			deleteRow: string;
+			deleteColumn: string;
 		};
 		map: {
 			name: string;
