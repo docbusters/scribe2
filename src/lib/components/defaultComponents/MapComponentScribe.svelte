@@ -5,19 +5,19 @@
 	import MapLibreMap from '../utilComponents/MapLibreMap.svelte';
 	import { untrack } from 'svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import EmptyContent from '../utilComponents/EmptyContent.svelte';
+	import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
 
-    let { componentData, resolvedValue, updateComponentValue, isDarkMode }: ScribeComponentProps<MapComponent> = $props();
+    let { componentData, sectionId, mode, resolvedValue, updateComponentValue, isDarkMode }: ScribeComponentProps<MapComponent> = $props();
 
     const i18n = getI18n();
 
-    const value = $derived.by(() => {
-        if (resolvedValue.type === 'empty') {
-            return undefined;
-        }
+    // The registry accepts any record, so one without the location attributes is drawn as an error instead of throwing while mounting
+    const isInvalid = $derived(resolvedValue.type !== 'empty' && (resolvedValue.type !== 'record' || !resolvedValue.value.latitude || !resolvedValue.value.longitude || !resolvedValue.value.address));
 
-        // Verify it contains the correct arttributes
-        if (resolvedValue.type !== 'record' || !resolvedValue.value.latitude || !resolvedValue.value.longitude || !resolvedValue.value.address) {
-            throw new Error(i18n.t('errors.invalidMapValue'));
+    const value = $derived.by(() => {
+        if (resolvedValue.type !== 'record' || isInvalid) {
+            return undefined;
         }
         const { latitude, longitude, address } = resolvedValue.value;
 
@@ -72,6 +72,14 @@
 </script>
 
 <div class="map-container" in:fade>
+    {#if isInvalid}
+        <EmptyContent
+            action={valueDialogStore.getAction(mode, sectionId, componentData.id, i18n.t('emptyContent.changeValue'))}
+            message={i18n.t('errors.invalidMapValue')}
+            icon="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0&quot;/><circle cx=&quot;12&quot; cy=&quot;10&quot; r=&quot;3&quot;/></svg>"
+            isError
+        />
+    {:else}
     {#key mapKey}
         <MapLibreMap
             initialZoom={config?.initialZoom}
@@ -90,6 +98,7 @@
             onLocationSelect={onLocationChange}
         />
     {/key}
+    {/if}
 </div>
 
 <style>
