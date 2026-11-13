@@ -88,7 +88,8 @@
 			hasChanges = true;
 		}
 
-		if (hasChanges && updateComponentConfig) {
+		// The repair is saved in the document, so only edit mode does it
+		if (hasChanges && mode === 'edit') {
 			updateComponentConfig({
 				...config,
 				xAxisKey: newXAxisKey,

@@ -83,6 +83,7 @@
 	}
 
 	function updateComponentConfig(newConfig: ComponentConfig) {
+		if (mode !== 'edit') return; // The config is part of the document, which only edit mode can change
 		editStore.setComponentConfig(sectionId, componentData.id, newConfig);
 	}
 
