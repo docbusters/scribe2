@@ -35,6 +35,12 @@ export interface ColorAccessors {
     getColor: (target: ColorTarget) => string | undefined;
     /** Null removes the colour */
     setColor: (color: string | null, target: ColorTarget) => void;
+    /**
+     * Called when the native picker opens, to keep what the colour acts on at that moment. The native picker reports the colour after the
+     * click that closes it, which can move what is selected. The returned function sets the colour on what was kept. Without it the colour
+     * goes through `setColor`, which suits a target that does not move (the config of a component)
+     */
+    holdTarget?: () => (color: string | null) => void;
 }
 
 interface ColorPickerDefinition {

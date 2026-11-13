@@ -470,9 +470,8 @@
     }
 
     /** Sets the colour of the marked fragment (null for the colour of the theme), rewriting the editable like formatSelection does */
-    function colorSelection(color: string | null) {
-        const marked = textFormatStore.selectionRange;
-        if (!textDiv || !marked) return;
+    function colorSelection(color: string | null, marked: { start: number, end: number }) {
+        if (!textDiv) return;
 
         const content = setTextColor(readEditableContent(textDiv), marked.start, marked.end, color);
         renderContent(textDiv, content);

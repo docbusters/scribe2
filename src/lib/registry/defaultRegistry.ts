@@ -145,6 +145,7 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                 {
                     getColor: () => textFormatStore.activeFormats.color ?? undefined,
                     setColor: (color) => textFormatStore.setColor(color),
+                    holdTarget: () => textFormatStore.holdColorTarget(),
                 }
             ),
         ],

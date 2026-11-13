@@ -13,6 +13,8 @@
         getColor: (target: ColorTarget) => string | undefined;
         /** Saves the chosen colour for the selected component. Null (the Automático row) removes it */
         setColor: (color: string | null, target: ColorTarget) => void;
+        /** Keeps what the colour acts on when the native picker opens, as it reports the colour after a click that may move it. See `ColorAccessors` */
+        holdTarget?: () => (color: string | null) => void;
         /** Colour that the button shows while there is none (`#rrggbb`). Without it the button shows the ink of the theme */
         defaultColor?: string;
         /** Adds the Automático row, which removes the colour */
@@ -24,7 +26,7 @@
         keepTextFocus?: boolean;
     }
 
-    let { name, label, icon: optionIcon, sectionId, componentId, disabled, shortcut, getColor, setColor, defaultColor, resettable = false, keepTextFocus = false }: ColorPickerOptionProps = $props();
+    let { name, label, icon: optionIcon, sectionId, componentId, disabled, shortcut, getColor, setColor, holdTarget, defaultColor, resettable = false, keepTextFocus = false }: ColorPickerOptionProps = $props();
 
     const i18n = getI18n();
 
@@ -66,10 +68,23 @@
         open = false;
     }
 
+    // What the colour of the native picker acts on, kept when it opens (see holdTarget). A picker that is cancelled leaves it here until the next one opens
+    let nativeTarget: ((color: string | null) => void) | null = null;
+
     /** Opens the native picker for any other colour. The popover closes first, as the input lives next to the button and not inside it */
     function openNativePicker() {
         open = false;
+        nativeTarget = holdTarget?.() ?? null;
         nativeInput?.showPicker();
+    }
+
+    function handleNativeChange(hex: string) {
+        if (!nativeTarget) {
+            select(hex);
+            return;
+        }
+        nativeTarget(hex);
+        nativeTarget = null;
     }
 
     function handleOpenChange(value: boolean) {
@@ -202,7 +217,7 @@
         value={shown ?? '#000000'}
         tabindex="-1"
         aria-hidden="true"
-        onchange={(event) => select(event.currentTarget.value)}
+        onchange={(event) => handleNativeChange(event.currentTarget.value)}
     />
 </span>
 

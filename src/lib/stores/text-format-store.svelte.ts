@@ -15,8 +15,8 @@ function areSameFormats(a: TextFormats, b: TextFormats): boolean {
 /** What the text does with the marked fragment: the text rewrites its content, the store only calls it back */
 export interface TextFormatTarget {
     toggle(command: TextFormatCommand): void;
-    /** Null goes back to the colour of the theme */
-    setColor(color: string | null): void;
+    /** Null goes back to the colour of the theme. The range is the fragment to colour, which the caller may have kept from earlier */
+    setColor(color: string | null, range: { start: number, end: number }): void;
 }
 
 function areSameCaret(a: CaretKey | null, b: CaretKey | null): boolean {
@@ -137,11 +137,23 @@ export class TextFormatStore {
         if (!this.canFormat) return;
 
         if (this.selectionRange) {
-            this.applyToSelection?.setColor(color);
+            this.applyToSelection?.setColor(color, this.selectionRange);
             return;
         }
 
         this.setPending({ ...this.activeFormats, color });
+    }
+
+    /**
+     * Keeps what a colour acts on now, for a colour that is reported later. The native colour picker reports it when it closes, after
+     * the click that closes it has moved the caret and dropped the marked fragment. With only a caret there is nothing to keep, so the
+     * returned function sets the colour as usual
+     */
+    holdColorTarget(): (color: string | null) => void {
+        const range = this.selectionRange ? { ...this.selectionRange } : null;
+        const apply = this.applyToSelection;
+        if (!range || !apply) return (color) => this.setColor(color);
+        return (color) => apply.setColor(color, range);
     }
 
     /** At the caret a change of format waits for the next typed character. Changing back to what the caret already has leaves nothing pending */
