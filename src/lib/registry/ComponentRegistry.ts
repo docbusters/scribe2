@@ -6,7 +6,11 @@ import type { ScribeMode, UpdateType } from '../types/ScribeProps.js';
 import type { ComponentEditOptions } from './ComponentEditOptions.ts';
 import type { InstanceData } from './svelteMountHelper.svelte.ts';
 
-/** Props that should be implemented by every user-defined component */
+/**
+ * Props that should be implemented by every user-defined component.
+ * A component that draws with the CSS of the host (for example Tailwind v4 utilities) can put `data-scribe-host` on its root,
+ * so Scribe's resets of plain tags (span, p, headings, a, button, input, border-color) do not apply inside it
+ */
 export interface ScribeComponentProps<T extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
     componentData: T;
     sectionId: string;

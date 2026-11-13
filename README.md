@@ -245,6 +245,15 @@ Add the `dark` class to `<html>`, to a wrapper or to the Scribe element, and ove
 }
 ```
 
+### Content drawn by the host
+
+Scribe resets the styles of plain tags inside the document (`span`, `p`, headings, `a`, `button`, `input`... and the `border-color` of every element), so the CSS of the host app does not leak into it. Those resets are not in a CSS layer, so they also win over utility classes that are, such as the ones of Tailwind v4 (`@layer utilities`).
+
+Any element with the attribute `data-scribe-host`, and everything inside it, is left out of those resets. The content drawn by the host then inherits the font and colour of its surroundings, its own classes apply as written, and the default margins of the browser are the host's to reset (Tailwind's preflight does it).
+
+- Scribe already sets the attribute on the content of `CustomBinding.renderItem`, the rows of the value selector. By default Scribe also draws the frame of each row (border, background, check and the Incompatible pill). With `CustomBinding.bareItems: true` it draws none of that and the host draws it from `isSelected` and `isDisabled`, keeping Scribe's button (selection, keyboard, focus ring).
+- A registered component that draws with the CSS of the host can put `data-scribe-host` on its root element.
+
 ## Important considerations
 
 - **Tailwind**: can be used when developing **ONLY** on the route pages. When developing the web component, if used, styles will not be applied (This is a limitation of web components).

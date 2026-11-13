@@ -42,9 +42,21 @@ export interface CustomBinding {
     getData: (id: string) => Promise<PrimitiveValue | CollectionValue> | CustomBindingSubscribable;
     /**
      * Draws the content of each row of this binding in the value selector, instead of the default one (type icon, title, value preview and type).
-     * Scribe keeps the row itself: the button, its selection, the disabled state, the focus, the keyboard and the search
+     * Scribe keeps the row itself: the button, its selection, the disabled state, the focus, the keyboard and the search,
+     * and by default its frame too (border, background, padding, check and Incompatible pill). See `bareItems` to draw the frame yourself.
+     *
+     * The content is drawn under `[data-scribe-host]`, which is excluded from the tag resets of Scribe (span fonts, `border-color`,
+     * the margins, fonts and colours of p, headings, a, button, input...). So the host's own CSS applies as written, including the layered
+     * utilities of Tailwind v4 (an unlayered rule beats a layered one whatever its specificity). The content inherits the font and colour of
+     * the row, and the browser's default margins are the host's to reset
      */
     renderItem?: BindingItemRenderer;
+    /**
+     * Scribe draws no frame around the rows of this binding: no border, background, padding, check or Incompatible pill.
+     * The content of `renderItem` draws them from `isSelected` and `isDisabled`. The button stays Scribe's (selection, `aria-pressed`,
+     * disabled, keyboard, search, focus ring, tooltip). It only has effect together with `renderItem`.
+     */
+    bareItems?: boolean;
 }
 
 /** What Scribe tells the renderer of a row of a custom binding. It is plain data: nothing here is a Svelte value or a store */

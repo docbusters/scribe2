@@ -355,7 +355,7 @@
 		box-sizing: border-box;
 	}
 
-	:global(.scribe-document h1) {
+	:global(.scribe-document h1:not(:where([data-scribe-host], [data-scribe-host] *))) {
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h1);
 		font-size: var(--scribe-font-size-h1);
@@ -364,7 +364,7 @@
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
-	:global(.scribe-document h2) {
+	:global(.scribe-document h2:not(:where([data-scribe-host], [data-scribe-host] *))) {
 		font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h2);
 		font-size: var(--scribe-font-size-h2);
@@ -373,18 +373,18 @@
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
-    :global(.scribe-document h3) {
+    :global(.scribe-document h3:not(:where([data-scribe-host], [data-scribe-host] *))) {
         font-family: var(--scribe-font-heading);
 		font-weight: var(--scribe-font-weight-h3);
 		font-size: var(--scribe-font-size-h3);
 		color: var(--scribe-doc-foreground);
 		margin: 0;
     }
-	:global(.scribe-document p) {
+	:global(.scribe-document p:not(:where([data-scribe-host], [data-scribe-host] *))) {
 		color: var(--scribe-doc-foreground);
 		margin: 0;
 	}
-	:global(:where(.scribe-document) span) {
+	:global(:where(.scribe-document) span:not(:where([data-scribe-host], [data-scribe-host] *))) {
 		font-family: var(--scribe-font-sans);
 		font-weight: var(--scribe-font-weight-body);
 		font-size: var(--scribe-font-size-body);

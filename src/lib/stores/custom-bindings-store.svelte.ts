@@ -101,6 +101,11 @@ class CustomBindingsStore {
         return this.definitions[type]?.renderItem;
     }
 
+    /** Whether the host draws the frame of the rows of a custom binding itself (see `CustomBinding.bareItems`) */
+    hasBareItems(type: string): boolean {
+        return !!this.definitions[type]?.bareItems;
+    }
+
     getAvailableIds(type: string, supportedTypes?: Omit<DataValue['type'], 'binding'>[]): { value: string; label: string; disabled?: boolean; type: string }[] {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {

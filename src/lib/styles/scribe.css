@@ -320,51 +320,61 @@ scribe-bindings-panel *,
 scribe-bindings-panel *::before,
 scribe-bindings-panel *::after {
 	box-sizing: border-box;
+}
+
+/* Host content (data-scribe-host) is excluded without raising the specificity: a host that uses Tailwind v4 keeps its layered utilities
+   (an unlayered rule beats a layered one, so :where() alone would not protect them) */
+.scribe-document *:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document *:not(:where([data-scribe-host], [data-scribe-host] *))::before,
+.scribe-document *:not(:where([data-scribe-host], [data-scribe-host] *))::after,
+scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *)),
+scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::before,
+scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::after {
 	border-color: var(--scribe-border-color);
 }
 
-.scribe-document p,
-.scribe-document h1,
-.scribe-document h2,
-.scribe-document h3,
-.scribe-document h4,
-.scribe-document h5,
-.scribe-document h6,
-.scribe-document blockquote,
-.scribe-document figure,
-.scribe-document hr,
-.scribe-document ul,
-.scribe-document ol,
-.scribe-document dl,
-.scribe-document dd,
-.scribe-document pre {
+.scribe-document p:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h1:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h2:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h3:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h4:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h5:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h6:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document blockquote:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document figure:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document hr:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document ul:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document ol:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document dl:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document dd:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document pre:not(:where([data-scribe-host], [data-scribe-host] *)) {
 	margin: 0;
 	padding: 0;
 	/* Force color inheritance so they don't pick up host tag styles */
 	color: inherit;
 }
 
-.scribe-document h1,
-.scribe-document h2,
-.scribe-document h3,
-.scribe-document h4,
-.scribe-document h5,
-.scribe-document h6 {
+.scribe-document h1:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h2:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h3:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h4:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h5:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document h6:not(:where([data-scribe-host], [data-scribe-host] *)) {
 	/* Prevent host heading rules from affecting Scribe headings */
 	font-size: inherit;
 	font-weight: inherit;
 }
 
-.scribe-document a {
+.scribe-document a:not(:where([data-scribe-host], [data-scribe-host] *)) {
 	color: inherit;
 	text-decoration: inherit;
 }
 
-.scribe-document button,
-.scribe-document input,
-.scribe-document optgroup,
-.scribe-document select,
-.scribe-document textarea {
+.scribe-document button:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document input:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document optgroup:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document select:not(:where([data-scribe-host], [data-scribe-host] *)),
+.scribe-document textarea:not(:where([data-scribe-host], [data-scribe-host] *)) {
 	font-family: inherit;
 	font-size: 100%;
 	font-weight: inherit;

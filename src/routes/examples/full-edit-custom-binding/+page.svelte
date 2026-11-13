@@ -58,6 +58,8 @@
 		description: 'Dynamic real-time clock updating every second',
 		// The row is a Svelte component of the examples. The one of `custom-binding` above is plain DOM: the contract needs no framework
 		renderItem: createSvelteItemRenderer(LiveClockRow),
+		// Scribe draws no frame around the rows: LiveClockRow draws its own card, its check and its disabled state
+		bareItems: true,
 		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],
 		getData: () => {
 			return {

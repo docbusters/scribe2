@@ -38,6 +38,8 @@
 
 	// The function the host gave to draw the rows of this custom binding. The default bindings never have one
 	const itemRenderer = $derived(bindingType === 'default' ? undefined : customBindingsStore.getItemRenderer(bindingType));
+	// The host draws the frame of the rows too (only with a renderer). A row whose renderer failed goes back to the framed default row
+	const bareItems = $derived(!!itemRenderer && customBindingsStore.hasBareItems(bindingType));
 
 	// Determine supported data types for this component
 	const supportedTypes = $derived.by<Omit<DataValue['type'], 'binding'>[] | undefined>(() => {
@@ -220,23 +222,25 @@
 			{/if}
 		</div>
 	{:else}
-		<div class="items-list">
+		<div class="items-list" class:is-bare={bareItems}>
 			{#each filteredItems as item (item.id)}
 				{@const isSelected = value === item.id}
+				{@const isBare = bareItems && !failedIds[item.id]}
 				<button
 					type="button"
 					class="binding-row"
 					class:selected={isSelected}
+					class:is-bare={isBare}
 					disabled={item.disabled}
 					aria-pressed={isSelected}
 					onclick={() => handleSelect(item)}
 					title={item.disabled ? i18n.t('bindingSelector.incompatibleTooltip') : item.title}
 				>
 					{#if itemRenderer && !failedIds[item.id]}
-						<!-- The host draws what is inside. The button, the check and the incompatible state stay Scribe's -->
-						<span class="row-custom" use:renderRow={{ renderer: itemRenderer, props: toItemProps(item, isSelected), onError: () => (failedIds[item.id] = true) }}></span>
+						<!-- The host draws what is inside. The button stays Scribe's, and so do the check and the incompatible state unless the rows are bare -->
+						<span class="row-custom" data-scribe-host use:renderRow={{ renderer: itemRenderer, props: toItemProps(item, isSelected), onError: () => (failedIds[item.id] = true) }}></span>
 
-						{#if item.disabled}
+						{#if item.disabled && !isBare}
 							<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
 						{/if}
 					{:else}
@@ -260,11 +264,13 @@
 						{/if}
 					{/if}
 
-					<span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">
-						{#if isSelected}
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-						{/if}
-					</span>
+					{#if !isBare}
+						<span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">
+							{#if isSelected}
+								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+							{/if}
+						</span>
+					{/if}
 				</button>
 			{/each}
 		</div>
@@ -359,6 +365,11 @@
 		padding: 0.125rem;
 	}
 
+	/* A bare row has no frame of its own, so the focus ring (2px, with a 2px offset) needs more room not to be cut by the scroll area */
+	.items-list.is-bare {
+		padding: 0.25rem;
+	}
+
 	.binding-row {
 		display: flex;
 		align-items: center;
@@ -377,23 +388,38 @@
 		box-sizing: border-box;
 	}
 
-	.binding-row:hover:not(:disabled) {
+	.binding-row:not(.is-bare):hover:not(:disabled) {
 		background-color: var(--scribe-muted);
 		border-color: var(--scribe-border-strong);
 	}
 
 	/* Chosen: the primary border, a wash of the accent and a check. It keeps the wash while hovered. */
-	.binding-row.selected:not(:disabled) {
+	.binding-row.selected:not(.is-bare):not(:disabled) {
 		border-color: var(--scribe-primary);
 		outline: 1px solid var(--scribe-primary);
 		background-color: var(--scribe-accent-wash);
 	}
 
-	.binding-row:disabled {
+	.binding-row:not(.is-bare):disabled {
 		opacity: 0.55;
 		cursor: not-allowed;
 		border-style: dashed;
 		background-color: var(--scribe-muted);
+	}
+
+	/* Bare: the host draws the frame, the check and the dimmed state from isSelected and isDisabled. The radius is the one of its card, so the focus ring follows it */
+	.binding-row.is-bare {
+		display: block;
+		padding: 0;
+		min-height: 0;
+		gap: 0;
+		border: 0;
+		background: none;
+		border-radius: var(--scribe-radius-xl);
+	}
+
+	.binding-row.is-bare:disabled {
+		cursor: not-allowed;
 	}
 
 	.row-main {
@@ -408,6 +434,11 @@
 	.row-custom {
 		flex: 1;
 		min-width: 0;
+	}
+
+	.is-bare .row-custom {
+		display: block;
+		width: 100%;
 	}
 
 	.row-title {
