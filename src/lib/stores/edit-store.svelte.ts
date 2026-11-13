@@ -1,5 +1,5 @@
 import type { BaseComponent, BlockComponent, ComponentConfig, SlotRef } from "../domain/components/Component.js";
-import type { CollectionValue, DataValue, PrimitiveValue, StringValue } from "../domain/data/DataValue.js";
+import type { CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.js";
 import type { BindingsDefinition, Document } from "../domain/Document.js";
 import type { Section } from "../domain/Section.js";
 import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
@@ -8,6 +8,7 @@ import { bindingStore } from "./binding-store.svelte.js";
 import { globalRegistry } from "./global-registry.svelte.js";
 import { calculateDocumentBindingUsages, extractBindingUsages, getDefaultBindingUsages, type CustomBindingUsages } from "../utils/bindingUsages.js";
 import { findSlotOf, readSlotEntries, rekeySlotContents, toSlotValue } from "../utils/componentSlots.js";
+import { mergeAdjacentTexts } from "../utils/textMerge.js";
 
 /** Handles document and binding modifications when the document is in edit mode */
 class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | undefined>> {
@@ -507,78 +508,21 @@ class EditStore<C extends BaseComponent<string, DataValue, ComponentConfig | und
 
     /**
      * Merges adjacent text components of a section (slot is null) or of a slot into a single text component and returns
-     * the ID of the merged component if targetId was merged into it
+     * the ID of the merged component if targetId was merged into it. The rules are in `mergeAdjacentTexts` (`utils/textMerge.ts`, tested)
      */
-    private mergeAdjacentTextComponents(sectionId: string, slot: SlotRef | null, targetId?: string, separator: string = ''): string | undefined {
+    private mergeAdjacentTextComponents(sectionId: string, slot: SlotRef | null, targetId?: string, separator: '' | ' ' | '\n' = ''): string | undefined {
         const section = this.findSection(sectionId) as Section<C> | null;
         if (!section) return undefined;
 
         const entries = this.readEntries(section, slot);
         if (!entries || entries.length < 2) return undefined;
 
-        const newEntries: [string, C][] = [];
-        let i = 0;
-        let resultingTargetId: string | undefined = undefined;
-
-        while (i < entries.length) {
-            const currentId = entries[i][0];
-            let currentComp = entries[i][1];
-            
-            if (currentComp.type === 'text') {
-                let mergedText = (currentComp.value as StringValue).value;
-                let j = i + 1;
-                
-                let didMergeTarget = currentId === targetId;
-
-                while (j < entries.length && entries[j][1].type === 'text') {
-                    const [nextId, nextComp] = entries[j];
-                    const nextText = (nextComp.value as StringValue).value;
-                    
-                    if (separator) {
-                        if (mergedText && nextText) {
-                            if (separator === ' ') {
-                                if (!mergedText.endsWith(' ') && !nextText.startsWith(' ')) {
-                                    mergedText += ' ';
-                                }
-                            } else if (separator === '\n') {
-                                if (!mergedText.endsWith('\n') && !nextText.startsWith('\n')) {
-                                    mergedText += '\n';
-                                }
-                            }
-                        }
-                    }
-                    mergedText += nextText;
-                    
-                    if (nextId === targetId) {
-                        didMergeTarget = true;
-                    }
-                    j++;
-                }
-                
-                if (j > i + 1) {
-                    currentComp = {
-                        ...currentComp,
-                        value: { type: 'string', value: mergedText }
-                    } as C;
-                }
-                
-                if (didMergeTarget) {
-                    resultingTargetId = currentId;
-                }
-
-                newEntries.push([currentId, currentComp]);
-                i = j;
-            } else {
-                newEntries.push([currentId, currentComp]);
-                i++;
-            }
+        const merged = mergeAdjacentTexts(entries, targetId, separator);
+        if (merged.entries.length !== entries.length) {
+            this.writeEntries(section, slot, merged.entries);
         }
 
-        if (newEntries.length !== entries.length) {
-            this.writeEntries(section, slot, newEntries);
-        }
-        
-        return resultingTargetId;
+        return merged.targetId;
     }
 
 

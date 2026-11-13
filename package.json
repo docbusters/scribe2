@@ -9,6 +9,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"verify:core": "node scripts/verify-core.mjs",
 		"prepack": "npm run build:wc",
+		"prepublishOnly": "npm test && npm run check && eslint src/lib src/routes scripts",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run",
