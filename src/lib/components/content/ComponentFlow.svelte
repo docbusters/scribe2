@@ -243,10 +243,15 @@
         return extensions;
     }
 
+    /** Where the hover class goes: the wrapper of the text, or the editable itself for a ghost, which has no wrapper until it is saved */
+    function getHoverTarget(textEl: HTMLElement): HTMLElement {
+        return textEl.closest<HTMLElement>('.component-edit-contents') ?? textEl;
+    }
+
     function setHoveredText(textEl: HTMLElement | null) {
         if (hoveredTextEl !== textEl) {
-            hoveredTextEl?.closest('.component-edit-contents')?.classList.remove('is-line-hovered');
-            textEl?.closest('.component-edit-contents')?.classList.add('is-line-hovered');
+            if (hoveredTextEl) getHoverTarget(hoveredTextEl).classList.remove('is-line-hovered');
+            if (textEl) getHoverTarget(textEl).classList.add('is-line-hovered');
             hoveredTextEl = textEl;
         }
 

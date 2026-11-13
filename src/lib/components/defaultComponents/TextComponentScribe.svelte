@@ -794,6 +794,13 @@
         outline: none;
         display: inline;
         position: relative;
+        transition: background-color 0.2s ease;
+    }
+
+    /* A ghost has no wrapper to carry the hover highlight (see ComponentRenderer), so the editable draws it, like the wrapper does */
+    .edit-text:global(.is-line-hovered) {
+        background-color: var(--scribe-selection-color);
+        border-radius: var(--scribe-radius-sm);
     }
 
     .edit-text.is-empty {
