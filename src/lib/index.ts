@@ -4,7 +4,6 @@ import type { ComponentRendererProps } from './types/CustomRendererProps.js';
 import type { ComponentSlotProps } from './types/ComponentSlotProps.js';
 import type { EmptyContentProps } from './types/EmptyContentProps.js';
 import type { BindingsPanelProps } from './types/BindingsPanelProps.js';
-import type { Component } from 'svelte';
 import type { Document, BindingsDefinition } from './domain/Document.js';
 import type { CustomBindingUsages } from './utils/bindingUsages.js';
 
@@ -55,25 +54,12 @@ export type { DefaultComponents };
 import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef } from './domain/components/Component.js';
 export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef };
 
-// SLOTS
-import ComponentSlotSvelte from './components/content/ComponentSlot.svelte';
-export const ComponentSlot = ComponentSlotSvelte as Component<ComponentSlotProps>;
+// SLOTS. A slot is drawn with the custom element <scribe-component-slot>: the Svelte components of the bundle are compiled against its own
+// copy of the Svelte runtime, so they cannot be rendered inside the components of a host (see "Slots" in the README)
 export type { ComponentSlotProps };
 
 import type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, QrComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
 export type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, QrComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
-
-import TextComponentSvelte from './components/defaultComponents/TextComponentScribe.svelte';
-import TextInputComponentSvelte from './components/defaultComponents/TextInputComponentScribe.svelte';
-import ImageComponentSvelte from './components/defaultComponents/ImageComponentScribe.svelte';
-import LatexComponentSvelte from './components/defaultComponents/LatexComponentScribe.svelte';
-import TableComponentSvelte from './components/defaultComponents/TableComponentScribe.svelte';
-
-export const TextComponentScribe = TextComponentSvelte as Component<ScribeComponentProps<TextComponent>>;
-export const TextInputComponentScribe = TextInputComponentSvelte as Component<ScribeComponentProps<TextInputComponent>>;
-export const ImageComponentScribe = ImageComponentSvelte as Component<ScribeComponentProps<ImageComponent>>;
-export const LatexComponentScribe = LatexComponentSvelte as Component<ScribeComponentProps<LatexComponent>>;
-export const TableComponentScribe = TableComponentSvelte as Component<ScribeComponentProps<TableComponent>>;
 
 // FOCUS NAVIGATION
 export {

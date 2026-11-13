@@ -34,6 +34,12 @@ export default defineConfig(
 		}
 	},
 	{
+		// Published as source with a hand-written .d.ts next to it, and TypeScript leaves a .js out of the project when a .d.ts has its name,
+		// so the project service cannot find it
+		files: ['src/lib/svelte/*.svelte.js'],
+		languageOptions: { parserOptions: { projectService: false } }
+	},
+	{
 		// Override or add rule settings here, such as:
 		// 'svelte/button-has-type': 'error'
 		rules: {}

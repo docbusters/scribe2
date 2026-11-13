@@ -3,7 +3,9 @@
 	import Scribe from '$lib/components/Scribe.svelte';
 	import { fullExampleBindings, fullExampleDocument } from '$lib/examples/fullExample.js';
 	import LiveClockRow from '$lib/examples/LiveClockRow.svelte';
-	import { createSvelteItemRenderer } from '$lib/registry/svelteMountHelper.svelte.js';
+	// A host app imports this from '@antonii22/scribe2/svelte', which is published as source so its own Svelte compiles it
+	import { createSvelteItemRenderer } from '$lib/svelte/mount.svelte.js';
+	import { getAllContexts, setContext } from 'svelte';
 	import type { Document } from '$lib/domain/Document.js';
 	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
 	import type { BindingChangeEventDetail, BindingItemProps, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
@@ -52,12 +54,17 @@
 
 	// LIVE CLOCK BINDING EXAMPLE
 
+	// A row mounted by Scribe is a new root, so it does not inherit the context of this page: it has to be passed to the helper.
+	// `getAllContexts` only works while the component initialises, which is where this binding is built
+	setContext('live-clock-hint', 'Updates every second');
+	const rowContext = getAllContexts();
+
 	const liveClockBinding: CustomBinding = {
 		type: 'live-clock',
 		name: 'Live clock',
 		description: 'Dynamic real-time clock updating every second',
 		// The row is a Svelte component of the examples. The one of `custom-binding` above is plain DOM: the contract needs no framework
-		renderItem: createSvelteItemRenderer(LiveClockRow),
+		renderItem: createSvelteItemRenderer(LiveClockRow, rowContext),
 		// Scribe draws no frame around the rows: LiveClockRow draws its own card, its check and its disabled state
 		bareItems: true,
 		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],

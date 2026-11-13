@@ -1,13 +1,17 @@
 <script lang="ts">
     import type { BindingItemProps } from '../types/ScribeProps.js';
     import { getI18n } from '../i18n/i18n.svelte.js';
+    import { getContext } from 'svelte';
 
-    // Example of the row of a custom binding drawn by the host app, here with a Svelte component (see `createSvelteItemRenderer`).
+    // Example of the row of a custom binding drawn by the host app, here with a Svelte component (see `createSvelteItemRenderer`,
+    // which gets the context of the page so the row can read it with `getContext`).
     // The binding sets `bareItems`, so Scribe keeps only the button of the row (selection, keyboard, focus ring) and draws no frame:
     // the card, its selected and disabled states and the check are drawn here from `isSelected` and `isDisabled`
     let { label, preview, isLoading, isSelected, isDisabled }: BindingItemProps = $props();
 
     const i18n = getI18n();
+    // Set by the page of the example, and only found because it passed its context to the renderer
+    const hint = getContext<string | undefined>('live-clock-hint');
 </script>
 
 <span class="clock-row" class:is-selected={isSelected} class:is-disabled={isDisabled}>
@@ -18,7 +22,7 @@
 
     <span class="clock-text">
         <span class="clock-title">{label}</span>
-        <span class="clock-detail">{isLoading ? i18n.t('common.loading') : preview}</span>
+        <span class="clock-detail">{isLoading ? i18n.t('common.loading') : preview}{hint ? ` · ${hint}` : ''}</span>
     </span>
 
     <span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">

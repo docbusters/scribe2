@@ -1,5 +1,5 @@
 import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistry.js';
-import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
+import { createSvelte5Mount } from '../svelte/mount.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
 import CheckboxComponentScribe from '../components/defaultComponents/CheckboxComponentScribe.svelte';

@@ -4,7 +4,7 @@ import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/
 import type { DefaultComponents } from './defaultRegistry.js';
 import type { ScribeMode, UpdateType } from '../types/ScribeProps.js';
 import type { ComponentEditOptions } from './ComponentEditOptions.ts';
-import type { InstanceData } from './svelteMountHelper.svelte.ts';
+import type { InstanceData } from '../svelte/mount.svelte.js';
 
 /**
  * Props that should be implemented by every user-defined component.

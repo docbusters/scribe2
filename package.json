@@ -1,10 +1,10 @@
 {
 	"name": "@antonii22/scribe2",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
-		"build:wc": "vite build -c vite.wc.config.ts && tsc -p tsconfig.types.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.copyFileSync('src/lib/styles/scribe.css', 'dist/scribe.css')\"",
+		"build:wc": "vite build -c vite.wc.config.ts && tsc -p tsconfig.types.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.copyFileSync('src/lib/styles/scribe.css', 'dist/scribe.css'); fs.cpSync('src/lib/svelte', 'dist/svelte', { recursive: true, filter: (s) => !s.includes('.test.') })\"",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "npm run build:wc",
@@ -39,7 +39,12 @@
 			"types": "./dist/index.d.ts",
 			"import": "./dist/scribe.js"
 		},
-		"./scribe.css": "./dist/scribe.css"
+		"./scribe.css": "./dist/scribe.css",
+		"./svelte": {
+			"types": "./dist/svelte/mount.svelte.d.ts",
+			"svelte": "./dist/svelte/mount.svelte.js",
+			"default": "./dist/svelte/mount.svelte.js"
+		}
 	},
 	"peerDependencies": {
 		"svelte": "^5.56.1"

@@ -65,7 +65,7 @@ Make sure it is intalled correctly in `package.json`
 
 ## Slots: editable areas inside a component
 
-A **slot** is an area inside a component that works like a section: the user types text in it, inserts any registered component with Add or <kbd>Ctrl</kbd>+<kbd>Space</kbd>, and moves through it with the arrow keys, leaving it into the next text or cell. The cells of the default table are slots. `ComponentSlot` draws one, so a custom component (a card, a two-column layout, a callout...) gets all of that without handling any of it.
+A **slot** is an area inside a component that works like a section: the user types text in it, inserts any registered component with Add or <kbd>Ctrl</kbd>+<kbd>Space</kbd>, and moves through it with the arrow keys, leaving it into the next text or cell. The cells of the default table are slots. The custom element `<scribe-component-slot>` draws one, so a custom component (a card, a two-column layout, a callout...) gets all of that without handling any of it.
 
 ### How it is stored
 
@@ -95,16 +95,22 @@ Register the type with `empty.value: 'record'` and `valueTypes: ['record']`. A n
 
 ### In a Svelte component
 
+Use the custom element, and give it the props the component receives. Svelte sets `componentData` as a property, and the others follow your component when they change:
+
 ```svelte
 <script lang="ts">
-	import { ComponentSlot, type ScribeComponentProps } from '@antonii22/scribe2';
+	import type { ScribeComponentProps } from '@antonii22/scribe2';
 	let { componentData, sectionId, mode, isDarkMode }: ScribeComponentProps<CalloutComponent> = $props();
 </script>
 
 <aside class="callout">
-	<ComponentSlot {componentData} slotKey="body" {sectionId} {mode} {isDarkMode} />
+	<scribe-component-slot {componentData} slotKey="body" {sectionId} {mode} {isDarkMode}></scribe-component-slot>
 </aside>
 ```
+
+The element is registered when `@antonii22/scribe2` is imported, and its props are typed for Svelte, JSX and `HTMLElementTagNameMap` (`ComponentSlotProps`).
+
+**Why not a Svelte component?** The bundle carries its own copy of the Svelte runtime, and Svelte keeps its reactive state (the effect that is running, the context) in the runtime that compiled the component. A Svelte component of Scribe rendered inside one of yours would read your props with the wrong runtime, so it would draw once and then ignore the changes of your own `$state` and of the component data (a component inserted in the slot would be stored but not drawn). A custom element is a plain DOM element, so Svelte passes the props through the DOM and each side keeps its own runtime. That is why Scribe exports no Svelte components (only the helpers of `@antonii22/scribe2/svelte`, which are published as source for this reason).
 
 | Prop | Description |
 | --- | --- |
@@ -112,9 +118,9 @@ Register the type with `empty.value: 'record'` and `valueTypes: ['record']`. A n
 | `slotKey` | The entry of that record where the slot is stored. Every key is a different slot, so a component can have as many as it needs (the table uses `row:col`). |
 | `sectionId`, `mode`, `isDarkMode` | The same ones every component receives. |
 
-### As a web component
+### In plain HTML
 
-The same element is registered as `<scribe-component-slot>`, with the same props (`componentData` as an object, the others as attributes):
+Outside of Svelte the element is the same, with `componentData` as an object property and the others as attributes:
 
 ```html
 <scribe-component-slot slotKey="body" sectionId="section-1" mode="edit"></scribe-component-slot>
@@ -153,6 +159,57 @@ The colour is a `#rrggbb` string in `config[configKey]`. Your component reads it
 ### Colour in a text
 
 The text component colours a fragment of its text, and stores it in the text itself: `{#rrggbb}` sets the colour of what follows and `{#}` goes back to the colour of the theme, for example `Hello {#ef4444}world{#}!`. A colour ends at the end of its line. Any other `{` is plain text (a literal `{` is written as `\{`), so existing texts are read as before. If you read the text of a document outside Scribe, remove these markers as you would the `*`, `_`, `~` and `-` of the other formats.
+
+## Svelte components in the registry and in `renderItem`
+
+If your app is written in Svelte 5, two helpers mount your components where Scribe needs a `mount`, `update` and `unmount`: `createSvelte5Mount` for the entries of the component registry, and `createSvelteItemRenderer` for the rows of a custom binding (`CustomBinding.renderItem`).
+
+```ts
+import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2/svelte';
+```
+
+**Why a separate import.** `@antonii22/scribe2` is a bundle that carries its own copy of the Svelte runtime. A helper exported from it would mount *your* components with *that* runtime, while they were compiled against yours. So the helpers are published as source (`@antonii22/scribe2/svelte`, with the `svelte` export condition) and your bundler compiles them with your own Svelte, as it does with the rest of your code. This needs Svelte 5 and a bundler that compiles Svelte libraries (such as `vite-plugin-svelte`). The file imports nothing from Scribe.
+
+**The context has to be passed.** A component mounted by Scribe is a new root, not a child of yours, so it does not inherit your Svelte context (i18n, stores, a router...). Both helpers take it as an optional last argument, which goes to Svelte's `mount()`. `getAllContexts()` only works while a component initialises, so build the registry or the renderer there:
+
+```svelte
+<script lang="ts">
+	import { getAllContexts } from 'svelte';
+	import { Scribe, getDefaultRegistry, type ScribeComponentProps } from '@antonii22/scribe2';
+	import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2/svelte';
+	import MyCard from './MyCard.svelte'; // a component of your own, which can use getContext
+	import MyRow from './MyRow.svelte';
+
+	const context = getAllContexts(); // a snapshot: what is set later in your components is not seen
+
+	// A registry component
+	const registry = {
+		...getDefaultRegistry(i18n),
+		'my-card': {
+			name: 'Card',
+			description: 'A card',
+			icon: '<svg>...</svg>',
+			...createSvelte5Mount<ScribeComponentProps<MyCardComponent>>(MyCard, context),
+			empty: { type: 'my-card', mode: 'block', value: 'string' },
+			valueTypes: ['string']
+		}
+	};
+
+	// The rows of a custom binding. `bareItems` makes Scribe draw no frame, so MyRow draws its own card
+	const customBinding: CustomBinding = {
+		type: 'my-binding',
+		name: 'My binding',
+		renderItem: createSvelteItemRenderer(MyRow, context),
+		bareItems: true,
+		getAvailableIds: () => [],
+		getData: async () => ({ type: 'string', value: '' })
+	};
+</script>
+```
+
+Without `context`, `getContext` in `MyCard` or `MyRow` returns `undefined`. You can also pass a `Map` of your own instead of `getAllContexts()`. The playground shows the row case in `/examples/full-edit-custom-binding`.
+
+Inside these components, draw the parts of Scribe with its custom elements, such as `<scribe-component-slot>` (see "Slots" above). Scribe exports no Svelte components for this, for the same reason of the two runtimes.
 
 ## Styling
 
