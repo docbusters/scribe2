@@ -64,6 +64,28 @@ import '@antonii22/scribe2/scribe.css';
 
 Both are imports for their side effects, so a host that takes nothing by name from the package still gets the elements. The package declares this in `sideEffects` (`**/*.css` and `./dist/scribe.js`), so a production build (Vite, Rollup, webpack) keeps the import instead of dropping it as unused. `@antonii22/scribe2/svelte` has no side effects and can be shaken.
 
+## Events
+
+Scribe tells the host about changes with two DOM events on the element, which bubble and are composed. In the Svelte component the same events arrive in the `ondocumentchange` and `onbindingchange` props.
+
+### `documentchange`
+
+Fired each time the document changes in edit mode (not for the initial document). Its detail is a `DocumentChangeDetail`:
+
+```ts
+el.addEventListener('documentchange', (event) => {
+	const { document, customBindingUsages } = event.detail;
+	// document: the document after the change, as a plain snapshot
+	// customBindingUsages: binding type → binding id → Set of the ids of the components that use it
+});
+```
+
+`customBindingUsages` is the same `CustomBindingUsages` that `el.getCustomBindingUsages()` returns, but it belongs to exactly the document of the event, so the host does not need the element. It covers custom bindings only, and it holds `Set`s, which `JSON.stringify` writes as `{}`: save `document`, not the whole detail. The event is not fired for the initial document, so call `getCustomBindingUsages()` once for the starting state.
+
+### `bindingchange`
+
+Fired when a variable of the document is created, updated or deleted, and when the value of a custom binding changes. Its detail is a `BindingChangeEventDetail`, discriminated by `type`: `binding_create`, `binding_update` and `binding_delete` carry the variable `id` (and its `definition`, except for the delete), and `value_update` carries `bindingType`, `id` and the new `value`. Both `binding_update` and `value_update` have an `updateType` (`onchange` while typing, `onblur` when done).
+
 ## Examples
 
 - [**Simple plain html example**](/test/simple-webcomponent-test.html): Shows the library usage with a basic example.

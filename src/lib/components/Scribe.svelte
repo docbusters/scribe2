@@ -34,7 +34,7 @@
 	import { globalRegistry } from '../stores/global-registry.svelte.js';
 	import { bindingStore } from '../stores/binding-store.svelte.ts';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
-	import type { ScribeProps, CustomBinding } from '../types/ScribeProps.js';
+	import type { ScribeProps, CustomBinding, DocumentChangeDetail } from '../types/ScribeProps.js';
 	import { setContext, onDestroy, onMount } from 'svelte';
 	import Sortable from 'sortablejs';
 	import type { Document, BindingsDefinition } from '../domain/Document.js';
@@ -49,6 +49,7 @@
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
 	import { setI18n } from '../i18n/i18n.svelte.js';
 	import { getAncestorChain, hasDarkClass } from '../utils/darkTheme.js';
+	import { calculateDocumentBindingUsages } from '../utils/bindingUsages.js';
 
 	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showPrintButton = false }: ScribeProps = $props();
 
@@ -276,8 +277,15 @@
 				return;
 			}
 
+			// The usages are found in the snapshot and not read from the edit store: the store keeps them in place (live Sets the host
+			// would see change), and it only exists in edit mode, while this event also fires in view mode after refreshDocument
+			const detail: DocumentChangeDetail<never> = {
+				document: docSnapshot,
+				customBindingUsages: calculateDocumentBindingUsages(docSnapshot)
+			};
+
 			const documentChangeEvent = new CustomEvent('documentchange', {
-				detail: docSnapshot,
+				detail,
 				bubbles: true,
 				composed: true
 			});

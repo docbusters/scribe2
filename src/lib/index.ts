@@ -30,7 +30,7 @@ export const BindingsPanel = BindingsFloatingPanelSvelte;
 export type { BindingsPanelProps } from './types/BindingsPanelProps.js';
 
 // TYPES
-export type { ScribeProps, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
+export type { ScribeProps, DocumentChangeDetail, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
 
 // i18n
 export * from './i18n/index.js';

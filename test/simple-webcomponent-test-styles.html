@@ -26,7 +26,7 @@
 	scribeElement.bindings = bindings;
 
 	scribeElement.addEventListener('documentchange', (event) => {
-		console.log('Document modified:', event.detail);
+		console.log('Document modified:', event.detail.document, 'custom binding usages:', event.detail.customBindingUsages);
 	});
 
 	document.getElementById('container').appendChild(scribeElement);

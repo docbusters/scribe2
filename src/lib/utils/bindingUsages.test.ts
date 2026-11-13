@@ -63,6 +63,29 @@ describe('custom binding usages', () => {
         expect([...usages['custom-type']['x']]).toEqual(['a']);
     });
 
+    // The documentchange event gives the usages of the snapshot of the document, so components nested in a slot (a record of
+    // components held by another component, as a table cell) must be found as well
+    it('are found for a component inside a slot, by its own id', () => {
+        const cell = text('cell-input', binding('x', 'custom-type'));
+        const table = { id: 'table-1', type: 'table', mode: 'block', value: { type: 'record', value: { '0:0': { type: 'record', value: { 'cell-input': { type: 'component', value: cell } } } } } };
+        const usages = calculateDocumentBindingUsages(documentWith(table as unknown as ReturnType<typeof text>));
+
+        expect([...usages['custom-type']['x']]).toEqual(['cell-input']);
+    });
+
+    it('are new objects on every call, so a host never shares a Set with the next event', () => {
+        const doc = documentWith(text('a', binding('x', 'custom-type')));
+        const first = calculateDocumentBindingUsages(doc);
+        const second = calculateDocumentBindingUsages(doc);
+
+        first['custom-type']['x'].add('intruder');
+        expect([...second['custom-type']['x']]).toEqual(['a']);
+    });
+
+    it('are empty when no component uses a custom binding', () => {
+        expect(calculateDocumentBindingUsages(documentWith(text('a', binding('name'))))).toEqual({});
+    });
+
     it('are added and removed per component, including nested ones', () => {
         const usages: CustomBindingUsages = {};
         const nested = text('inner', binding('x', 'custom-type'));

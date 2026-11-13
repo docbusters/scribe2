@@ -2,20 +2,29 @@ import type { BaseComponent } from "../domain/components/Component.js";
 import type { CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.js";
 import type { Document, BindingsDefinition } from "../domain/Document.js";
 import type { ComponentRegistry } from "../registry/ComponentRegistry.js";
+import type { CustomBindingUsages } from "../utils/bindingUsages.js";
 
 export type ScribeMode = "edit" | "view";
+
+/** The detail of the `documentchange` event: the document after the change, and the custom bindings that document uses */
+export interface DocumentChangeDetail<C extends BaseComponent<string, DataValue> = never> {
+    /** The document after the change (a plain snapshot) */
+    document: Document<C>;
+    /** Usages of each custom binding in that document: binding type → binding id → ids of the components that use it. Same type as `getCustomBindingUsages()` */
+    customBindingUsages: CustomBindingUsages;
+}
 
 export interface ScribeProps<C extends BaseComponent<string, DataValue> = never> {
     id?: string;
     class?: string;
     style?: string;
     mode?: ScribeMode;
-    /** Initial document value. Changes made in the document while in edit mode will be notified via the `ondocumentchange` event. */
+    /** Initial document value. Changes made in the document while in edit mode will be notified via the `ondocumentchange` event (see `DocumentChangeDetail`). */
     document: Document<C>;
     bindings?: Record<string, BindingsDefinition>;
     registry?: ComponentRegistry<C>;
     customBindings?: Record<string, CustomBinding>;
-    ondocumentchange?: (event: CustomEvent<Document<C>>) => void;
+    ondocumentchange?: (event: CustomEvent<DocumentChangeDetail<C>>) => void;
     onbindingchange?: (event: CustomEvent<BindingChangeEventDetail>) => void;
     /** Current language / locale for the interface ('en' or 'es'). Defaults to 'en'. */
     lang?: 'en' | 'es';
