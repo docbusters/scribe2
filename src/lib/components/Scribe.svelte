@@ -48,6 +48,7 @@
 	import DocumentTitle from './utilComponents/DocumentTitle.svelte';
 	import BindingsFloatingPanel from './bindings/BindingsFloatingPanel.svelte';
 	import { setI18n } from '../i18n/i18n.svelte.js';
+	import { getAncestorChain, hasDarkClass } from '../utils/darkTheme.js';
 
 	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showPrintButton = false }: ScribeProps = $props();
 
@@ -71,18 +72,32 @@
 	let isDarkMode = $state(false);
 	let isWebComponent = $state(false);
 	
-	// We check for dark mode and web component status on the host element
+	// Web component status of the root element
 	$effect(() => {
 		if (rootElement) {
-			const host = rootElement.closest('scribe-interpreter');
-			if (host) {
-				isWebComponent = true;
-				isDarkMode = host.classList.contains('dark') || window.document.documentElement.classList.contains('dark');
-			} else {
-				isWebComponent = false;
-				isDarkMode = className.includes('dark') || window.document.documentElement.classList.contains('dark');
-			}
+			isWebComponent = !!rootElement.closest('scribe-interpreter');
 		}
+	});
+
+	// Dark mode follows the rule of the CSS: a `.dark` on the root element or on any ancestor (`<html>`, a wrapper, the Scribe element)
+	// themes Scribe, and it is kept up to date: `classList` is not reactive, so a MutationObserver watches the class attribute of each node
+	// of the chain. It does not watch `<html>` with `subtree`, as Scribe itself toggles classes all the time (hover, selected) and the
+	// observer would fire constantly. The `class` prop is on the root element in the Svelte case, so it is in the chain as well.
+	// shortcut: the chain is read when the element mounts, so an element moved to another parent later keeps watching the old ancestors, remount it to refresh
+	$effect(() => {
+		if (!rootElement) return;
+
+		const chain = getAncestorChain(rootElement);
+		const update = () => {
+			isDarkMode = hasDarkClass(chain);
+		};
+		update();
+
+		const observer = new MutationObserver(update);
+		for (const node of chain) {
+			observer.observe(node as Element, { attributes: true, attributeFilter: ['class'] });
+		}
+		return () => observer.disconnect();
 	});
 
 	let computedClass = $derived(isWebComponent ? 'scribe-document' : `${className} scribe-document`);

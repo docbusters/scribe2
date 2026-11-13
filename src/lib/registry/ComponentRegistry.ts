@@ -23,7 +23,7 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     updateComponentValue: (newValue: DataValue, updateType: UpdateType) => void;
     /** Updates the component config handling config updates */
     updateComponentConfig: (newConfig: ComponentConfig) => void;
-    /** Indicates whether the component is in dark mode */
+    /** Indicates whether the component is in dark mode: the class `dark` is on the root element of Scribe or on any ancestor, and it follows the class live */
     isDarkMode: boolean;
 }
 

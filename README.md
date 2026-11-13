@@ -293,7 +293,7 @@ Some colours are derived from these with `color-mix` (field borders, the fill of
 
 ### Dark theme
 
-Add the `dark` class to `<html>`, to a wrapper or to the Scribe element, and override the variables for it:
+Add the `dark` class to `<html>`, to a wrapper or to the Scribe element, and override the variables for it. Scribe is dark when its root element or **any ancestor** has the class, as the CSS is, and it follows the class live: adding or removing `dark` while the editor is open updates the colours and the `isDarkMode` prop that the components receive (the map switches its base map, and your own components can read it). It also works when Scribe sits inside the shadow root of another element, with the class outside of it.
 
 ```css
 .dark {
