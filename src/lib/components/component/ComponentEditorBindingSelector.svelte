@@ -4,7 +4,10 @@
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
 	import { truncateString } from '$lib/utils/truncateString.js';
-	import type { DataValue } from '$lib/domain/data/DataValue.js';
+	import type { CollectionValue, DataValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
+	import type { BindingItemProps, BindingItemRenderer } from '$lib/types/ScribeProps.js';
+	import { createItemHost } from '$lib/utils/bindingItemRenderer.js';
+	import type { Action } from 'svelte/action';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 	import { getTypeLabel, isListedBinding } from '$lib/utils/dataTypes.js';
 	import TypeIcon from '../utilComponents/TypeIcon.svelte';
@@ -27,7 +30,14 @@
 
 	let searchQuery = $state('');
 	let customPreviewValues = $state<Record<string, string>>({});
+	// The resolved values of the custom items, for the renderer of the rows (the default row only shows their text)
+	let customValues = $state<Record<string, PrimitiveValue | CollectionValue>>({});
 	let loadingIds = $state<Record<string, boolean>>({});
+	// The items whose custom renderer threw, which show the default row
+	let failedIds = $state<Record<string, boolean>>({});
+
+	// The function the host gave to draw the rows of this custom binding. The default bindings never have one
+	const itemRenderer = $derived(bindingType === 'default' ? undefined : customBindingsStore.getItemRenderer(bindingType));
 
 	// Determine supported data types for this component
 	const supportedTypes = $derived.by<Omit<DataValue['type'], 'binding'>[] | undefined>(() => {
@@ -44,6 +54,8 @@
 		title: string;
 		type: string;
 		valuePreview: string;
+		/** The resolved value, only known for custom items once they are loaded */
+		value?: PrimitiveValue | CollectionValue;
 		disabled: boolean;
 		isLoading?: boolean;
 	}
@@ -58,6 +70,7 @@
 					customBindingsStore
 						.getValue(bindingType, item.value)
 						.then((resolved) => {
+							customValues[item.value] = resolved;
 							try {
 								customPreviewValues[item.value] = stringifyDataValue(resolved);
 							} catch {
@@ -106,6 +119,7 @@
 				title: item.label || item.value,
 				type: item.type || 'unknown',
 				valuePreview: preview,
+				value: customValues[item.value],
 				disabled: !!item.disabled,
 				isLoading: !!loadingIds[item.value]
 			};
@@ -130,6 +144,38 @@
 		value = item.id;
 		onselect?.(item.id);
 	}
+
+	/** What the renderer of the host gets for a row. It is a plain copy, so the host never holds a reactive proxy of Scribe */
+	function toItemProps(item: BindingItem, isSelected: boolean): BindingItemProps {
+		return {
+			id: item.id,
+			label: item.title,
+			type: item.type,
+			bindingType,
+			value: item.value === undefined ? undefined : $state.snapshot(item.value),
+			preview: item.valuePreview,
+			isLoading: !!item.isLoading,
+			isDisabled: item.disabled,
+			isSelected
+		};
+	}
+
+	interface RowRender {
+		renderer: BindingItemRenderer;
+		props: BindingItemProps;
+		/** The renderer threw while mounting: the row shows the default content */
+		onError: () => void;
+	}
+
+	// Draws the content of a row with the renderer of the host. The row is keyed by id, so it stays mounted and the host gets the new props
+	const renderRow: Action<HTMLElement, RowRender> = (node, params) => {
+		const host = createItemHost(params.renderer, node, params.props, params.onError);
+
+		return {
+			update: (next) => host.update(next.props),
+			destroy: () => host.destroy()
+		};
+	};
 </script>
 
 <div class="binding-selector-root">
@@ -186,23 +232,32 @@
 					onclick={() => handleSelect(item)}
 					title={item.disabled ? i18n.t('bindingSelector.incompatibleTooltip') : item.title}
 				>
-					<span class="scribe-tile" data-size="sm" data-type={item.type}><TypeIcon type={item.type} /></span>
+					{#if itemRenderer && !failedIds[item.id]}
+						<!-- The host draws what is inside. The button, the check and the incompatible state stay Scribe's -->
+						<span class="row-custom" use:renderRow={{ renderer: itemRenderer, props: toItemProps(item, isSelected), onError: () => (failedIds[item.id] = true) }}></span>
 
-					<span class="row-main">
-						<span class="row-title" title={item.title}>{item.title}</span>
-						{#if item.isLoading}
-							<span class="row-preview is-muted">{i18n.t('common.loading')}</span>
-						{:else if item.valuePreview !== ''}
-							<span class="row-preview" title={item.valuePreview}>{truncateString(item.valuePreview, 60)}</span>
-						{:else}
-							<span class="row-preview is-muted">{i18n.t('common.empty')}</span>
+						{#if item.disabled}
+							<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
 						{/if}
-					</span>
+					{:else}
+						<span class="scribe-tile" data-size="sm" data-type={item.type}><TypeIcon type={item.type} /></span>
 
-					{#if item.disabled}
-						<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
-					{:else if item.type}
-						<span class="scribe-pill" data-type={item.type}>{getTypeLabel(i18n, item.type)}</span>
+						<span class="row-main">
+							<span class="row-title" title={item.title}>{item.title}</span>
+							{#if item.isLoading}
+								<span class="row-preview is-muted">{i18n.t('common.loading')}</span>
+							{:else if item.valuePreview !== ''}
+								<span class="row-preview" title={item.valuePreview}>{truncateString(item.valuePreview, 60)}</span>
+							{:else}
+								<span class="row-preview is-muted">{i18n.t('common.empty')}</span>
+							{/if}
+						</span>
+
+						{#if item.disabled}
+							<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
+						{:else if item.type}
+							<span class="scribe-pill" data-type={item.type}>{getTypeLabel(i18n, item.type)}</span>
+						{/if}
 					{/if}
 
 					<span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">
@@ -345,6 +400,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.125rem;
+		flex: 1;
+		min-width: 0;
+	}
+
+	/* Where the host draws a row. It takes the space of the default content, and the host owns what is inside */
+	.row-custom {
 		flex: 1;
 		min-width: 0;
 	}

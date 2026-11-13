@@ -2,10 +2,28 @@
 	import '$lib/styles/scribe.css';
 	import Scribe from '$lib/components/Scribe.svelte';
 	import { fullExampleBindings, fullExampleDocument } from '$lib/examples/fullExample.js';
+	import LiveClockRow from '$lib/examples/LiveClockRow.svelte';
+	import { createSvelteItemRenderer } from '$lib/registry/svelteMountHelper.svelte.js';
 	import type { Document } from '$lib/domain/Document.js';
 	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
-	import type { BindingChangeEventDetail, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
+	import type { BindingChangeEventDetail, BindingItemProps, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
 
+	// The rows of a custom binding can be drawn by the host. With plain DOM here, as any framework would do it: a node comes in,
+	// and an update and a destroy go out. Scribe keeps the button of the row, so the selection and the keyboard still work
+	function renderCustomRow(node: HTMLElement, initial: BindingItemProps) {
+		const title = document.createElement('strong');
+		const detail = document.createElement('span');
+		detail.style.cssText = 'display: block; font-size: 0.75rem; opacity: 0.7;';
+		node.append(title, detail);
+
+		const paint = (props: BindingItemProps) => {
+			title.textContent = `${props.isSelected ? '★ ' : ''}${props.label}`;
+			detail.textContent = props.isLoading ? 'Loading from the server...' : `${props.type}: ${props.preview}`;
+		};
+		paint(initial);
+
+		return { update: paint, destroy: () => node.replaceChildren() };
+	}
 
 	// BASIC CUSTOM BINDING EXAMPLE
 
@@ -18,6 +36,7 @@
 		type: 'custom-binding',
 		name: 'Custom Binding',
 		description: 'Sample external data source with asynchronous loading',
+		renderItem: renderCustomRow,
 		getAvailableIds: () => {
 			return Object.entries(bindingData).map(([id, value]) => ({ id, label: id, type: value.type }));
 		},
@@ -37,6 +56,8 @@
 		type: 'live-clock',
 		name: 'Live clock',
 		description: 'Dynamic real-time clock updating every second',
+		// The row is a Svelte component of the examples. The one of `custom-binding` above is plain DOM: the contract needs no framework
+		renderItem: createSvelteItemRenderer(LiveClockRow),
 		getAvailableIds: () => [{ id: 'not-used', label: 'Default live clock', type: 'string' }],
 		getData: () => {
 			return {

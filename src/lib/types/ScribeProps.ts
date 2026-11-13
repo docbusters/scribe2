@@ -40,7 +40,45 @@ export interface CustomBinding {
     getAvailableIds: () => { id: string; label: string; type: string }[];
     /** Returns the static value or a subscribable value object */
     getData: (id: string) => Promise<PrimitiveValue | CollectionValue> | CustomBindingSubscribable;
+    /**
+     * Draws the content of each row of this binding in the value selector, instead of the default one (type icon, title, value preview and type).
+     * Scribe keeps the row itself: the button, its selection, the disabled state, the focus, the keyboard and the search
+     */
+    renderItem?: BindingItemRenderer;
 }
+
+/** What Scribe tells the renderer of a row of a custom binding. It is plain data: nothing here is a Svelte value or a store */
+export interface BindingItemProps {
+    /** Id of the item, as returned by `getAvailableIds` */
+    id: string;
+    /** Label of the item, which is its id when `getAvailableIds` gives none */
+    label: string;
+    /** Type of the value of the item, as returned by `getAvailableIds` */
+    type: string;
+    /** Key of the custom binding the item belongs to */
+    bindingType: string;
+    /** The value of the item once loaded. Undefined while it loads, or when it could not be loaded */
+    value: PrimitiveValue | CollectionValue | undefined;
+    /** The value as text, which is what the default row shows. Empty while it loads */
+    preview: string;
+    isLoading: boolean;
+    /** The component that is being edited does not support the type of the item, so the row cannot be chosen */
+    isDisabled: boolean;
+    isSelected: boolean;
+}
+
+/** What a renderer hands back to Scribe: how to give it the new props of the row and how to clean up. Both are optional */
+export interface BindingItemRendererHandle {
+    update?: (props: BindingItemProps) => void;
+    destroy?: () => void;
+}
+
+/**
+ * Draws the content of a row into `node` and returns how to update and clean it up. It does not depend on any framework: with React it is
+ * `createRoot(node)` and `root.render` (in `update` too) and `root.unmount` in `destroy`. `update` runs again when the value loads or the
+ * selection changes. The row is a button, so the content must not hold buttons or links. If the renderer throws, the row falls back to the default content
+ */
+export type BindingItemRenderer = (node: HTMLElement, props: BindingItemProps) => BindingItemRendererHandle | void;
 
 /** 
  * The type of update that occurred. 

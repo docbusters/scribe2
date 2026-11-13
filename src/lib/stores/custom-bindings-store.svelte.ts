@@ -1,4 +1,4 @@
-import type { CustomBinding, CustomBindingSubscribable } from '$lib/types/ScribeProps.js';
+import type { BindingItemRenderer, CustomBinding, CustomBindingSubscribable } from '$lib/types/ScribeProps.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 
 interface CustomBindingInstance {
@@ -94,6 +94,11 @@ class CustomBindingsStore {
             name: def.name || type,
             description: def.description
         }));
+    }
+
+    /** The function that draws the rows of a custom binding, or undefined when it has none (the default row is drawn) */
+    getItemRenderer(type: string): BindingItemRenderer | undefined {
+        return this.definitions[type]?.renderItem;
     }
 
     getAvailableIds(type: string, supportedTypes?: Omit<DataValue['type'], 'binding'>[]): { value: string; label: string; disabled?: boolean; type: string }[] {
