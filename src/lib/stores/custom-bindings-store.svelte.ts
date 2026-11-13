@@ -1,4 +1,4 @@
-import type { BindingItemRenderer, CustomBinding, CustomBindingSubscribable } from '$lib/types/ScribeProps.js';
+import type { BindingItemRenderer, CustomBinding, CustomBindingSubscribable } from '../types/ScribeProps.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
 
 interface CustomBindingInstance {

@@ -1,17 +1,3 @@
-<svelte:options
-	customElement={{
-		tag: 'scribe-component-slot',
-		shadow: 'none',
-		props: {
-			componentData: { type: 'Object' },
-			slotKey: { type: 'String' },
-			sectionId: { type: 'String' },
-			mode: { type: 'String' },
-			isDarkMode: { type: 'Boolean' }
-		}
-	}}
-/>
-
 <script lang="ts">
 	import type { ComponentSlotProps } from '$lib/types/ComponentSlotProps.js';
 	import { readSlotEntries } from '$lib/utils/componentSlots.js';

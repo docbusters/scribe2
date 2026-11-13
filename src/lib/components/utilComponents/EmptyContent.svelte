@@ -1,19 +1,3 @@
-<svelte:options
-    customElement={{
-        tag: 'scribe-empty-content',
-        shadow: 'none',
-        props: {
-            message: { type: 'String' },
-            description: { type: 'String' },
-            icon: { type: 'String' },
-            isError: { type: 'Boolean' },
-            valueStyle: { type: 'String' },
-            style: { type: 'String' },
-            action: { type: 'Object' }
-        }
-    }}
-/>
-
 <script lang="ts">
 	import type { EmptyContentProps } from "$lib/types/EmptyContentProps.js";
 	import Button from "./Button.svelte";

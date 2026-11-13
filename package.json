@@ -1,12 +1,13 @@
 {
 	"name": "@antonii22/scribe2",
-	"version": "0.0.24",
+	"version": "0.0.25",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
-		"build:wc": "vite build -c vite.wc.config.ts && tsc -p tsconfig.types.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.copyFileSync('src/lib/styles/scribe.css', 'dist/scribe.css'); fs.cpSync('src/lib/svelte', 'dist/svelte', { recursive: true, filter: (s) => !s.includes('.test.') })\"",
+		"build:wc": "vite build -c vite.wc.config.ts && tsc -p tsconfig.types.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.copyFileSync('src/lib/styles/scribe.css', 'dist/scribe.css'); fs.cpSync('src/lib/svelte', 'dist/svelte', { recursive: true, filter: (s) => !s.includes('.test.') })\" && node scripts/verify-core.mjs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
+		"verify:core": "node scripts/verify-core.mjs",
 		"prepack": "npm run build:wc",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -39,6 +40,10 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/scribe.js"
+		},
+		"./core": {
+			"types": "./dist/core.d.ts",
+			"import": "./dist/core.js"
 		},
 		"./scribe.css": "./dist/scribe.css",
 		"./svelte": {

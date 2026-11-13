@@ -1,4 +1,4 @@
-import type { I18nService } from '$lib/i18n/i18n.svelte.js';
+import type { I18nService } from '../i18n/i18n.svelte.js';
 
 /** Data types a variable can have, in the order they are listed in the UI. */
 export const DATA_TYPE_ORDER = ['string', 'number', 'boolean', 'date', 'array', 'record'] as const;

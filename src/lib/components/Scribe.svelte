@@ -1,25 +1,3 @@
-<svelte:options
-	customElement={{
-		tag: 'scribe-interpreter',
-		shadow: 'none',
-		props: {
-			id: { type: 'String' },
-			class: { type: 'String' },
-			style: { type: 'String' },
-			mode: { type: 'String' },
-			registry: { type: 'Object' },
-			document: { type: 'Object' },
-			bindings: { type: 'Object' },
-			ondocumentchange: { type: 'Object' },
-			onbindingchange: { type: 'Object' },
-			customBindings: { type: 'Object' },
-			lang: { type: 'String' },
-			showBindingsPanel: { type: 'Boolean' },
-			showPrintButton: { type: 'Boolean' },
-		}
-	}}
-/>
-
 <script module lang="ts">
 	// The stores are page-wide singletons, so a second mounted instance would overwrite the state of the first one
 	let mountedInstances = 0;

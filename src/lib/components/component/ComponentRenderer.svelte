@@ -1,17 +1,3 @@
-<svelte:options
-	customElement={{
-		tag: 'scribe-component-renderer',
-		shadow: 'none',
-		props: {
-			mode: { type: 'String' },
-			isDarkMode: { type: 'Boolean' },
-			componentData: { type: 'Object' },
-			sectionId: { type: 'String' },
-			disabledOptions: { type: 'Array' }
-		}
-	}}
-/>
-
 <script lang="ts">
 	import type { CollectionValue, DataValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
 	import { bindingStore } from "$lib/stores/binding-store.svelte.js";

@@ -26,7 +26,7 @@ Building the library requires generating the web component + types + styles. Thi
 npm run build:wc
 ```
 
-This command basically uses `vite.wc.config.ts` to generate the web component in a single js and `tsconfig.types.json` to generate the corresponding types. It also copies the styles `scribe.css` into the `dist` folder.
+This command uses `vite.wc.config.ts` to generate the two JavaScript entries (`dist/scribe.js`, which registers the custom elements, and `dist/core.js`, which has no import effects) with the chunks they share in `dist/chunks`, and `tsconfig.types.json` to generate the corresponding types. It also copies the styles `scribe.css` and the source of `@antonii22/scribe2/svelte` into the `dist` folder, and finishes with `scripts/verify-core.mjs`, which imports `core` in a clean Node process, checks that `scribe.js` is the only file that defines the five elements, and fails the build otherwise (`npm run verify:core` runs it alone).
 
 ## Testing the library locally in other package
 
@@ -55,14 +55,41 @@ Make sure it is intalled correctly in `package.json`
 
 ## Using the package
 
-Importing the package registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>` and `<scribe-bindings-panel>`), and the styles are a separate import:
+The package has three entries:
+
+| Import | What it is |
+| --- | --- |
+| `@antonii22/scribe2` | Registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>` and `<scribe-bindings-panel>`). It needs a DOM. |
+| `@antonii22/scribe2/core` | Everything else, with **no effect when imported**: the types, `getDefaultRegistry` and `defaultRegistry`, `createColorOption`, the i18n (`en`, `es`, `getI18n`...) and the focus helpers. It can be imported in a Node unit test, with no DOM and no mock. |
+| `@antonii22/scribe2/svelte` | `createSvelte5Mount` and `createSvelteItemRenderer`, published as source (see below). |
+
+The app imports the main entry once, and the styles, which are a separate file:
 
 ```js
 import '@antonii22/scribe2';
 import '@antonii22/scribe2/scribe.css';
 ```
 
-Both are imports for their side effects, so a host that takes nothing by name from the package still gets the elements. The package declares this in `sideEffects` (`**/*.css` and `./dist/scribe.js`), so a production build (Vite, Rollup, webpack) keeps the import instead of dropping it as unused. `@antonii22/scribe2/svelte` has no side effects and can be shaken.
+Both are imports for their side effects, so a host that takes nothing by name from the package still gets the elements. The package declares this in `sideEffects` (`**/*.css` and `./dist/scribe.js`), so a production build (Vite, Rollup, webpack) keeps the import instead of dropping it as unused.
+
+Everything else is imported from `/core`, so a module of the host that only builds a registry or reads a type is safe to import in a test:
+
+```ts
+import { defaultRegistry, type Document } from '@antonii22/scribe2/core';
+
+export const registry = { ...defaultRegistry, callout: myCallout };
+```
+
+```js
+// registry.test.js, run by Vitest in its default Node environment
+import { registry } from './registry.js';
+
+it('registers the callout', () => expect(Object.keys(registry)).toContain('callout'));
+```
+
+The main entry does not re-export the values of `core` (only their types), so importing a value from it by mistake brings the DOM requirement back into the test, and fails there with `Class extends value undefined`. The package is ESM only.
+
+`/core` has no effect when imported, but it is not smaller for that: the library is one module underneath, so a bundle that imports only `en` from `/core` is about as large as one that imports the registry. Use the main entry or `/core` for what they do, not to save bytes.
 
 ## Events
 
@@ -132,7 +159,7 @@ Use the custom element, and give it the props the component receives. Svelte set
 
 ```svelte
 <script lang="ts">
-	import type { ScribeComponentProps } from '@antonii22/scribe2';
+	import type { ScribeComponentProps } from '@antonii22/scribe2/core';
 	let { componentData, sectionId, mode, isDarkMode }: ScribeComponentProps<CalloutComponent> = $props();
 </script>
 
@@ -171,7 +198,7 @@ Outside of Svelte the element is the same, with `componentData` as an object pro
 `createColorOption` makes a ribbon option that lets the user pick a colour: a button with a block of the current colour that opens a palette (with the native picker for any other colour). Put it in the `options` of a component of your registry:
 
 ```ts
-import { createColorOption } from '@antonii22/scribe2';
+import { createColorOption } from '@antonii22/scribe2/core';
 
 const options = [
     ...defaultComponentOptions,
@@ -208,7 +235,7 @@ import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2
 ```svelte
 <script lang="ts">
 	import { getAllContexts } from 'svelte';
-	import { Scribe, getDefaultRegistry, type ScribeComponentProps } from '@antonii22/scribe2';
+	import { getDefaultRegistry, type ScribeComponentProps } from '@antonii22/scribe2/core';
 	import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2/svelte';
 	import MyCard from './MyCard.svelte'; // a component of your own, which can use getContext
 	import MyRow from './MyRow.svelte';

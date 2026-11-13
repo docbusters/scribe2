@@ -1,18 +1,3 @@
-<svelte:options
-	customElement={{
-		tag: 'scribe-bindings-panel',
-		shadow: 'none',
-		props: {
-			class: { type: 'String' },
-			style: { type: 'String' },
-			floating: { type: 'Boolean' },
-			isExpanded: { type: 'Boolean' },
-			collapsible: { type: 'Boolean' },
-			lang: { type: 'String' }
-		}
-	}}
-/>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';

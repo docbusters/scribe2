@@ -1,4 +1,4 @@
-import { GEOCODING_ENDPOINT, REVERSE_GEOCODING_ENDPOINT } from "$lib/constants/ApiConstants.js";
+import { GEOCODING_ENDPOINT, REVERSE_GEOCODING_ENDPOINT } from "../constants/ApiConstants.js";
 import type ApiResponse from "./ApiResponse.ts";
 
 const GEOCODING_MAX_RETRIES = 3;

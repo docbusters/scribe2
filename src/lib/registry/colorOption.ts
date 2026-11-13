@@ -1,8 +1,8 @@
 import { mount, unmount } from 'svelte';
 import type { ComponentEditOptionContext, ComponentEditOptions } from './ComponentEditOptions.js';
-import ColorPickerOption from '$lib/components/componentOptions/ColorPickerOption.svelte';
-import { editStore } from '$lib/stores/edit-store.svelte.js';
-import { isHexColor } from '$lib/utils/colorPalette.js';
+import ColorPickerOption from '../components/componentOptions/ColorPickerOption.svelte';
+import { editStore } from '../stores/edit-store.svelte.js';
+import { isHexColor } from '../utils/colorPalette.js';
 
 export interface ColorOptionDefinition {
     /** Unique among the options of the component, like any `ComponentEditOptions.type` */

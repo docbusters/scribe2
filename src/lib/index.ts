@@ -1,73 +1,17 @@
-import type { ScribeProps, CustomBinding } from './types/ScribeProps.js';
-import ScribeComponent from './components/Scribe.svelte';
+// The types of the main entry `@antonii22/scribe2` (its JavaScript is `scribe.ts`, which registers the custom elements when it is imported,
+// and needs a DOM). Everything else is in `core.ts` (`@antonii22/scribe2/core`), which has no import effects
+import type { ScribeConstructor, ScribeInterpreterElement } from './core.js';
+import type { ScribeProps } from './types/ScribeProps.js';
 import type { ComponentRendererProps } from './types/CustomRendererProps.js';
 import type { ComponentSlotProps } from './types/ComponentSlotProps.js';
 import type { EmptyContentProps } from './types/EmptyContentProps.js';
 import type { BindingsPanelProps } from './types/BindingsPanelProps.js';
-import type { Document, BindingsDefinition } from './domain/Document.js';
-import type { CustomBindingUsages } from './utils/bindingUsages.js';
 
-// COMPONENTS
-export interface ScribeInterpreterElement<C extends BaseComponent<string, DataValue> = never> extends HTMLElement, Omit<ScribeProps<C>, 'style' | 'id' | 'class' | 'lang'> {
-    getCustomBindingUsages(): CustomBindingUsages;
-    refreshDocument(newDocument: Document<C>): void;
-    refreshBindings(newBindings: Record<string, BindingsDefinition>): void;
-    refreshCustomBindings(newCustomBindings: Record<string, CustomBinding>): void;
-}
+// The class of <scribe-interpreter>, created by the JavaScript entry (scribe.ts)
+export declare const Scribe: ScribeConstructor;
 
-export interface ScribeConstructor {
-    new (): ScribeInterpreterElement;
-    prototype: ScribeInterpreterElement;
-}
-
-export const Scribe = ScribeComponent as unknown as ScribeConstructor;
-export { defaultRegistry, getDefaultRegistry } from './registry/defaultRegistry.js';
-export { createColorOption } from './registry/colorOption.js';
-export type { ColorOptionDefinition } from './registry/colorOption.js';
-import BindingsFloatingPanelSvelte from './components/bindings/BindingsFloatingPanel.svelte';
-export const BindingsFloatingPanel = BindingsFloatingPanelSvelte;
-export const BindingsPanel = BindingsFloatingPanelSvelte;
-export type { BindingsPanelProps } from './types/BindingsPanelProps.js';
-
-// TYPES
-export type { ScribeProps, DocumentChangeDetail, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
-
-// i18n
-export * from './i18n/index.js';
-
-// DOCUMENT STRUCTURE
-export type { Document, BindingsDefinition } from './domain/Document.js';
-export type { Section } from './domain/Section.js';
-export type { CustomBindingUsages } from './utils/bindingUsages.js';
-
-// DATA VALUES
-import type { DataValue, PrimitiveValue, CollectionValue, EmptyValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue } from './domain/data/DataValue.js';
-export type { DataValue, PrimitiveValue, CollectionValue, EmptyValue, StringValue, NumberValue, BindingValue, BooleanValue, DateValue, ArrayValue, ComponentValue, RecordValue };
-
-// COMPONENTS
-import type { ComponentRegistry, ScribeComponentProps } from './registry/ComponentRegistry.js';
-export type { ComponentRegistry, ScribeComponentProps };
-
-import type { DefaultComponents } from './registry/defaultRegistry.js';
-export type { DefaultComponents };
-
-import type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef } from './domain/components/Component.js';
-export type { BaseComponent, InlineComponent, BlockComponent, ComponentConfig, SlotRef };
-
-// SLOTS. A slot is drawn with the custom element <scribe-component-slot>: the Svelte components of the bundle are compiled against its own
-// copy of the Svelte runtime, so they cannot be rendered inside the components of a host (see "Slots" in the README)
-export type { ComponentSlotProps };
-
-import type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, QrComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex } from './domain/components/DefaultComponents.js';
-export type { TextComponent, TextInputComponent, ImageComponent, VideoComponent, QrComponent, LatexComponent, TableComponent, MapComponent, TableCellIndex };
-
-// FOCUS NAVIGATION
-export {
-    handleArrowNavigation,
-    setupFocusListeners,
-    navigateToAdjacentComponent
-} from './utils/focusNavigation.js';
-export type { FocusNavigationDetail } from './utils/focusNavigation.js';
+// The types are re-exported for convenience: a type has no runtime, so it does not bring the effects of this entry
+export type * from './core.js';
 
 declare global {
     interface HTMLElementTagNameMap {

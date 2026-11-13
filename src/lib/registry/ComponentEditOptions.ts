@@ -1,8 +1,8 @@
-import type { ComponentConfig } from "$lib/domain/components/Component.js";
-import type { DataValue } from "$lib/domain/data/DataValue.js";
-import { editStore } from "$lib/stores/edit-store.svelte.js";
-import { toolbarStore, type ToolbarInsertion } from "$lib/stores/toolbar-store.svelte.js";
-import { valueDialogStore } from "$lib/stores/value-dialog-store.svelte.js";
+import type { ComponentConfig } from "../domain/components/Component.js";
+import type { DataValue } from "../domain/data/DataValue.js";
+import { editStore } from "../stores/edit-store.svelte.js";
+import { toolbarStore, type ToolbarInsertion } from "../stores/toolbar-store.svelte.js";
+import { valueDialogStore } from "../stores/value-dialog-store.svelte.js";
 
 export interface ComponentEditOnClick {
     event: MouseEvent;

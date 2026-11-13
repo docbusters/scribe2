@@ -21,5 +21,9 @@ export default defineConfig({
 		},
 		tailwindcss(),
 		sveltekit()
-	]
+	],
+	server: {
+		// /examples/full-webcomponent-edit loads dist/, and its lazy chunks (QR code, charts) are separate files since the build is split in chunks
+		fs: { allow: ['dist'] }
+	}
 });

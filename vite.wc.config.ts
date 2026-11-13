@@ -31,12 +31,10 @@ export default defineConfig({
 			compilerOptions: {
 				css: 'injected'
 			},
+			// Only the wrappers of `src/lib/elements` are compiled as custom elements: defining one is an effect of importing its module,
+			// so they must be the only modules with that effect, and only the main entry imports them
 			dynamicCompileOptions({ filename }) {
-				if (filename.includes('Scribe.svelte') || 
-					filename.includes('EmptyContent.svelte') || 
-					filename.includes('ComponentRenderer.svelte') ||
-					filename.includes('ComponentSlot.svelte') ||
-					filename.includes('BindingsFloatingPanel.svelte')) {
+				if (filename.replace(/\\/g, '/').includes('/src/lib/elements/')) {
 					return {
 						customElement: true
 					};
@@ -47,15 +45,19 @@ export default defineConfig({
 	build: {
 		cssCodeSplit: false,
 		lib: {
-			entry: 'src/lib/index.ts',
-			name: 'Scribe',
-			fileName: 'scribe',
-			formats: ['es']
+			// Two entries: `scribe` registers the custom elements, `core` has no import effects (see package.json `exports`).
+			// They share chunks (stores, registry, Svelte runtime), so the page-wide singletons exist once even if a host loads both
+			entry: {
+				scribe: 'src/lib/scribe.ts',
+				core: 'src/lib/core.ts'
+			},
+			formats: ['es'],
+			fileName: (_format, entryName) => `${entryName}.js`
 		},
 		rollupOptions: {
 			output: {
-				codeSplitting: false,
-			},
+				chunkFileNames: 'chunks/[name]-[hash].js'
+			}
 		},
 		outDir: 'dist',
 		emptyOutDir: true
