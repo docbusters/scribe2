@@ -176,6 +176,10 @@ export const en: Translations = {
 			name: 'Text Input',
 			description: 'Used to input text'
 		},
+		checkbox: {
+			name: 'Checkbox',
+			description: 'A box to tick, bound to a yes/no variable'
+		},
 		image: {
 			name: 'Image',
 			description: 'Display online images'

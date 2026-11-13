@@ -177,6 +177,10 @@ export interface Translations {
 			name: string;
 			description: string;
 		};
+		checkbox: {
+			name: string;
+			description: string;
+		};
 		image: {
 			name: string;
 			description: string;

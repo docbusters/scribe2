@@ -2,7 +2,8 @@ import type { ComponentRegistry, ScribeComponentProps } from './ComponentRegistr
 import { createSvelte5Mount } from './svelteMountHelper.svelte.js';
 import TextComponentScribe from '../components/defaultComponents/TextComponentScribe.svelte';
 import TextInputComponentScribe from '../components/defaultComponents/TextInputComponentScribe.svelte';
-import type { ChartComponent, ImageComponent, LatexComponent, MapComponent, QrComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent, VideoComponent } from '../domain/components/DefaultComponents.js';
+import CheckboxComponentScribe from '../components/defaultComponents/CheckboxComponentScribe.svelte';
+import type { ChartComponent, CheckboxComponent, ImageComponent, LatexComponent, MapComponent, QrComponent, TableComponent, TextBindingComponent, TextComponent, TextInputComponent, VideoComponent } from '../domain/components/DefaultComponents.js';
 import ImageComponentScribe from '../components/defaultComponents/ImageComponentScribe.svelte';
 import LatexComponentScribe from '../components/defaultComponents/LatexComponentScribe.svelte';
 import VideoComponentScribe from '../components/defaultComponents/VideoComponentScribe.svelte';
@@ -21,7 +22,7 @@ import { mount, unmount } from 'svelte';
 import { defaultI18n, type I18nService } from '../i18n/i18n.svelte.js';
 import { createColorOption, createColorPickerOption } from './colorOption.js';
 
-export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | ImageComponent | VideoComponent | QrComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
+export type DefaultComponents = TextComponent | TextBindingComponent | TextInputComponent | CheckboxComponent | ImageComponent | VideoComponent | QrComponent | LatexComponent | TableComponent | MapComponent | ChartComponent;
 
 /** Returns the default component implementations, localized with the given i18n service */
 export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
@@ -183,6 +184,24 @@ export function getDefaultRegistry(i18n: I18nService): ComponentRegistry {
                 },
             },
         ],
+    },
+    'checkbox': {
+        name: i18n.t('components.checkbox.name'),
+        description: i18n.t('components.checkbox.description'),
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-check-icon lucide-square-check"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>',
+        ...createSvelte5Mount<ScribeComponentProps<CheckboxComponent>>(CheckboxComponentScribe),
+        empty: {
+            type: 'checkbox',
+            mode: 'inline',
+            value: 'binding',
+        },
+        initialValue: {
+            type: 'boolean',
+            value: false,
+        },
+        valueTypes: ['binding'],
+        supportedBindingValueTypes: ['empty', 'boolean'],
+        options: [...defaultComponentOptions],
     },
     'image': {
         name: i18n.t('components.image.name'),

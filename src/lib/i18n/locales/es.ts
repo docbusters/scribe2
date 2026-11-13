@@ -176,6 +176,10 @@ export const es: Translations = {
 			name: 'Entrada de texto',
 			description: 'Permite introducir texto'
 		},
+		checkbox: {
+			name: 'Casilla',
+			description: 'Casilla de verificación enlazada a una variable de sí/no'
+		},
 		image: {
 			name: 'Imagen',
 			description: 'Muestra imágenes en línea'

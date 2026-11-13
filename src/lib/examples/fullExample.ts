@@ -54,6 +54,35 @@ export const fullExampleDocument: Document = {
                         value: 'image-url',
                     },
                 },
+                'text-checkbox': {
+                    id: 'text-checkbox',
+                    mode: 'inline',
+                    type: 'text',
+                    value: {
+                        type: 'string',
+                        value: ' Tick the box to flip the variable: '
+                    },
+                },
+                'checkbox-1': {
+                    id: 'checkbox-1',
+                    mode: 'inline',
+                    type: 'checkbox',
+                    value: {
+                        type: 'binding',
+                        bindingType: 'default',
+                        value: 'checkbox-binding',
+                    },
+                },
+                'text-checkbox-bind': {
+                    id: 'text-checkbox-bind',
+                    mode: 'inline',
+                    type: 'text-binding',
+                    value: {
+                        type: 'binding',
+                        bindingType: 'default',
+                        value: 'checkbox-binding',
+                    },
+                },
                 'image-1': {
                     id: 'image-1',
                     type: 'image',
@@ -304,6 +333,7 @@ export const fullExampleBindings: Record<string, BindingsDefinition> = {
     'latex-string': { type: 'string', initialValue: '\\frac{1}{n} \\sum_{i=1}^n x_i' },
     'table-latex-binding': { type: 'string', initialValue: 'I hate LaTeX' },
     'number-binding': { type: 'number', initialValue: 42 },
+    'checkbox-binding': { type: 'boolean', initialValue: false },
     'chart-binding': { 
         type: 'array',
         initialValue: [

@@ -11,6 +11,9 @@ export type TextBindingComponent = InlineComponent<'text-binding', BindingValue>
 /** Shows a text input field */
 export type TextInputComponent = InlineComponent<'text-input', BindingValue, TextInputComponentConfig>;
 
+/** Shows a checkbox bound to a boolean variable */
+export type CheckboxComponent = InlineComponent<'checkbox', BindingValue>;
+
 /** Shows an image from the web */
 export type ImageComponent = BlockComponent<'image', StringValue | BindingValue, ImageComponentConfig>;
 
