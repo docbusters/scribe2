@@ -140,24 +140,14 @@ export function getCaretCoordinates(element: HTMLElement): { x: number; top: num
         };
     }
 
-    const selection = getSelection(element);
-    if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        let rangeRect = range.getBoundingClientRect();
-        if ((rangeRect.width === 0 && rangeRect.height === 0) || rangeRect.top === 0) {
-            const clientRects = range.getClientRects();
-            if (clientRects.length > 0) {
-                rangeRect = clientRects[0];
-            }
-        }
-        if (rangeRect && rangeRect.height > 0) {
-            return {
-                x: rangeRect.left,
-                top: rangeRect.top,
-                bottom: rangeRect.bottom,
-                y: rangeRect.top + rangeRect.height / 2
-            };
-        }
+    const rangeRect = getSelectionRect(element);
+    if (rangeRect && rangeRect.height > 0) {
+        return {
+            x: rangeRect.left,
+            top: rangeRect.top,
+            bottom: rangeRect.bottom,
+            y: rangeRect.top + rangeRect.height / 2
+        };
     }
 
     return {
@@ -203,18 +193,51 @@ export function isAtEnd(element: HTMLElement): boolean {
     return postRange.toString().length === 0 && postRange.cloneContents().querySelectorAll('br').length <= 1;
 }
 
-/** Returns the bounding rect of the current selection range, falling back to its first client rect */
+/**
+ * Returns the bounding rect of the current selection range, falling back to its first client rect.
+ * Browsers report no rect for a caret on a line that only holds a line break, so that line is measured by its <br>
+ */
 function getSelectionRect(element: HTMLElement): DOMRect | null {
     const selection = getSelection(element);
     if (!selection || selection.rangeCount === 0) return null;
 
     const range = selection.getRangeAt(0);
     let caretRect = range.getBoundingClientRect();
-    if (caretRect.height === 0) {
+    if (caretRect.height === 0 || caretRect.top === 0) {
         const clientRects = range.getClientRects();
         if (clientRects.length > 0) caretRect = clientRects[0];
     }
+    if (caretRect.height > 0 || !range.collapsed) return caretRect;
+
+    const { startContainer, startOffset } = range;
+    if (startContainer.nodeType !== Node.ELEMENT_NODE) return caretRect;
+
+    // The caret sits before a line break: that line is the one of the break
+    const next = startContainer.childNodes[startOffset];
+    if (next?.nodeName === 'BR') {
+        const breakRect = (next as HTMLElement).getBoundingClientRect();
+        if (breakRect.height > 0) return breakRect;
+    }
+    // The caret sits after a line break that ends a line: it is on the line below
+    const previous = startContainer.childNodes[startOffset - 1];
+    if (previous?.nodeName === 'BR') {
+        const breakRect = (previous as HTMLElement).getBoundingClientRect();
+        if (breakRect.height > 0) return new DOMRect(breakRect.left, breakRect.bottom, 0, breakRect.height);
+    }
     return caretRect;
+}
+
+/**
+ * Vertical extent of the lines of an element. An inline element made of line breaks only has a degenerate
+ * bounding rect (zero size at its bottom), so its lines are measured one by one
+ */
+function getLinesBox(element: HTMLElement): { top: number; bottom: number } {
+    const rects = Array.from(element.getClientRects());
+    if (rects.length === 0) return element.getBoundingClientRect();
+    return {
+        top: Math.min(...rects.map(rect => rect.top)),
+        bottom: Math.max(...rects.map(rect => rect.bottom))
+    };
 }
 
 /**
@@ -229,7 +252,7 @@ export function isAtFirstLine(element: HTMLElement): boolean {
     const caretRect = getSelectionRect(element);
     if (!caretRect || caretRect.height === 0 || caretRect.top === 0) return true;
 
-    const elRect = element.getBoundingClientRect();
+    const elRect = getLinesBox(element);
     const style = window.getComputedStyle(element);
     const paddingTop = parseFloat(style.paddingTop) || 0;
     const lineHeight = parseFloat(style.lineHeight) || caretRect.height || 20;
@@ -249,7 +272,7 @@ export function isAtLastLine(element: HTMLElement): boolean {
     const caretRect = getSelectionRect(element);
     if (!caretRect || caretRect.height === 0 || caretRect.bottom === 0) return true;
 
-    const elRect = element.getBoundingClientRect();
+    const elRect = getLinesBox(element);
     const style = window.getComputedStyle(element);
     const paddingBottom = parseFloat(style.paddingBottom) || 0;
     const lineHeight = parseFloat(style.lineHeight) || caretRect.height || 20;
@@ -617,7 +640,8 @@ export function navigateToAdjacentComponent(
         if (el === currentElement) continue;
 
         const rect = getRelevantRect(el, currentX, direction);
-        if (rect.width === 0 || rect.height === 0) continue; // Ignore invisible elements
+        // Ignore invisible elements. A text of empty lines has a height but no width
+        if (rect.height === 0) continue;
 
         const candidateCenter = (rect.top + rect.bottom) / 2;
         const dyCenter = candidateCenter - currentLineCenter;
