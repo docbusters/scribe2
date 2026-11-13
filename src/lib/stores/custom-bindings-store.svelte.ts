@@ -12,6 +12,8 @@ class CustomBindingsStore {
     // Stores data values in a non-reactive way to avoid state_unsafe_mutation errors
     private cache = new Map<string, CustomBindingInstance>();
     private pendingRequests = new Map<string, Promise<PrimitiveValue | CollectionValue>>();
+    // Changes on every destroy, so a request started before it can tell its result is stale
+    private generation = 0;
     // Triggers used to notify Svelte of changes in a safe way (outside the render cycle)
     private triggers = $state<Record<string, number>>({});
 
@@ -43,9 +45,10 @@ class CustomBindingsStore {
             throw new Error(`Custom binding definition '${bindingType}' not found.`);
         }
 
+        const generation = this.generation;
         const fetchPromise = (async () => {
             const instance: CustomBindingInstance = { value: { type: 'string', value: '' } };
-            
+
             // Get the value or the subscribable object
             const result = await def.getData(id);
             const isSubscribable = result !== null && typeof result === 'object' && 'subscribe' in result;
@@ -53,6 +56,9 @@ class CustomBindingsStore {
             instance.value = isSubscribable 
                 ? (result as CustomBindingSubscribable).value 
                 : (result as PrimitiveValue | CollectionValue);
+
+            // The definitions were swapped or the store destroyed while waiting: do not subscribe nor cache the old definition's data
+            if (generation !== this.generation) return instance.value;
 
             if (isSubscribable) {
                 const subscribable = result as CustomBindingSubscribable;
@@ -75,12 +81,15 @@ class CustomBindingsStore {
         try {
             return await fetchPromise;
         } finally {
-            this.pendingRequests.delete(key);
+            // A newer request of the same key may have replaced this one after a destroy
+            if (this.pendingRequests.get(key) === fetchPromise) this.pendingRequests.delete(key);
         }
     }
 
     // Called when Scribe unmounts or changes document
     destroy() {
+        this.generation++;
+        this.pendingRequests.clear();
         this.cache.forEach(instance => {
             if (instance.destroy) instance.destroy();
         });
