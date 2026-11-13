@@ -53,6 +53,17 @@ Make sure it is intalled correctly in `package.json`
 ...
 ```
 
+## Using the package
+
+Importing the package registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>` and `<scribe-bindings-panel>`), and the styles are a separate import:
+
+```js
+import '@antonii22/scribe2';
+import '@antonii22/scribe2/scribe.css';
+```
+
+Both are imports for their side effects, so a host that takes nothing by name from the package still gets the elements. The package declares this in `sideEffects` (`**/*.css` and `./dist/scribe.js`), so a production build (Vite, Rollup, webpack) keeps the import instead of dropping it as unused. `@antonii22/scribe2/svelte` has no side effects and can be shaken.
+
 ## Examples
 
 - [**Simple plain html example**](/test/simple-webcomponent-test.html): Shows the library usage with a basic example.

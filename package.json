@@ -1,6 +1,6 @@
 {
 	"name": "@antonii22/scribe2",
-	"version": "0.0.22",
+	"version": "0.0.23",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
@@ -21,7 +21,8 @@
 		"!dist/**/*.spec.*"
 	],
 	"sideEffects": [
-		"**/*.css"
+		"**/*.css",
+		"./dist/scribe.js"
 	],
 	"main": "./dist/scribe.js",
 	"publishConfig": {
