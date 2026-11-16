@@ -15,6 +15,7 @@
 	import type { ScribeProps, CustomBinding, DocumentChangeDetail } from '../types/ScribeProps.js';
 	import { onDestroy, onMount } from 'svelte';
 	import { portalStore } from '../stores/portal-store.svelte.js';
+	import { getSelection } from '../utils/selection.js';
 	import Sortable from 'sortablejs';
 	import type { Document, BindingsDefinition } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -219,8 +220,32 @@
 	function handleClearSelection(event: Event) {
 		if (mode !== 'edit') return;
 		const keepSelection = event.composedPath().some(node => node instanceof Element && node.matches(KEEP_SELECTION_SELECTOR));
+		if (event.type === 'pointerdown') {
+			outsidePressTarget = keepSelection ? null : (event.composedPath()[0] ?? null);
+		}
 		if (keepSelection) return;
 		selectionStore.clear();
+	}
+
+	// Where the pointer press being handled started, when it started outside the areas that keep the selection. Null otherwise, and once the
+	// pointer is released. The browser places the caret of a press on the page background in the closest editable text, and when the text
+	// that was blurred by the same press has been saved and drawn again, that gives the focus back to the new editable
+	let outsidePressTarget: EventTarget | null = null;
+
+	function endPress() {
+		outsidePressTarget = null;
+	}
+
+	/** A text that gets the focus because of a press that did not start in it (see outsidePressTarget) is blurred again, so the press does what it was meant for */
+	function handleFocusIn(event: FocusEvent) {
+		const focused = event.target;
+		if (mode === 'edit' && outsidePressTarget && focused instanceof HTMLElement && focused.isContentEditable && !focused.contains(outsidePressTarget as Node)) {
+			focused.blur();
+			getSelection(focused)?.removeAllRanges();
+			selectionStore.clear();
+			return;
+		}
+		handleClearSelection(event);
 	}
 
 	// Sortable initialization
@@ -293,9 +318,9 @@
 
 <!-- Pointerdown is listened to on the whole document, so clicking anywhere outside the components clears the selection.
      It is handled in the capture phase, so the selection is cleared before inner handlers (such as focusing the closest text) can select a component -->
-<svelte:document onpointerdowncapture={handleClearSelection} />
+<svelte:document onpointerdowncapture={handleClearSelection} onpointerupcapture={endPress} onpointercancelcapture={endPress} />
 
-<div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleClearSelection}>
+<div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleFocusIn}>
 	{#if mode === 'edit' && showTopToolbar}
 		<TopToolbar />
 	{/if}
