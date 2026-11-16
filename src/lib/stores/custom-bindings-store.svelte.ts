@@ -1,5 +1,6 @@
 import type { BindingItemRenderer, CustomBinding, CustomBindingSubscribable } from '../types/ScribeProps.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
+import { compatibleFirst } from '../utils/compatibleFirst.js';
 
 interface CustomBindingInstance {
     value: PrimitiveValue | CollectionValue;
@@ -119,7 +120,7 @@ class CustomBindingsStore {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {
             const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];
-            return def.getAvailableIds().map(item => {
+            return compatibleFirst(def.getAvailableIds().map(item => {
                 const disabled = item.type && allowedTypes.length > 0 ? !allowedTypes.includes(item.type) : false;
                 return {
                     value: item.id,
@@ -127,7 +128,7 @@ class CustomBindingsStore {
                     disabled,
                     type: item.type
                 };
-            });
+            }));
         }
         return [];
     }

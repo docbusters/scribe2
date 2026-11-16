@@ -309,6 +309,9 @@ export const es: Translations = {
 		chartNoSeriesDesc: 'Añade al menos una serie de datos para visualizar el gráfico.',
 		unsupportedValueType: 'Tipo de valor no admitido: {type}',
 		unsupportedBindingType: 'Tipo de valor de variable no admitido: {type}',
+		missingVariable: 'La variable "{id}" no existe. Puede que se haya eliminado.',
+		unknownVariableSource: 'La fuente de variables externas "{type}" no está disponible en esta página.',
+		variableLoadFailed: 'No se pudo cargar el valor de la variable "{id}".',
 		invalidMapValue: 'Valor no válido para el componente de mapa',
 		invalidSlotContent: 'El hueco "{slot}" debe contener componentes, indexados por su id'
 	}

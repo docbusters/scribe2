@@ -165,8 +165,8 @@ export const en: Translations = {
 	},
 	components: {
 		'text-binding': {
-			name: 'Text Binding',
-			description: 'Text that can be binded'
+			name: 'Text Variable',
+			description: 'Text linked to a variable'
 		},
 		text: {
 			name: 'Text',
@@ -308,7 +308,10 @@ export const en: Translations = {
 		chartNoSeries: 'No Series Defined',
 		chartNoSeriesDesc: 'Add at least one data series to visualize the chart.',
 		unsupportedValueType: 'Unsupported value type: {type}',
-		unsupportedBindingType: 'Unsupported binding value type: {type}',
+		unsupportedBindingType: 'Unsupported variable value type: {type}',
+		missingVariable: 'The variable "{id}" does not exist. It may have been deleted.',
+		unknownVariableSource: 'The external variable source "{type}" is not available on this page.',
+		variableLoadFailed: 'The value of the variable "{id}" could not be loaded.',
 		invalidMapValue: 'Invalid value for the map component',
 		invalidSlotContent: 'Slot "{slot}" must hold components, keyed by their ids'
 	}

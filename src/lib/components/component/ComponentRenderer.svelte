@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CollectionValue, DataValue, PrimitiveValue } from "$lib/domain/data/DataValue.js";
 	import { bindingStore } from "$lib/stores/binding-store.svelte.js";
+	import { customBindingsStore } from "$lib/stores/custom-bindings-store.svelte.js";
 	import { editStore } from "$lib/stores/edit-store.svelte.js";
 	import { selectionStore } from "$lib/stores/selection-store.svelte.js";
 	import { valueDialogStore } from "$lib/stores/value-dialog-store.svelte.js";
@@ -33,10 +34,23 @@
 			}
 
 			if (componentData.value.type === 'binding') {
-				const bindingResult = bindingStore.getBindingValue(componentData.value.value, componentData.value.bindingType);
+				const { value: bindingId, bindingType } = componentData.value;
+				// The stores throw English diagnostics, so the cases a user can reach are checked here to show a translated message
+				if (bindingType === 'default' && !(bindingId in bindingStore.data)) {
+					throw new Error(i18n.t('errors.missingVariable', { id: bindingId }));
+				}
+				if (bindingType !== 'default' && !customBindingsStore.definitions[bindingType]) {
+					throw new Error(i18n.t('errors.unknownVariableSource', { type: bindingType }));
+				}
+
+				const bindingResult = bindingStore.getBindingValue(bindingId, bindingType);
 
 				if (bindingResult instanceof Promise) {
-					return bindingResult.then(bindingValue => {
+					return bindingResult.catch(hostError => {
+						// The host's message may be technical or in another language: keep it for the console only
+						console.error(`Custom binding ${bindingType}:${bindingId} failed to load`, hostError);
+						throw new Error(i18n.t('errors.variableLoadFailed', { id: bindingId }));
+					}).then(bindingValue => {
 						if (!bindingTypes.includes(bindingValue.type)) {
 							console.error(`Component ${componentData.type} does not support binding value type ${bindingValue.type}`, { componentData, bindingValue });
 							throw new Error(i18n.t('errors.unsupportedBindingType', { type: bindingValue.type }));

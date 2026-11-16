@@ -312,6 +312,9 @@ export interface Translations {
 		chartNoSeriesDesc: string;
 		unsupportedValueType: string;
 		unsupportedBindingType: string;
+		missingVariable: string;
+		unknownVariableSource: string;
+		variableLoadFailed: string;
 		invalidMapValue: string;
 		invalidSlotContent: string;
 	};

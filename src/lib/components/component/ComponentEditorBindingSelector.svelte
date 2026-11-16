@@ -4,6 +4,7 @@
 	import { globalRegistry } from '$lib/stores/global-registry.svelte.js';
 	import { stringifyDataValue } from '$lib/utils/stringifyDataValue.js';
 	import { truncateString } from '$lib/utils/truncateString.js';
+	import { compatibleFirst } from '$lib/utils/compatibleFirst.js';
 	import type { CollectionValue, DataValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
 	import type { BindingItemProps, BindingItemRenderer } from '$lib/types/ScribeProps.js';
 	import { createItemHost } from '$lib/utils/bindingItemRenderer.js';
@@ -93,7 +94,7 @@
 	// Derive the list of all available binding items
 	const items = $derived.by<BindingItem[]>(() => {
 		if (bindingType === 'default') {
-			return Object.entries(bindingStore.data).filter(([id, dataVal]) => isListedBinding(id, dataVal)).map(([id, dataVal]) => {
+			return compatibleFirst(Object.entries(bindingStore.data).filter(([id, dataVal]) => isListedBinding(id, dataVal)).map(([id, dataVal]) => {
 				const isSupported = !supportedTypes || supportedTypes.includes(dataVal.type);
 				let preview: string;
 				try {
@@ -109,7 +110,7 @@
 					valuePreview: preview,
 					disabled: !isSupported
 				};
-			});
+			}));
 		}
 
 		// Custom bindings

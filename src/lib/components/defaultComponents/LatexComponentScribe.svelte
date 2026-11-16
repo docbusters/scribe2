@@ -23,6 +23,7 @@
                 displayMode: true,
                 throwOnError: true,
                 strict: true,
+                output: 'mathml',
                 errorColor: 'var(--scribe-error-foreground)'
             });
         } catch {

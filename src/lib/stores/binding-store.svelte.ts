@@ -2,6 +2,7 @@ import type { BindingChangeEventDetail, BindingDefinitionCreate, BindingDefiniti
 import { generateDefaultDataValue } from "../utils/generateDefaultDataValue.js";
 import { stringifyDataValue } from "../utils/stringifyDataValue.js";
 import { truncateString } from "../utils/truncateString.js";
+import { compatibleFirst } from "../utils/compatibleFirst.js";
 import type { BindingValue, CollectionValue, DataValue, PrimitiveValue } from "../domain/data/DataValue.ts";
 import type { BindingsDefinition } from "../domain/Document.ts";
 import { customBindingsStore } from "./custom-bindings-store.svelte.js";
@@ -73,7 +74,7 @@ class BindingStore {
     }
 
     getBindingOptions(supportedTypes?: Omit<DataValue['type'], 'binding'>[]) {
-        return Object.entries(this.data).map(([id]) => {
+        return compatibleFirst(Object.entries(this.data).map(([id]) => {
             const type = this.data[id].type;
             const disabled = !supportedTypes?.includes(type);
             return {
@@ -82,7 +83,7 @@ class BindingStore {
                 disabled,
                 type
             };
-        });
+        }));
     }
 
     /** Returns the value of a binding based on its ID and type */
