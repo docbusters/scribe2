@@ -103,7 +103,8 @@
 		const target = event.target instanceof HTMLElement ? event.target : null;
 		// Only the document and the page body count. Dialogs and menus have their own keys
 		if (!target || target.closest('[role="dialog"], [role="menu"], [role="listbox"]')) return;
-		if (target !== document.body && !target.closest('.scribe-document')) return;
+		// The ribbon can be placed outside the document by the host, so it counts as well
+		if (target !== document.body && !target.closest('.scribe-document, .scribe-top-toolbar')) return;
 
 		const match = shortcutOptions.find(({ parsed }) => matchesShortcut(event, parsed, isMac));
 		if (!match) return;

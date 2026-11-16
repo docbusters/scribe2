@@ -1,7 +1,7 @@
 <!--
 	The custom element of <scribe-interpreter>. It is a wrapper on purpose: `Scribe.svelte` stays a plain component that the effect-free
 	`core` entry can import without a DOM. No `tag` is set here: Svelte creates the element class when this module is evaluated and leaves it in
-	`ScribeElement.element`, and `scribe.ts` defines the five tags in one place
+	`ScribeElement.element`, and `scribe.ts` defines the six tags in one place
 -->
 <svelte:options
 	customElement={{
@@ -19,6 +19,7 @@
 			customBindings: { type: 'Object' },
 			lang: { type: 'String' },
 			showBindingsPanel: { type: 'Boolean' },
+			showTopToolbar: { type: 'Boolean' },
 			showPrintButton: { type: 'Boolean' }
 		}
 	}}
@@ -44,6 +45,7 @@
 		customBindings,
 		lang,
 		showBindingsPanel,
+		showTopToolbar,
 		showPrintButton
 	}: ScribeProps = $props();
 
@@ -86,5 +88,6 @@
 	{customBindings}
 	{lang}
 	{showBindingsPanel}
+	{showTopToolbar}
 	{showPrintButton}
 />

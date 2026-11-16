@@ -30,6 +30,8 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     lang?: 'en' | 'es';
     /** Whether to display the built-in floating variables/bindings panel in edit mode. Defaults to true. */
     showBindingsPanel?: boolean;
+    /** Whether to display the built-in top toolbar (the ribbon) in edit mode. Defaults to true. Set it to false to place a `<scribe-top-toolbar>` elsewhere. */
+    showTopToolbar?: boolean;
     /** Whether to display the button that prints the document to the console in edit mode. Defaults to false. */
     showPrintButton?: boolean;
 }

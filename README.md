@@ -59,7 +59,7 @@ The package has three entries:
 
 | Import | What it is |
 | --- | --- |
-| `@antonii22/scribe2` | Registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>` and `<scribe-bindings-panel>`). It needs a DOM. |
+| `@antonii22/scribe2` | Registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>`, `<scribe-bindings-panel>` and `<scribe-top-toolbar>`). It needs a DOM. |
 | `@antonii22/scribe2/core` | Everything else, with **no effect when imported**: the types, `getDefaultRegistry` and `defaultRegistry`, `createColorOption`, the i18n (`en`, `es`, `getI18n`...) and the focus helpers. It can be imported in a Node unit test, with no DOM and no mock. |
 | `@antonii22/scribe2/svelte` | `createSvelte5Mount` and `createSvelteItemRenderer`, published as source (see below). |
 
@@ -270,6 +270,36 @@ import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2
 Without `context`, `getContext` in `MyCard` or `MyRow` returns `undefined`. You can also pass a `Map` of your own instead of `getAllContexts()`. The playground shows the row case in `/examples/full-edit-custom-binding`.
 
 Inside these components, draw the parts of Scribe with its custom elements, such as `<scribe-component-slot>` (see "Slots" above). Scribe exports no Svelte components for this, for the same reason of the two runtimes.
+
+## Placing the toolbar and the variables panel
+
+In edit mode `<scribe-interpreter>` draws the toolbar (the ribbon) above the document and the variables panel floating over it. Both are also elements of their own, so the host can put them anywhere: hide the built-in ones and add the tags where you want them.
+
+```html
+<header class="my-app-bar">
+	<scribe-top-toolbar></scribe-top-toolbar>
+</header>
+
+<scribe-interpreter id="editor" mode="edit"></scribe-interpreter>
+
+<aside>
+	<scribe-bindings-panel></scribe-bindings-panel>
+</aside>
+
+<script>
+	// A boolean attribute cannot be false in HTML (`showTopToolbar="false"` would turn it on), so they are set as properties
+	const editor = document.getElementById('editor');
+	editor.showTopToolbar = false;
+	editor.showBindingsPanel = false;
+</script>
+```
+
+In a Svelte or React template pass the booleans as props (`showTopToolbar={false}`). `<scribe-top-toolbar>` takes `class` and `style`, `<scribe-bindings-panel>` also takes `floating`, `collapsible`, `isExpanded` and `lang`.
+
+- They work with the Scribe on the page (there is one per page), and the language follows its `lang`. Without one the toolbar has nothing to act on and its buttons are disabled, and in `view` mode too, so render it only when the editor is in `edit` mode.
+- The toolbar is **not sticky** on its own: the host element is only as tall as the ribbon, so `position: sticky` has nothing to scroll in. Position it from your own CSS (`sticky top-0` in Tailwind, or a fixed bar).
+- Put the `dark` class and any `--scribe-*` override on an element that contains all of them (`<html>` or a wrapper), not only on `<scribe-interpreter>`, or the toolbar and the panel will not follow it.
+- Tooltips, the colour popover and dialogs open inside the Scribe element, so they keep its theme. Keyboard shortcuts keep working while the focus is in the toolbar.
 
 ## Styling
 

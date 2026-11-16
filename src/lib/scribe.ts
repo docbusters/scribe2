@@ -6,6 +6,7 @@ import ComponentRendererElement from './elements/ComponentRendererElement.svelte
 import ComponentSlotElement from './elements/ComponentSlotElement.svelte';
 import EmptyContentElement from './elements/EmptyContentElement.svelte';
 import BindingsPanelElement from './elements/BindingsPanelElement.svelte';
+import TopToolbarElement from './elements/TopToolbarElement.svelte';
 
 /** Svelte leaves the class of a custom element in the `element` property of the component, when the module of the component is evaluated */
 const elementOf = (wrapper: unknown) => (wrapper as { element: CustomElementConstructor }).element;
@@ -17,7 +18,8 @@ const ELEMENTS: [string, unknown][] = [
 	['scribe-component-renderer', ComponentRendererElement],
 	['scribe-component-slot', ComponentSlotElement],
 	['scribe-empty-content', EmptyContentElement],
-	['scribe-bindings-panel', BindingsPanelElement]
+	['scribe-bindings-panel', BindingsPanelElement],
+	['scribe-top-toolbar', TopToolbarElement]
 ];
 
 for (const [tag, wrapper] of ELEMENTS) {

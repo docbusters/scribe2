@@ -7,6 +7,7 @@
     import Divider from '$lib/components/utilComponents/Divider.svelte';
     import { COLOR_PALETTE_MAIN, COLOR_PALETTE_SHADES, isHexColor, isLightColor, type PaletteColor } from '$lib/utils/colorPalette.js';
     import { getI18n } from '$lib/i18n/i18n.svelte.js';
+    import { portalStore } from '$lib/stores/portal-store.svelte.js';
 
     interface ColorPickerOptionProps extends ComponentEditProps {
         /** The current colour (`#rrggbb`) of the selected component, or undefined when there is none. It is read where it is used, so it follows what it reads */
@@ -34,7 +35,6 @@
     const allColors = ROWS.flat();
 
     let open = $state(false);
-    let root: HTMLElement | undefined = $state();
     let grid: HTMLElement | undefined = $state();
     let nativeInput: HTMLInputElement | undefined = $state();
 
@@ -46,8 +46,8 @@
     const shownFill = $derived(shown ?? 'var(--scribe-section-foreground)');
 
     // The popover goes inside the Scribe element, so it gets the theme and the tokens, and a click in it keeps the selection. An option that
-    // mounts itself has no Svelte context to ask for that element, so it is found from the button
-    const portalTarget = $derived(root?.closest('.scribe-document')?.querySelector<HTMLElement>('.scribe-portal-target') ?? undefined);
+    // mounts itself has no Svelte context to ask for that element, so it comes from the store (also when the ribbon is outside Scribe)
+    const portalTarget = $derived(portalStore.target ?? undefined);
 
     // With a label the button is a rounded block of the colour, with a hairline so white shows on the ribbon. Without one it is the icon of
     // the option with a bar of the colour under it. `shownFill` is a checked hex or a variable, so it is safe in markup
@@ -118,7 +118,7 @@
 
 <!-- The events of the button bubble up to this wrapper, which tells how the panel was opened -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<span class="color-option" bind:this={root} onpointerdown={() => (openedByPointer = true)} onkeydown={() => (openedByPointer = false)}>
+<span class="color-option" onpointerdown={() => (openedByPointer = true)} onkeydown={() => (openedByPointer = false)}>
     <Popover.Root bind:open onOpenChange={handleOpenChange}>
         <Popover.Trigger>
             {#snippet child({ props })}

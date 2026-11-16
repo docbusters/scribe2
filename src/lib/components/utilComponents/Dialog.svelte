@@ -2,7 +2,7 @@
 	import { Dialog as BitsDialog } from "bits-ui";
 	import type { Snippet } from 'svelte';
 	import Button from './Button.svelte';
-	import { getContext } from 'svelte';
+	import { portalStore } from '$lib/stores/portal-store.svelte.js';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 
 	export interface DialogProps {
@@ -24,8 +24,7 @@
     }: DialogProps = $props();
 
     const i18n = getI18n();
-    const getPortalTarget = getContext<() => HTMLElement | null>('scribe-portal-target');
-	const portalTarget = $derived(getPortalTarget?.() || undefined);
+	const portalTarget = $derived(portalStore.target ?? undefined);
 </script>
 
 <BitsDialog.Root bind:open>

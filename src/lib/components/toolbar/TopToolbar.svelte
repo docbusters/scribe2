@@ -6,6 +6,9 @@
 	import { selectionStore } from '../../stores/selection-store.svelte.js';
 	import ComponentEditor from '../component/ComponentEditor.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
+	import type { TopToolbarProps } from '$lib/types/TopToolbarProps.js';
+
+	let { class: className = '', style = '' }: TopToolbarProps = $props();
 
 	const i18n = getI18n();
 
@@ -72,7 +75,7 @@
 </script>
 
 <!-- The scribe-top-toolbar class keeps the selection when the toolbar is clicked, see Scribe.svelte -->
-<div class="scribe-top-toolbar" role="toolbar" aria-label={i18n.t('topToolbar.ariaLabel')} tabindex="-1" onmousedown={keepTextFocus}>
+<div class="scribe-top-toolbar {className}" {style} role="toolbar" aria-label={i18n.t('topToolbar.ariaLabel')} tabindex="-1" onmousedown={keepTextFocus}>
 	<ComponentEditor {...target} />
 </div>
 

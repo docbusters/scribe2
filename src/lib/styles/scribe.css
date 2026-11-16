@@ -149,6 +149,7 @@
 .scribe-document,
 scribe-interpreter,
 scribe-bindings-panel,
+scribe-top-toolbar,
 scribe-empty-content,
 scribe-component-renderer,
 scribe-component-slot,
@@ -294,12 +295,12 @@ scribe-component-slot,
    application's global styles (like Tailwind preflight).
    ========================================================================== */
 
-scribe-interpreter, scribe-bindings-panel {
+scribe-interpreter, scribe-bindings-panel, scribe-top-toolbar {
 	display: block;
 	width: 100%;
 }
 
-.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-component-slot, scribe-bindings-panel {
+.scribe-document, scribe-interpreter, scribe-empty-content, scribe-component-renderer, scribe-component-slot, scribe-bindings-panel, scribe-top-toolbar {
 	/* Base typography and coloring to stop inheritance from host body */
 	color: var(--scribe-doc-foreground);
 	font-family: var(--scribe-font-sans);
@@ -318,7 +319,10 @@ scribe-interpreter, scribe-bindings-panel {
 .scribe-document *::after,
 scribe-bindings-panel *,
 scribe-bindings-panel *::before,
-scribe-bindings-panel *::after {
+scribe-bindings-panel *::after,
+scribe-top-toolbar *,
+scribe-top-toolbar *::before,
+scribe-top-toolbar *::after {
 	box-sizing: border-box;
 }
 
@@ -329,7 +333,10 @@ scribe-bindings-panel *::after {
 .scribe-document *:not(:where([data-scribe-host], [data-scribe-host] *))::after,
 scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *)),
 scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::before,
-scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::after {
+scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::after,
+scribe-top-toolbar *:not(:where([data-scribe-host], [data-scribe-host] *)),
+scribe-top-toolbar *:not(:where([data-scribe-host], [data-scribe-host] *))::before,
+scribe-top-toolbar *:not(:where([data-scribe-host], [data-scribe-host] *))::after {
 	border-color: var(--scribe-border-color);
 }
 
@@ -374,7 +381,10 @@ scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::a
 .scribe-document input:not(:where([data-scribe-host], [data-scribe-host] *)),
 .scribe-document optgroup:not(:where([data-scribe-host], [data-scribe-host] *)),
 .scribe-document select:not(:where([data-scribe-host], [data-scribe-host] *)),
-.scribe-document textarea:not(:where([data-scribe-host], [data-scribe-host] *)) {
+.scribe-document textarea:not(:where([data-scribe-host], [data-scribe-host] *)),
+/* The ribbon placed outside the document by the host is all buttons (and its option renderers may draw inputs) */
+scribe-top-toolbar button:not(:where([data-scribe-host], [data-scribe-host] *)),
+scribe-top-toolbar input:not(:where([data-scribe-host], [data-scribe-host] *)) {
 	font-family: inherit;
 	font-size: 100%;
 	font-weight: inherit;
@@ -391,6 +401,7 @@ scribe-bindings-panel *:not(:where([data-scribe-host], [data-scribe-host] *))::a
 
 .scribe-document :focus-visible:not([contenteditable]),
 scribe-bindings-panel :focus-visible,
+scribe-top-toolbar :focus-visible,
 .scribe-dialog-content :focus-visible,
 .scribe-dropdown-content :focus-visible {
 	outline: 2px solid var(--scribe-accent);
@@ -400,6 +411,7 @@ scribe-bindings-panel :focus-visible,
 /* scrollbar-width is not inherited, so it goes on the elements that scroll */
 .scribe-document,
 scribe-bindings-panel,
+scribe-top-toolbar,
 .scribe-dialog-content,
 .scribe-dialog-body,
 .scribe-dropdown-content {
@@ -410,6 +422,7 @@ scribe-bindings-panel,
 @media (prefers-reduced-motion: reduce) {
 	.scribe-document *,
 	scribe-bindings-panel *,
+	scribe-top-toolbar *,
 	.scribe-dialog-content,
 	.scribe-dialog-overlay {
 		animation-duration: 0.01ms !important;

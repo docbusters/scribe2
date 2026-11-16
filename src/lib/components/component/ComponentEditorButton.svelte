@@ -1,7 +1,7 @@
 <script lang="ts">
     /* eslint-disable svelte/no-at-html-tags */
     import { mergeProps, Tooltip } from "bits-ui";
-    import { getContext } from "svelte";
+    import { portalStore } from "$lib/stores/portal-store.svelte.js";
     import Button, { type ButtonProps } from "../utilComponents/Button.svelte";
     import { getI18n } from "$lib/i18n/i18n.svelte.js";
     import { getShortcutTokens, isMacPlatform, parseShortcut, toAriaKeyShortcuts } from "$lib/utils/shortcuts.js";
@@ -21,9 +21,8 @@
 
     const i18n = getI18n();
     const anchorId = $props.id();
-    const getPortalTarget = getContext<(() => HTMLElement | null) | undefined>('scribe-portal-target');
-    // Inside the Scribe element, so the tooltip gets its theme and tokens. An option that mounts itself has no context and portals to the body
-    const portalTarget = $derived(getPortalTarget?.() || undefined);
+    // Inside the Scribe element, so the tooltip gets its theme and tokens, also when the ribbon is placed outside it. Without a Scribe it portals to the body
+    const portalTarget = $derived(portalStore.target ?? undefined);
 
     // Buttons without a label are square icons, the ones with a label grow with their text
     // The size comes from a variable so a grid of buttons can make them smaller (an inline style cannot be overridden by CSS)

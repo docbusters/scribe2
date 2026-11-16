@@ -6,6 +6,7 @@ import type { ComponentRendererProps } from './types/CustomRendererProps.js';
 import type { ComponentSlotProps } from './types/ComponentSlotProps.js';
 import type { EmptyContentProps } from './types/EmptyContentProps.js';
 import type { BindingsPanelProps } from './types/BindingsPanelProps.js';
+import type { TopToolbarProps } from './types/TopToolbarProps.js';
 
 // The class of <scribe-interpreter>, created by the JavaScript entry (scribe.ts)
 export declare const Scribe: ScribeConstructor;
@@ -20,6 +21,7 @@ declare global {
         'scribe-component-slot': HTMLElement & ComponentSlotProps;
         'scribe-empty-content': HTMLElement & EmptyContentProps;
         'scribe-bindings-panel': HTMLElement & BindingsPanelProps;
+        'scribe-top-toolbar': HTMLElement & TopToolbarProps;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -30,6 +32,7 @@ declare global {
             'scribe-component-slot': ComponentSlotProps;
             'scribe-empty-content': EmptyContentProps;
             'scribe-bindings-panel': BindingsPanelProps;
+            'scribe-top-toolbar': TopToolbarProps;
         }
     }
 
@@ -65,6 +68,13 @@ declare global {
                 [key: string]: any;
             };
             'scribe-bindings-panel': BindingsPanelProps & {
+                id?: string;
+                class?: string;
+                style?: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                [key: string]: any;
+            };
+            'scribe-top-toolbar': TopToolbarProps & {
                 id?: string;
                 class?: string;
                 style?: string;

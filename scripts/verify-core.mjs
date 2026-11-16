@@ -1,7 +1,7 @@
 // Checks the built entries of the package. It runs at the end of `build:wc`, so a package whose entries do not behave as documented can
 // not be packed or published:
 //   - `dist/core.js` is imported as a host's Node unit test would: a clean Node process, no DOM and no mocks, and it has no import effects
-//   - `dist/scribe.js` is the only file that defines custom elements, and it defines all five of them
+//   - `dist/scribe.js` is the only file that defines custom elements, and it defines all six of them
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -10,7 +10,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const distDir = fileURLToPath(new URL('../dist/', import.meta.url));
 const DOM_GLOBALS = ['document', 'window', 'HTMLElement', 'customElements'];
-const TAGS = ['scribe-interpreter', 'scribe-component-renderer', 'scribe-component-slot', 'scribe-empty-content', 'scribe-bindings-panel'];
+const TAGS = ['scribe-interpreter', 'scribe-component-renderer', 'scribe-component-slot', 'scribe-empty-content', 'scribe-bindings-panel', 'scribe-top-toolbar'];
 
 // 1. core, in a Node process with nothing the DOM provides, or the import would prove nothing
 for (const name of DOM_GLOBALS) {
@@ -54,7 +54,7 @@ const probe = `
 `;
 const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }));
 
-assert.deepEqual(result.tags.sort(), [...TAGS].sort(), 'dist/scribe.js does not define exactly the five elements');
+assert.deepEqual(result.tags.sort(), [...TAGS].sort(), 'dist/scribe.js does not define exactly the six elements');
 assert.ok(result.scribeIsInterpreter, 'Scribe is not the class of <scribe-interpreter>');
 
 console.log(`verify ok: core loads in Node (${Object.keys(core.defaultRegistry).length} default components), scribe.js defines ${result.tags.length} elements and only it does`);

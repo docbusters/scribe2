@@ -13,7 +13,8 @@
 	import { bindingStore } from '../stores/binding-store.svelte.ts';
 	import { customBindingsStore } from '../stores/custom-bindings-store.svelte.js';
 	import type { ScribeProps, CustomBinding, DocumentChangeDetail } from '../types/ScribeProps.js';
-	import { setContext, onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { portalStore } from '../stores/portal-store.svelte.js';
 	import Sortable from 'sortablejs';
 	import type { Document, BindingsDefinition } from '../domain/Document.js';
 	import { editStore } from '../stores/edit-store.svelte.js';
@@ -29,7 +30,7 @@
 	import { getAncestorChain, hasDarkClass } from '../utils/darkTheme.js';
 	import { calculateDocumentBindingUsages } from '../utils/bindingUsages.js';
 
-	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showPrintButton = false }: ScribeProps = $props();
+	let { id, class: className = "", style, document, bindings, customBindings = {}, registry, mode = 'view', ondocumentchange, onbindingchange, lang = 'en', showBindingsPanel = true, showTopToolbar = true, showPrintButton = false }: ScribeProps = $props();
 
 	// svelte-ignore state_referenced_locally
 	const i18n = setI18n(lang);
@@ -106,8 +107,14 @@
 		}
 	}
 
+	// Published through a store and not a context, so a top toolbar or bindings panel placed outside this component finds it too
 	let portalTarget = $state<HTMLElement | null>(null);
-	setContext('scribe-portal-target', () => portalTarget);
+	$effect(() => {
+		portalStore.target = portalTarget;
+		return () => {
+			portalStore.target = null;
+		};
+	});
 
 	let loading = $state(true);
 	let rootElement = $state<HTMLElement | null>(null);
@@ -289,7 +296,7 @@
 <svelte:document onpointerdowncapture={handleClearSelection} />
 
 <div id={isWebComponent ? undefined : id} style={isWebComponent ? undefined : style} bind:this={rootElement} class={computedClass} onfocusin={handleClearSelection}>
-	{#if mode === 'edit'}
+	{#if mode === 'edit' && showTopToolbar}
 		<TopToolbar />
 	{/if}
 	{#if mode === 'edit' && showPrintButton}

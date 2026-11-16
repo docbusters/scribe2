@@ -22,6 +22,7 @@ export { defaultRegistry, getDefaultRegistry } from './registry/defaultRegistry.
 export { createColorOption } from './registry/colorOption.js';
 export type { ColorOptionDefinition } from './registry/colorOption.js';
 export type { BindingsPanelProps } from './types/BindingsPanelProps.js';
+export type { TopToolbarProps } from './types/TopToolbarProps.js';
 
 // TYPES
 export type { ScribeProps, DocumentChangeDetail, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
