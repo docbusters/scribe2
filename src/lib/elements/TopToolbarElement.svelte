@@ -4,7 +4,8 @@
 		shadow: 'none',
 		props: {
 			class: { type: 'String' },
-			style: { type: 'String' }
+			style: { type: 'String' },
+			bare: { type: 'Boolean' }
 		}
 	}}
 />
@@ -13,7 +14,7 @@
 	import TopToolbar from '../components/toolbar/TopToolbar.svelte';
 	import type { TopToolbarProps } from '../types/TopToolbarProps.js';
 
-	let { class: className, style }: TopToolbarProps = $props();
+	let { class: className, style, bare }: TopToolbarProps = $props();
 </script>
 
-<TopToolbar class={className} {style} />
+<TopToolbar class={className} {style} {bare} />

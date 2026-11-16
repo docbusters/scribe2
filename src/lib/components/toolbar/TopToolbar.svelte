@@ -8,7 +8,7 @@
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 	import type { TopToolbarProps } from '$lib/types/TopToolbarProps.js';
 
-	let { class: className = '', style = '' }: TopToolbarProps = $props();
+	let { class: className = '', style = '', bare = false }: TopToolbarProps = $props();
 
 	const i18n = getI18n();
 
@@ -75,7 +75,7 @@
 </script>
 
 <!-- The scribe-top-toolbar class keeps the selection when the toolbar is clicked, see Scribe.svelte -->
-<div class="scribe-top-toolbar {className}" {style} role="toolbar" aria-label={i18n.t('topToolbar.ariaLabel')} tabindex="-1" onmousedown={keepTextFocus}>
+<div class="scribe-top-toolbar {className}" class:is-bare={bare} {style} role="toolbar" aria-label={i18n.t('topToolbar.ariaLabel')} tabindex="-1" onmousedown={keepTextFocus}>
 	<ComponentEditor {...target} />
 </div>
 
@@ -94,5 +94,16 @@
 		border-radius: var(--scribe-radius-xl);
 		box-shadow: var(--scribe-shadow-md);
 		user-select: none;
+	}
+
+	/* Only the buttons, to sit inside a bar of the host. The scroll stays, so a narrow bar scrolls the ribbon */
+	.scribe-top-toolbar.is-bare {
+		position: static;
+		z-index: auto;
+		padding: 0;
+		background: none;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
 	}
 </style>

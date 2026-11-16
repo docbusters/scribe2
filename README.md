@@ -305,7 +305,7 @@ In edit mode `<scribe-interpreter>` draws the toolbar (the ribbon) above the doc
 </script>
 ```
 
-In a Svelte or React template pass the booleans as props (`showTopToolbar={false}`). `<scribe-top-toolbar>` takes `class` and `style`, `<scribe-bindings-panel>` also takes `floating`, `collapsible`, `isExpanded` and `lang`.
+In a Svelte or React template pass the booleans as props (`showTopToolbar={false}`). `<scribe-top-toolbar>` takes `class`, `style` and `bare` (draws only the buttons, with no card of its own, to place it inside a bar of the host), `<scribe-bindings-panel>` also takes `floating`, `collapsible`, `isExpanded` and `lang`.
 
 - They work with the Scribe on the page (there is one per page), and the language follows its `lang`. Without one the toolbar has nothing to act on and its buttons are disabled, and in `view` mode too, so render it only when the editor is in `edit` mode.
 - The toolbar is **not sticky** on its own: the host element is only as tall as the ribbon, so `position: sticky` has nothing to scroll in. Position it from your own CSS (`sticky top-0` in Tailwind, or a fixed bar).
