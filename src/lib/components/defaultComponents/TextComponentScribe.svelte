@@ -9,7 +9,7 @@
 	import { parseStringForContentEditable } from '../../utils/parseStringForContentEditable.ts';
     import { findEditableText, handleArrowNavigation, navigateToAdjacentComponent, setupFocusListeners } from '../../utils/focusNavigation.ts';
 	import { textFormatStore } from '../../stores/text-format-store.svelte.ts';
-	import { colorMarker, getFormatsInRange, normalizeColorMarkers, setTextColor, toggleTextFormat, tokenizeFormattedText, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
+	import { colorMarker, getFormatsInRange, getLineBreakColors, normalizeColorMarkers, setTextColor, toggleTextFormat, tokenizeFormattedText, type TextFormatCommand, type TextFormats } from '../../utils/textFormat.ts';
 	import { isHexColor } from '../../utils/colorPalette.ts';
 	import { escapeSpecialChars } from '../../utils/textFormatEscape.ts';
 	import { BOLD_CHAR, ITALIC_CHAR, STRIKETHROUGH_CHAR, UNDERLINE_CHAR } from '../../constants/DocumentConstants.ts';
@@ -31,7 +31,7 @@
     const i18n = getI18n();
 
     let rawValue = $derived(componentData.value.value);
-    let value = $derived(parseStringForContentEditable(rawValue));
+    let lines = $derived(getLines(rawValue));
     let isEmpty = $derived(rawValue === '');
 
     // A ghost is a placeholder to write in, it is not part of the document until it has content
@@ -54,6 +54,16 @@
     /** A ghost or an empty text holds no component, so toolbars need to know the caret is in a place where a component can be inserted */
     function selectInsertionPoint() {
         selectionStore.selectInsertionPoint(sectionId, componentData.id);
+    }
+
+    /** The lines of a text as the editable draws them. An empty line is a line break (empty text), which carries the colour of its line (null when it has none) */
+    function getLines(markdown: string): { text: string; breakColor: string | null }[] {
+        const colors = getLineBreakColors(markdown);
+        let breakIndex = 0;
+        return parseStringForContentEditable(markdown)
+            .map((text) => ({ text, breakColor: text === '' ? (colors[breakIndex++] ?? null) : null }))
+            // A "line" with only markers (the colour of the empty line that follows it) has nothing to draw: the colour goes on the line break
+            .filter((line) => line.text === '' || tokenizeFormattedText(line.text).tokens.some((token) => token.text !== ''));
     }
 
     function parseDOM(node: Node): string {
@@ -196,6 +206,8 @@
         preRange.selectNodeContents(target);
         preRange.setEnd(range.startContainer, range.startOffset);
         const textBefore = preRange.toString();
+        // The caret as an index of the stored text (a line break is one character), measured now as creating the text below replaces the element
+        const caretOffset = getVisualOffset(target, range.startContainer, range.startOffset);
 
         const postRange = range.cloneRange();
         postRange.selectNodeContents(target);
@@ -265,8 +277,7 @@
             };
         }
 
-        // Record the exact cursor character offset for restoration if the user cancels the insertion
-        const caretOffset = textBefore.length;
+        // The caret is put back at caretOffset if the user cancels the insertion
         const restoreFocus = () => {
             const element = findCaretElement();
             if (element) {
@@ -350,10 +361,25 @@
         return (element.textContent ?? '').length === 0 && element.querySelectorAll('br').length <= 1;
     }
 
+    /** The formats that the caret had when Enter was pressed, kept until the break is inserted. See handleInput */
+    let formatsBeforeBreak: TextFormats | null = null;
+
+    const isLineBreakInput = (inputType: string) => inputType === 'insertParagraph' || inputType === 'insertLineBreak';
+
     function handleInput(event: Event) {
         const target = event.target as HTMLSpanElement;
         isEmpty = isEditableEmpty(target);
         isDirty = true;
+
+        const formats = formatsBeforeBreak;
+        formatsBeforeBreak = null;
+        if (formats && isLineBreakInput((event as InputEvent).inputType)) {
+            // The browser puts the caret after the break wherever it likes (in a clone of a span left around the filler <br>, or outside
+            // every span), so the new line would not keep what the user was typing with. The caret is read again first, as the store
+            // still has the old one and a pending format is dropped as soon as the caret differs
+            syncFormatState();
+            textFormatStore.keepFormats(formats);
+        }
     }
 
     function handleFocus() {
@@ -404,19 +430,14 @@
             return;
         }
 
-        // Calculate the selected text indexes
-        const preRange = range.cloneRange();
-        preRange.selectNodeContents(textDiv);
-        preRange.setEnd(range.startContainer, range.startOffset);
-
-        const startIndex = preRange.toString().length;
-        const selectedText = range.toString();
-        const endIndex = startIndex + selectedText.length;
+        // The indexes of the selected text. Each line break counts as one character, as in the stored text, so they are not measured with toString()
+        const startIndex = getVisualOffset(textDiv, range.startContainer, range.startOffset);
+        const endIndex = getVisualOffset(textDiv, range.endContainer, range.endOffset);
 
         textFormatStore.setSelection(
             sectionId,
             componentData.id,
-            { start: startIndex, end: endIndex, text: selectedText },
+            { start: startIndex, end: endIndex, text: range.toString() },
             getFormatsInRange(readEditableContent(textDiv), startIndex, endIndex),
             { toggle: formatSelection, setColor: colorSelection }
         );
@@ -432,13 +453,22 @@
     /** Replaces the content of the editable with what the template renders for a text, so it can be rewritten without recreating the editable */
     function renderContent(element: HTMLElement, markdown: string) {
         const nodes: Node[] = [];
-        for (const line of parseStringForContentEditable(markdown)) {
-            if (line === '') {
-                nodes.push(document.createElement('br'));
+        for (const line of getLines(markdown)) {
+            if (line.text === '') {
+                const lineBreak = document.createElement('br');
+                if (line.breakColor) {
+                    // The caret of a coloured empty line is inside the span, so what is typed there gets the colour
+                    const span = document.createElement('span');
+                    applyColor(span, line.breakColor);
+                    span.append(lineBreak);
+                    nodes.push(span);
+                } else {
+                    nodes.push(lineBreak);
+                }
                 continue;
             }
 
-            for (const token of tokenizeFormattedText(line).tokens) {
+            for (const token of tokenizeFormattedText(line.text).tokens) {
                 const span = document.createElement('span');
                 for (const key of FORMAT_KEYS) {
                     if (token[key]) span.classList.add(FORMAT_CLASSES[key]);
@@ -648,6 +678,13 @@
             return;
         }
 
+        // Enter: the formats at the caret (the pending ones first) go on in the new line. The break itself is left to the browser
+        if (isLineBreakInput(event.inputType)) {
+            const owns = textFormatStore.componentId === componentData.id && !textFormatStore.selectionRange;
+            formatsBeforeBreak = owns ? { ...(textFormatStore.pending ?? textFormatStore.activeFormats) } : null;
+            return;
+        }
+
         const pending = textFormatStore.componentId === componentData.id ? textFormatStore.pending : null;
         if (!pending || event.inputType !== 'insertText' || !event.data || !textDiv) return;
 
@@ -665,6 +702,18 @@
         if (!textDiv) return;
         return setupFocusListeners(textDiv);
     });
+
+    /**
+     * The position of a point of the editable as an index of the stored text, which is what `restoreSelection` takes: each <br> counts as
+     * one character (a newline). `Range.toString()` skips the <br>, so it cannot measure a position of the text
+     */
+    function getVisualOffset(element: HTMLElement, container: Node, offset: number): number {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        range.setEnd(container, offset);
+        const content = range.cloneContents();
+        return (content.textContent?.length ?? 0) + content.querySelectorAll('br').length;
+    }
 
     /**
      * Marks a fragment of the editable again using absolute string indices, useful when its content is rewritten
@@ -769,11 +818,15 @@
         oninput={handleInput}
         onkeydown={mode === 'edit' ? handleKeyDown : undefined}
     >
-        {#each value as line, index (`${componentData.id}-${index}`)}
-            {#if line === ''}
-                <br>
+        {#each lines as line, index (`${componentData.id}-${index}`)}
+            {#if line.text === ''}
+                {#if line.breakColor}
+                    <span data-color={line.breakColor} style:color={line.breakColor}><br></span>
+                {:else}
+                    <br>
+                {/if}
             {:else}
-                {#each tokenizeFormattedText(line).tokens as token, index (index)}
+                {#each tokenizeFormattedText(line.text).tokens as token, index (index)}
                     <span
                         class:is-bold={token.bold}
                         class:is-italic={token.italic}

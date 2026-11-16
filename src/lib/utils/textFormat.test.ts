@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getFormatsInRange, setTextColor, toggleTextFormat, tokenizeFormattedText } from './textFormat.js';
+import { getFormatsInRange, getLineBreakColors, normalizeColorMarkers, setTextColor, toggleTextFormat, tokenizeFormattedText } from './textFormat.js';
 import { escapeSpecialChars, removeEmptyToggles } from './textFormatEscape.js';
 
 const BS = String.fromCharCode(92); // The escape character, written without a backslash literal to avoid editing mistakes
@@ -15,7 +15,7 @@ function createRandom(seed: number) {
     };
 }
 
-const ALPHABET = ['a', 'b', ' ', '*', '_', '~', '-', BS, '😀', '{', '#', '}'];
+const ALPHABET = ['a', 'b', ' ', '*', '_', '~', '-', BS, '😀', '{', '#', '}', '\n'];
 
 function randomString(random: () => number, maxLength = 10) {
     const length = Math.floor(random() * (maxLength + 1));
@@ -180,6 +180,53 @@ describe('getFormatsInRange with colours', () => {
     it('gives the colour at the end of the text for a fragment with no characters', () => {
         expect(getFormatsInRange('a{#ef4444}b', 1, 1).color).toBe('#ef4444');
     });
+
+    it('does not count the line break that ends a line with characters, unless it is all that is selected', () => {
+        // The fragment starts at the break of the first line, which is drawn as nothing, so the colour is the one of what follows
+        expect(getFormatsInRange('a\n{#ef4444}b', 1, 3).color).toBe('#ef4444');
+        expect(getFormatsInRange('a\n{#ef4444}b', 1, 2).color).toBeNull();
+        expect(getFormatsInRange('{#ef4444}a\nb', 1, 2).color).toBe('#ef4444');
+    });
+});
+
+describe('colour on empty lines', () => {
+    const red = '#ef4444';
+    const text = 'hola\n\n\nque tal';
+    const coloured = `{#ef4444}hola\n{#ef4444}\n{#ef4444}\n{#ef4444}que{#} tal`;
+
+    it('keeps the marker before the line break of an empty line', () => {
+        expect(normalizeColorMarkers('a\n{#ef4444}\nb')).toBe('a\n{#ef4444}\nb');
+        expect(normalizeColorMarkers('{#ef4444}\n{#ef4444}\nb')).toBe('{#ef4444}\n{#ef4444}\nb');
+    });
+
+    it('still drops the marker before the line break that ends a line with characters', () => {
+        expect(normalizeColorMarkers('a{#ef4444}\nb')).toBe('a\nb');
+        expect(normalizeColorMarkers('a{#ef4444}')).toBe('a');
+        // A marker that sets no colour on an empty line changes nothing either
+        expect(normalizeColorMarkers('a\n{#}\nb')).toBe('a\n\nb');
+    });
+
+    it('colours the empty lines inside a fragment, counting each line break as one character', () => {
+        expect(setTextColor(text, 0, 10, red)).toBe(coloured);
+        expect(getFormatsInRange(coloured, 0, 10).color).toBe(red);
+        expect(getLineBreakColors(coloured)).toEqual([null, red, red]);
+    });
+
+    it('colours an empty line that is selected on its own, and nothing for the break that ends a line with characters', () => {
+        expect(setTextColor('ab\n\ncd', 3, 4, red)).toBe('ab\n{#ef4444}\ncd');
+        expect(setTextColor('ab\n\ncd', 2, 3, red)).toBe('ab\n\ncd');
+    });
+
+    it('removes the colour of the empty lines with null', () => {
+        expect(setTextColor(coloured, 0, 10, null)).toBe(text);
+    });
+
+    it('gives the colour of each line break of an empty line', () => {
+        expect(getLineBreakColors('')).toEqual([]);
+        expect(getLineBreakColors('a\nb')).toEqual([null]);
+        expect(getLineBreakColors('\n\n')).toEqual([null, null]);
+        expect(getLineBreakColors('{#ef4444}\n\n{#22c55e}\n')).toEqual([red, null, '#22c55e']);
+    });
 });
 
 describe('setTextColor', () => {
@@ -255,6 +302,13 @@ describe('setTextColor', () => {
             const end = start + 1 + Math.floor(random() * (length - start));
             const stored = escapeSpecialChars(text);
             const label = JSON.stringify({ text, start, end });
+
+            // A line break that ends a line with characters is drawn as nothing, so a fragment made only of those has nothing to colour
+            let hasColourable = false;
+            for (let k = start; k < end; k++) {
+                if (text[k] !== '\n' || k === 0 || text[k - 1] === '\n') hasColourable = true;
+            }
+            if (!hasColourable) continue;
 
             const coloured = setTextColor(stored, start, end, red);
             expect(visibleText(coloured), label).toBe(text);

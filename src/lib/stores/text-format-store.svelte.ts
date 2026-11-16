@@ -168,6 +168,16 @@ export class TextFormatStore {
         }
     }
 
+    /**
+     * Makes the formats the ones of the characters typed next at the current caret. A line break moves the caret to wherever the browser
+     * puts it (a clone of a span around the filler `<br>`, or outside every span), so the text keeps the formats it was typing with and
+     * calls this after the break. With a marked fragment there is nothing to keep, and formats equal to the caret's leave nothing pending
+     */
+    keepFormats(formats: TextFormats) {
+        if (!this.canFormat || this.selectionRange) return;
+        this.setPending({ ...formats });
+    }
+
     /** The pending format has been applied to what was typed, so from now on the formats follow the caret */
     consumePending() {
         this.dropPending();

@@ -101,9 +101,14 @@ export function tokenizeFormattedText(text: string): { tokens: FormatToken[]; en
 export function getFormatsInRange(markdown: string, visualStart: number, visualEnd: number): TextFormats {
     const { tokens, end } = tokenizeFormattedText(markdown);
     const shared: TextFormats = { bold: true, italic: true, strikethrough: true, underline: true, color: null };
-    // Undefined until a token of the fragment is seen, then its colour, or null as soon as two of them differ
+    // Undefined until a character of the fragment is seen, then its colour, or null as soon as two of them differ
     let color: string | null | undefined;
+    // Same, for the line breaks that end a line with characters. Nothing is drawn for them, so they only count when nothing else is selected
+    let breakColor: string | null | undefined;
+    const merge = (current: string | null | undefined, next: string | null) => (current === undefined || current === next ? next : null);
+
     let offset = 0;
+    let lineHasChars = false;
     let hasSelectedChars = false;
 
     for (const token of tokens) {
@@ -111,12 +116,21 @@ export function getFormatsInRange(markdown: string, visualStart: number, visualE
         if (Math.max(offset, visualStart) < Math.min(offset + token.text.length, visualEnd)) {
             hasSelectedChars = true;
             for (const key of FORMAT_KEYS) shared[key] &&= token[key];
-            color = color === undefined || color === token.color ? token.color : null;
+        }
+
+        for (let i = 0; i < token.text.length; i++) {
+            const isNewline = token.text[i] === '\n';
+            const position = offset + i;
+            if (position >= visualStart && position < visualEnd) {
+                if (isNewline && lineHasChars) breakColor = merge(breakColor, token.color);
+                else color = merge(color, token.color);
+            }
+            lineHasChars = !isNewline;
         }
         offset += token.text.length;
     }
 
-    return hasSelectedChars ? { ...shared, color: color ?? null } : end;
+    return hasSelectedChars ? { ...shared, color: (color !== undefined ? color : breakColor) ?? null } : end;
 }
 
 /**
@@ -235,12 +249,14 @@ function colorBefore(text: string, index: number): string | null {
 /**
  * Drops the colour markers that change nothing: the ones that set the colour that is already on, the ones that are overridden by the
  * next marker before a visible character, and the ones with no visible character after them on their line. A marker is written
- * right before the first visible character it affects, so the text is left in the shortest form
+ * right before the first visible character it affects, so the text is left in the shortest form. The exception is an empty line: its
+ * line break is what the editable draws there, so a marker right before it is kept, as it is the colour of that line
  */
 export function normalizeColorMarkers(text: string): string {
     let result = '';
     let written: string | null = null; // The colour that the text written so far has on the current line
     let pending: string | null | undefined; // The colour set by the last marker, not written yet
+    let lineHasContent = false; // Whether a visible character has been written on the current line
 
     const flush = () => {
         if (pending !== undefined && pending !== written) {
@@ -256,9 +272,13 @@ export function normalizeColorMarkers(text: string): string {
         if (char === ESCAPE_CHAR) {
             flush();
             result += char;
+            lineHasContent = true;
             if (i + 1 < text.length) {
                 result += text[++i];
-                if (text[i] === '\n') written = null;
+                if (text[i] === '\n') {
+                    written = null;
+                    lineHasContent = false;
+                }
             }
             continue;
         }
@@ -268,18 +288,44 @@ export function normalizeColorMarkers(text: string): string {
             pending = marker.color;
             i += marker.length - 1;
         } else if (char === '\n') {
+            // On an empty line the marker is written, as there is no character to write it before. On any other line it colours nothing
+            if (!lineHasContent) flush();
             pending = undefined;
             written = null;
+            lineHasContent = false;
             result += char;
         } else if (isFormatChar(char)) {
             result += char;
         } else {
             flush();
+            lineHasContent = true;
             result += char;
         }
     }
 
     return result;
+}
+
+/**
+ * The colour of each line break of a text, in order, when it is the break of an empty line (null for the break that ends a line with
+ * characters, and for an empty line with no colour). The editable draws every `\n` as a `<br>`, so this is what colours the empty ones
+ */
+export function getLineBreakColors(text: string): (string | null)[] {
+    const colors: (string | null)[] = [];
+    let lineHasChars = false;
+
+    for (const token of tokenizeFormattedText(text).tokens) {
+        for (const char of token.text) {
+            if (char === '\n') {
+                colors.push(lineHasChars ? null : token.color);
+                lineHasChars = false;
+            } else {
+                lineHasChars = true;
+            }
+        }
+    }
+
+    return colors;
 }
 
 /**
