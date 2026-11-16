@@ -189,6 +189,10 @@
 		editStore.setComponentHeight(sectionId, componentData.id, clampHeight(blockHeight + (event.key === 'ArrowDown' ? step : -step)));
 	}
 
+	const openValueDialog = () => {
+		if (mode === 'edit') valueDialogStore.open(sectionId, componentData.id);
+	};
+
 	const mountComponent: Action<HTMLElement, AgnosticActionProps> = (node, props) => {
 		const componentDef = globalRegistry.getComponent(props.componentData.type);
 		const instanceData = componentDef.mount(node, props);
@@ -213,7 +217,7 @@
 		class="component-mount"
 		class:is-sized={blockHeight !== null}
 		style:height={blockHeight !== null ? `${blockHeight}px` : undefined}
-		use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolved.value, isBinding: resolved.isBinding, updateComponentValue, updateComponentConfig, isDarkMode }}
+		use:mountComponent={{ componentData, sectionId, mode, resolvedValue: resolved.value, isBinding: resolved.isBinding, updateComponentValue, updateComponentConfig, isDarkMode, openValueDialog }}
 	></div>
 {/snippet}
 

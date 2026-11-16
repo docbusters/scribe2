@@ -75,9 +75,10 @@ Both are imports for their side effects, so a host that takes nothing by name fr
 Everything else is imported from `/core`, so a module of the host that only builds a registry or reads a type is safe to import in a test:
 
 ```ts
-import { defaultRegistry, type Document } from '@antonii22/scribe2/core';
+import type { ComponentRegistry, Document } from '@antonii22/scribe2/core';
 
-export const registry = { ...defaultRegistry, callout: myCallout };
+// Only the components of the host: Scribe adds the default ones, in the current `lang`
+export const registry: Partial<ComponentRegistry<CalloutComponent>> = { callout: myCallout };
 ```
 
 ```js
@@ -235,16 +236,15 @@ import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2
 ```svelte
 <script lang="ts">
 	import { getAllContexts } from 'svelte';
-	import { getDefaultRegistry, type ScribeComponentProps } from '@antonii22/scribe2/core';
+	import type { ScribeComponentProps } from '@antonii22/scribe2/core';
 	import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2/svelte';
 	import MyCard from './MyCard.svelte'; // a component of your own, which can use getContext
 	import MyRow from './MyRow.svelte';
 
 	const context = getAllContexts(); // a snapshot: what is set later in your components is not seen
 
-	// A registry component
+	// A registry component. Only yours: Scribe adds the default ones in its `lang`
 	const registry = {
-		...getDefaultRegistry(i18n),
 		'my-card': {
 			name: 'Card',
 			description: 'A card',
@@ -270,6 +270,17 @@ import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2
 Without `context`, `getContext` in `MyCard` or `MyRow` returns `undefined`. You can also pass a `Map` of your own instead of `getAllContexts()`. The playground shows the row case in `/examples/full-edit-custom-binding`.
 
 Inside these components, draw the parts of Scribe with its custom elements, such as `<scribe-component-slot>` (see "Slots" above). Scribe exports no Svelte components for this, for the same reason of the two runtimes.
+
+**Empty state with a button.** While a component has no value, show `<scribe-empty-content>` with an `action`. Every component receives `openValueDialog`, which opens the dialog that sets its value (it does nothing outside edit mode, so give no action there):
+
+```svelte
+{#if isEmpty}
+	<scribe-empty-content
+		message="Select a table"
+		action={mode === 'edit' ? { label: 'Set value', onclick: openValueDialog } : undefined}
+	></scribe-empty-content>
+{/if}
+```
 
 ## Placing the toolbar and the variables panel
 

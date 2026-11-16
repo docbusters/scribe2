@@ -22,7 +22,8 @@ export interface ScribeProps<C extends BaseComponent<string, DataValue> = never>
     /** Initial document value. Changes made in the document while in edit mode will be notified via the `ondocumentchange` event (see `DocumentChangeDetail`). */
     document: Document<C>;
     bindings?: Record<string, BindingsDefinition>;
-    registry?: ComponentRegistry<C>;
+    /** Components of the host, added to the default ones. Scribe adds the defaults in the current `lang`, so do not spread `defaultRegistry` here: it is in English and would replace them */
+    registry?: Partial<ComponentRegistry<C>>;
     customBindings?: Record<string, CustomBinding>;
     ondocumentchange?: (event: CustomEvent<DocumentChangeDetail<C>>) => void;
     onbindingchange?: (event: CustomEvent<BindingChangeEventDetail>) => void;

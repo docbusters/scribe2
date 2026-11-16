@@ -32,10 +32,6 @@
 </div>
 
 <style>
-    :host {
-        display: block;
-        width: 100%;
-    }
     .empty-container {
         display: flex;
         flex-direction: column;

@@ -23,3 +23,12 @@
 </script>
 
 <EmptyContent {message} {description} {icon} {isError} {valueStyle} {style} {action} />
+
+<style>
+    /* The element has no shadow root, so it needs its own display to fill a block (a flex item) like the empty states of Scribe */
+    :global(scribe-empty-content) {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+    }
+</style>

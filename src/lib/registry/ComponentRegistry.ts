@@ -25,6 +25,8 @@ export interface ScribeComponentProps<T extends BaseComponent<string, DataValue,
     updateComponentConfig: (newConfig: ComponentConfig) => void;
     /** Indicates whether the component is in dark mode: the class `dark` is on the root element of Scribe or on any ancestor, and it follows the class live */
     isDarkMode: boolean;
+    /** Opens the dialog that sets the value of this component. Use it as the `action` of a `<scribe-empty-content>` while the value is not set. It does nothing outside edit mode */
+    openValueDialog: () => void;
 }
 
 /** Height in px of a block component: the one it has when inserted and the limits it can be resized between */
