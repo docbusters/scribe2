@@ -7,7 +7,8 @@
 	import { editStore } from '$lib/stores/edit-store.svelte.js';
 	import { customBindingsStore } from '$lib/stores/custom-bindings-store.svelte.js';
 	import ComponentEditorValue from './ComponentEditorValue.svelte';
-		import ScrollArea from '../utilComponents/ScrollArea.svelte';
+	import BindingPickerStep from './BindingPickerStep.svelte';
+	import ScrollArea from '../utilComponents/ScrollArea.svelte';
 	import DataTypeCard from '../utilComponents/DataTypeCard.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 	import { untrack } from 'svelte';
@@ -129,6 +130,16 @@
 		});
 	});
 
+	/** The picker step of a custom binding, shown instead of the content while it is open */
+	const pickerStep = $derived(valueDialogStore.picker);
+
+	/** Escape leaves the picker step and keeps the dialog (and the pending value) as it was. Without a step it closes the dialog, as always */
+	function handleEscape(event: KeyboardEvent) {
+		if (!valueDialogStore.picker) return;
+		event.preventDefault();
+		valueDialogStore.closePicker();
+	}
+
 	function handleSelectValueType(newValType: string) {
 		if (valueType === newValType) return;
 		valueType = newValType;
@@ -181,7 +192,18 @@
 	}
 </script>
 
-<Dialog bind:open={() => valueDialogStore.isOpen, (isOpen) => { if (!isOpen) valueDialogStore.close(); }} title={i18n.t('valueSelector.typeTitle')}>
+<Dialog
+	bind:open={() => valueDialogStore.isOpen, (isOpen) => { if (!isOpen) valueDialogStore.close(); }}
+	title={i18n.t('valueSelector.typeTitle')}
+	class={pickerStep ? 'scribe-value-dialog-picker' : undefined}
+	onEscapeKeydown={handleEscape}
+>
+	{#if pickerStep}
+		<BindingPickerStep picker={pickerStep} />
+	{/if}
+
+	<!-- Hidden, not removed, during the picker step: the selector that opened it, with the pending value, stays as it is. A plain wrapper, as a display rule of its own would beat `hidden` -->
+	<div class="dialog-content-wrapper" hidden={!!pickerStep}>
 	{#if component}
 		<div class="value-selector-container">
 			<div class="config-section">
@@ -226,6 +248,7 @@
 			{/if}
 		</div>
 	{/if}
+	</div>
 
 	{#snippet footer()}
 		<Button variant="ghost" onclick={() => valueDialogStore.close()}>{i18n.t('common.cancel')}</Button>
@@ -292,6 +315,17 @@
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0.5rem;
 		width: 100%;
+	}
+
+	/* The picker step: a wide, tall box for what the host draws. Two classes, as the box of the dialog is a global class of one */
+	:global(.scribe-dialog-content.scribe-value-dialog-picker) {
+		max-width: min(1100px, calc(100vw - 2rem));
+		height: min(720px, calc(100vh - 4rem));
+	}
+
+	/* Choosing an item already goes back, and Cancel and Apply are there again afterwards */
+	:global(.scribe-dialog-content.scribe-value-dialog-picker .scribe-dialog-footer) {
+		display: none;
 	}
 
 	@media (max-width: 480px) {

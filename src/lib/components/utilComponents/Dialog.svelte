@@ -12,6 +12,10 @@
         description?: string;
         open: boolean;
         showCloseButton?: boolean;
+        /** Extra class of the dialog box, for a dialog that needs another size */
+        class?: string;
+        /** Runs on Escape before the dialog closes: call `preventDefault()` to keep it open */
+        onEscapeKeydown?: (event: KeyboardEvent) => void;
 	}
 
     let {
@@ -20,6 +24,8 @@
         title,
         description,
         showCloseButton = true,
+        class: className,
+        onEscapeKeydown,
         open = $bindable(),
     }: DialogProps = $props();
 
@@ -30,7 +36,7 @@
 <BitsDialog.Root bind:open>
   <BitsDialog.Portal to={portalTarget}>
     <BitsDialog.Overlay class="scribe-dialog-overlay" />
-    <BitsDialog.Content class="scribe-dialog-content">
+    <BitsDialog.Content class={className ? `scribe-dialog-content ${className}` : 'scribe-dialog-content'} {onEscapeKeydown}>
       <header class="scribe-dialog-header">
         <div class="scribe-dialog-heading">
           <BitsDialog.Title class="scribe-dialog-title">{title}</BitsDialog.Title>

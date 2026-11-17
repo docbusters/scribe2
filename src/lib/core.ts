@@ -25,7 +25,7 @@ export type { BindingsPanelProps } from './types/BindingsPanelProps.js';
 export type { TopToolbarProps } from './types/TopToolbarProps.js';
 
 // TYPES
-export type { ScribeProps, DocumentChangeDetail, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
+export type { ScribeProps, DocumentChangeDetail, CustomBinding, CustomBindingSubscribable, BindingItemProps, BindingItemRenderer, BindingItemRendererHandle, BindingPickerProps, BindingPickerRenderer, BindingPickerRendererHandle, ScribeMode, BindingChangeEventDetail, BindingDefinitionCreate, BindingDefinitionUpdate, BindingDefinitionDelete, CustomBindingValueUpdate } from './types/ScribeProps.js';
 
 // i18n
 export * from './i18n/index.js';

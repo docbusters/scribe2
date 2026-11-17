@@ -7,8 +7,11 @@
 	import { compatibleFirst } from '$lib/utils/compatibleFirst.js';
 	import type { CollectionValue, DataValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
 	import type { BindingItemProps, BindingItemRenderer } from '$lib/types/ScribeProps.js';
-	import { createItemHost } from '$lib/utils/bindingItemRenderer.js';
+	import { createRendererHost } from '$lib/utils/bindingItemRenderer.js';
+	import { valueDialogStore } from '$lib/stores/value-dialog-store.svelte.js';
+	import { tick } from 'svelte';
 	import type { Action } from 'svelte/action';
+	import Button from '../utilComponents/Button.svelte';
 	import { getI18n } from '$lib/i18n/i18n.svelte.js';
 	import { getTypeLabel, isListedBinding } from '$lib/utils/dataTypes.js';
 	import TypeIcon from '../utilComponents/TypeIcon.svelte';
@@ -41,6 +44,10 @@
 	const itemRenderer = $derived(bindingType === 'default' ? undefined : customBindingsStore.getItemRenderer(bindingType));
 	// The host draws the frame of the rows too (only with a renderer). A row whose renderer failed goes back to the framed default row
 	const bareItems = $derived(!!itemRenderer && customBindingsStore.hasBareItems(bindingType));
+	// With a picker of the host the list and its search are not shown: the chosen item and a button that opens the picker are. It falls back to the list if the picker threw
+	const hasPicker = $derived(bindingType !== 'default' && !!customBindingsStore.getPickerRenderer(bindingType));
+
+	let root = $state<HTMLElement>();
 
 	// Determine supported data types for this component
 	const supportedTypes = $derived.by<Omit<DataValue['type'], 'binding'>[] | undefined>(() => {
@@ -66,7 +73,8 @@
 	// Fetch or update async values for custom bindings
 	$effect(() => {
 		if (bindingType !== 'default') {
-			const ids = customBindingsStore.getAvailableIds(bindingType, supportedTypes);
+			// With a picker only the chosen item is drawn, so only its value is loaded (a sheet can have thousands of ids)
+			const ids = customBindingsStore.getAvailableIds(bindingType, supportedTypes).filter((item) => !hasPicker || item.value === value);
 			for (const item of ids) {
 				if (customPreviewValues[item.value] === undefined && !loadingIds[item.value]) {
 					loadingIds[item.value] = true;
@@ -114,7 +122,7 @@
 		}
 
 		// Custom bindings
-		const availableIds = customBindingsStore.getAvailableIds(bindingType, supportedTypes);
+		const availableIds = customBindingsStore.getAvailableIds(bindingType, supportedTypes).filter((item) => !hasPicker || item.value === value);
 		return availableIds.map((item) => {
 			const preview = customPreviewValues[item.value] ?? (loadingIds[item.value] ? i18n.t('common.loading') : '');
 			return {
@@ -142,10 +150,30 @@
 		);
 	});
 
+	// The chosen item, which is all that the summary of a picker shows. Undefined when nothing is chosen or the id is no longer available
+	const selectedItem = $derived(hasPicker ? items[0] : undefined);
+
 	function handleSelect(item: BindingItem) {
 		if (item.disabled) return;
 		value = item.id;
 		onselect?.(item.id);
+	}
+
+	/** Opens the picker of the host in the dialog. The choice only becomes the pending value here, and "Apply" is what saves it */
+	function openPicker() {
+		valueDialogStore.openPicker({
+			bindingType,
+			componentType,
+			selectedId: value || null,
+			onpick: (id) => {
+				value = id;
+				onselect?.(id);
+			},
+			// This selector may be one of several in the dialog, so the focus goes back to its own button once the content is shown again
+			onclose: () => {
+				void tick().then(() => root?.querySelector<HTMLElement>('.picker-open')?.focus());
+			}
+		});
 	}
 
 	/** What the renderer of the host gets for a row. It is a plain copy, so the host never holds a reactive proxy of Scribe */
@@ -172,7 +200,7 @@
 
 	// Draws the content of a row with the renderer of the host. The row is keyed by id, so it stays mounted and the host gets the new props
 	const renderRow: Action<HTMLElement, RowRender> = (node, params) => {
-		const host = createItemHost(params.renderer, node, params.props, params.onError);
+		const host = createRendererHost(params.renderer, node, params.props, params.onError, 'rows');
 
 		return {
 			update: (next) => host.update(next.props),
@@ -181,7 +209,64 @@
 	};
 </script>
 
-<div class="binding-selector-root">
+{#snippet rowContent(item: BindingItem, isSelected: boolean, isBare: boolean)}
+	{#if itemRenderer && !failedIds[item.id]}
+		<!-- The host draws what is inside. The button stays Scribe's, and so do the check and the incompatible state unless the rows are bare -->
+		<span class="row-custom" data-scribe-host use:renderRow={{ renderer: itemRenderer, props: toItemProps(item, isSelected), onError: () => (failedIds[item.id] = true) }}></span>
+
+		{#if item.disabled && !isBare}
+			<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
+		{/if}
+	{:else}
+		<span class="scribe-tile" data-size="sm" data-type={item.type}><TypeIcon type={item.type} /></span>
+
+		<span class="row-main">
+			<span class="row-title" title={item.title}>{item.title}</span>
+			{#if item.isLoading}
+				<span class="row-preview is-muted">{i18n.t('common.loading')}</span>
+			{:else if item.valuePreview !== ''}
+				<span class="row-preview" title={item.valuePreview}>{truncateString(item.valuePreview, 60)}</span>
+			{:else}
+				<span class="row-preview is-muted">{i18n.t('common.empty')}</span>
+			{/if}
+		</span>
+
+		{#if item.disabled}
+			<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
+		{:else if item.type}
+			<span class="scribe-pill" data-type={item.type}>{getTypeLabel(i18n, item.type)}</span>
+		{/if}
+	{/if}
+
+	{#if !isBare}
+		<span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">
+			{#if isSelected}
+				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+			{/if}
+		</span>
+	{/if}
+{/snippet}
+
+<div class="binding-selector-root" bind:this={root}>
+{#if hasPicker}
+	<!-- The host picks the item in a large area of the dialog: here only the chosen one and the button that opens it -->
+	{#if selectedItem}
+		{@const isBare = bareItems && !failedIds[selectedItem.id]}
+		<div class="picker-summary">
+			<div class="binding-row selected is-static" class:is-bare={isBare}>
+				{@render rowContent(selectedItem, true, isBare)}
+			</div>
+			<Button class="picker-open" variant="outline" size="sm" onclick={openPicker}>{i18n.t('bindingSelector.change')}</Button>
+		</div>
+	{:else}
+		<div class="empty-state">
+			<span class="empty-icon"><TypeIcon type="binding" size={24} /></span>
+			<p class="empty-title">{i18n.t('bindingSelector.pickerEmptyTitle')}</p>
+			<p class="empty-subtitle">{i18n.t('bindingSelector.pickerEmptySubtitle')}</p>
+			<Button class="picker-open empty-action" variant="default" size="sm" onclick={openPicker}>{i18n.t('bindingSelector.pick')}</Button>
+		</div>
+	{/if}
+{:else}
 	<div class="search-box">
 		<div class="search-field-wrapper">
 			<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon" aria-hidden="true"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
@@ -237,45 +322,12 @@
 					onclick={() => handleSelect(item)}
 					title={item.disabled ? i18n.t('bindingSelector.incompatibleTooltip') : item.title}
 				>
-					{#if itemRenderer && !failedIds[item.id]}
-						<!-- The host draws what is inside. The button stays Scribe's, and so do the check and the incompatible state unless the rows are bare -->
-						<span class="row-custom" data-scribe-host use:renderRow={{ renderer: itemRenderer, props: toItemProps(item, isSelected), onError: () => (failedIds[item.id] = true) }}></span>
-
-						{#if item.disabled && !isBare}
-							<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
-						{/if}
-					{:else}
-						<span class="scribe-tile" data-size="sm" data-type={item.type}><TypeIcon type={item.type} /></span>
-
-						<span class="row-main">
-							<span class="row-title" title={item.title}>{item.title}</span>
-							{#if item.isLoading}
-								<span class="row-preview is-muted">{i18n.t('common.loading')}</span>
-							{:else if item.valuePreview !== ''}
-								<span class="row-preview" title={item.valuePreview}>{truncateString(item.valuePreview, 60)}</span>
-							{:else}
-								<span class="row-preview is-muted">{i18n.t('common.empty')}</span>
-							{/if}
-						</span>
-
-						{#if item.disabled}
-							<span class="scribe-pill">{i18n.t('common.incompatible')}</span>
-						{:else if item.type}
-							<span class="scribe-pill" data-type={item.type}>{getTypeLabel(i18n, item.type)}</span>
-						{/if}
-					{/if}
-
-					{#if !isBare}
-						<span class="scribe-check" class:is-checked={isSelected} aria-hidden="true">
-							{#if isSelected}
-								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-							{/if}
-						</span>
-					{/if}
+					{@render rowContent(item, isSelected, isBare)}
 				</button>
 			{/each}
 		</div>
 	{/if}
+{/if}
 </div>
 
 <style>
@@ -421,6 +473,40 @@
 
 	.binding-row.is-bare:disabled {
 		cursor: not-allowed;
+	}
+
+	/* The summary of a picker: the chosen item and the button that opens the picker */
+	.picker-summary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		/* Room for the outline of the chosen row */
+		padding: 0.125rem;
+	}
+
+	.picker-summary .binding-row {
+		flex: 1;
+		width: auto;
+		min-width: 0;
+	}
+
+	/* The chosen row is not a button: it has no hover, pointer or disabled look. These rules beat the ones of `.binding-row` */
+	.binding-row.is-static,
+	.binding-row.is-static:hover {
+		cursor: default;
+	}
+
+	.binding-row.is-static:not(.is-bare):hover {
+		background-color: var(--scribe-accent-wash);
+		border-color: var(--scribe-primary);
+	}
+
+	:global(.picker-summary .picker-open) {
+		flex: none;
+	}
+
+	:global(.empty-state .empty-action) {
+		margin-top: 0.875rem;
 	}
 
 	.row-main {

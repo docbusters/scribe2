@@ -58,7 +58,12 @@ export const es: Translations = {
 		emptyTitle: 'No hay variables disponibles',
 		emptySubtitleComponent: 'No hay variables compatibles con este componente',
 		emptySubtitleDocument: 'Crea variables en el documento para seleccionarlas aquí',
-		incompatibleTooltip: 'Tipo de dato no compatible con este componente'
+		incompatibleTooltip: 'Tipo de dato no compatible con este componente',
+		pick: 'Elegir',
+		change: 'Cambiar',
+		back: 'Volver',
+		pickerEmptyTitle: 'Ningún elemento elegido',
+		pickerEmptySubtitle: 'Elige uno para vincularlo a este componente'
 	},
 	bindingsPanel: {
 		title: 'Variables',

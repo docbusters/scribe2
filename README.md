@@ -61,7 +61,7 @@ The package has three entries:
 | --- | --- |
 | `@antonii22/scribe2` | Registers the custom elements (`<scribe-interpreter>`, `<scribe-component-slot>`, `<scribe-component-renderer>`, `<scribe-empty-content>`, `<scribe-bindings-panel>` and `<scribe-top-toolbar>`). It needs a DOM. |
 | `@antonii22/scribe2/core` | Everything else, with **no effect when imported**: the types, `getDefaultRegistry` and `defaultRegistry`, `createColorOption`, the i18n (`en`, `es`, `getI18n`...) and the focus helpers. It can be imported in a Node unit test, with no DOM and no mock. |
-| `@antonii22/scribe2/svelte` | `createSvelte5Mount` and `createSvelteItemRenderer`, published as source (see below). |
+| `@antonii22/scribe2/svelte` | `createSvelte5Mount`, `createSvelteItemRenderer` and `createSveltePickerRenderer`, published as source (see below). |
 
 The app imports the main entry once, and the styles, which are a separate file:
 
@@ -221,17 +221,17 @@ The colour is a `#rrggbb` string in `config[configKey]`. Your component reads it
 
 The text component colours a fragment of its text, and stores it in the text itself: `{#rrggbb}` sets the colour of what follows and `{#}` goes back to the colour of the theme, for example `Hello {#ef4444}world{#}!`. A colour ends at the end of its line. Any other `{` is plain text (a literal `{` is written as `\{`), so existing texts are read as before. If you read the text of a document outside Scribe, remove these markers as you would the `*`, `_`, `~` and `-` of the other formats.
 
-## Svelte components in the registry and in `renderItem`
+## Svelte components in the registry, in `renderItem` and in `renderPicker`
 
-If your app is written in Svelte 5, two helpers mount your components where Scribe needs a `mount`, `update` and `unmount`: `createSvelte5Mount` for the entries of the component registry, and `createSvelteItemRenderer` for the rows of a custom binding (`CustomBinding.renderItem`).
+If your app is written in Svelte 5, three helpers mount your components where Scribe needs a `mount`, `update` and `unmount`: `createSvelte5Mount` for the entries of the component registry, `createSvelteItemRenderer` for the rows of a custom binding (`CustomBinding.renderItem`) and `createSveltePickerRenderer` for its picker (`CustomBinding.renderPicker`, see "A picker for a custom binding" below).
 
 ```ts
-import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2/svelte';
+import { createSvelte5Mount, createSvelteItemRenderer, createSveltePickerRenderer } from '@antonii22/scribe2/svelte';
 ```
 
 **Why a separate import.** `@antonii22/scribe2` is a bundle that carries its own copy of the Svelte runtime. A helper exported from it would mount *your* components with *that* runtime, while they were compiled against yours. So the helpers are published as source (`@antonii22/scribe2/svelte`, with the `svelte` export condition) and your bundler compiles them with your own Svelte, as it does with the rest of your code. This needs Svelte 5 and a bundler that compiles Svelte libraries (such as `vite-plugin-svelte`). The file imports nothing from Scribe.
 
-**The context has to be passed.** A component mounted by Scribe is a new root, not a child of yours, so it does not inherit your Svelte context (i18n, stores, a router...). Both helpers take it as an optional last argument, which goes to Svelte's `mount()`. `getAllContexts()` only works while a component initialises, so build the registry or the renderer there:
+**The context has to be passed.** A component mounted by Scribe is a new root, not a child of yours, so it does not inherit your Svelte context (i18n, stores, a router...). All the helpers take it as an optional last argument, which goes to Svelte's `mount()`. `getAllContexts()` only works while a component initialises, so build the registry or the renderer there:
 
 ```svelte
 <script lang="ts">
@@ -267,7 +267,7 @@ import { createSvelte5Mount, createSvelteItemRenderer } from '@antonii22/scribe2
 </script>
 ```
 
-Without `context`, `getContext` in `MyCard` or `MyRow` returns `undefined`. You can also pass a `Map` of your own instead of `getAllContexts()`. The playground shows the row case in `/examples/full-edit-custom-binding`.
+Without `context`, `getContext` in `MyCard`, `MyRow` or a picker component returns `undefined`. You can also pass a `Map` of your own instead of `getAllContexts()`. The playground shows the row case in `/examples/full-edit-custom-binding`.
 
 Inside these components, draw the parts of Scribe with its custom elements, such as `<scribe-component-slot>` (see "Slots" above). Scribe exports no Svelte components for this, for the same reason of the two runtimes.
 
@@ -403,6 +403,33 @@ Add the `dark` class to `<html>`, to a wrapper or to the Scribe element, and ove
 }
 ```
 
+### A picker for a custom binding
+
+By default the value selector lists every id of a custom binding, with a search box. When a binding has thousands of ids (one per cell of a spreadsheet, for example) the host can replace that list with its own picker, `CustomBinding.renderPicker`. Like `renderItem` it does not depend on any framework: it receives a node and the props, and returns an optional `update` and `destroy`.
+
+```ts
+const sheetBinding: CustomBinding = {
+	type: 'sheet',
+	name: 'Sheet',
+	getAvailableIds: () => cells.map((cell) => ({ id: cell.ref, label: cell.ref, type: cell.type })),
+	getData: async (id) => readCell(id),
+	renderItem: renderCellRow, // optional: how the chosen cell looks in the summary
+	renderPicker: (node, { selectedId, isTypeAccepted, select, cancel, lang }) => {
+		// Draw the sheet into `node`, and call select('B3') when the user clicks a cell
+		return { update: (props) => { /* selection or language changed */ }, destroy: () => { /* clean up */ } };
+	}
+};
+```
+
+With `renderPicker`, the selector shows the chosen item (drawn with `renderItem` when there is one, or the default row) and a **Change** button, or **Choose** when nothing is chosen. The button opens the picker as a step of the same dialog, which widens, with a **Back** button. When the host calls `select(id)`, Scribe returns to the summary with that item as the pending choice, as before: it is saved with **Apply** and discarded with **Cancel**. **Back** and Escape return to the summary without changing anything and do not close the dialog.
+
+- `select(id)` only takes an id that `getAvailableIds` returns and whose type `isTypeAccepted` accepts (the same rule that disables the rows of the list). Anything else is ignored and the picker stays open, so check `isTypeAccepted` to show what cannot be chosen. After the picker is left, `select` and `cancel` do nothing.
+- The picker is drawn under `[data-scribe-host]` (see "Content drawn by the host") in a box with a defined width and height and its own scroll, so a big sheet needs no container of its own. Unlike a row, it is not inside a Scribe button: it can hold buttons and links, and the keyboard handling and accessibility of what it draws are the host's.
+- `lang` is the language of Scribe (`'en'` or `'es'`), and `update` runs with the new props when it changes.
+- If `renderPicker` throws while mounting, the list is shown instead, and an error is logged. Without `renderPicker` nothing changes.
+
+In Svelte, `createSveltePickerRenderer(MyPicker, context)` mounts a component whose props are `BindingPickerProps`. The playground shows a plain DOM sheet in `/examples/full-edit-custom-binding`.
+
 ### Content drawn by the host
 
 Scribe resets the styles of plain tags inside the document (`span`, `p`, headings, `a`, `button`, `input`... and the `border-color` of every element), so the CSS of the host app does not leak into it. Those resets are not in a CSS layer, so they also win over utility classes that are, such as the ones of Tailwind v4 (`@layer utilities`).
@@ -410,6 +437,7 @@ Scribe resets the styles of plain tags inside the document (`span`, `p`, heading
 Any element with the attribute `data-scribe-host`, and everything inside it, is left out of those resets. The content drawn by the host then inherits the font and colour of its surroundings, its own classes apply as written, and the default margins of the browser are the host's to reset (Tailwind's preflight does it).
 
 - Scribe already sets the attribute on the content of `CustomBinding.renderItem`, the rows of the value selector. By default Scribe also draws the frame of each row (border, background, check and the Incompatible pill). With `CustomBinding.bareItems: true` it draws none of that and the host draws it from `isSelected` and `isDisabled`, keeping Scribe's button (selection, keyboard, focus ring).
+- Scribe also sets it on the box of `CustomBinding.renderPicker`.
 - A registered component that draws with the CSS of the host can put `data-scribe-host` on its root element.
 
 ## Important considerations

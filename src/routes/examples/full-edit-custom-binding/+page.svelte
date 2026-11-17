@@ -8,7 +8,7 @@
 	import { getAllContexts, setContext } from 'svelte';
 	import type { Document } from '$lib/domain/Document.js';
 	import type { CollectionValue, PrimitiveValue } from '$lib/domain/data/DataValue.js';
-	import type { BindingChangeEventDetail, BindingItemProps, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
+	import type { BindingChangeEventDetail, BindingItemProps, BindingPickerProps, CustomBinding, ScribeProps } from '$lib/types/ScribeProps.js';
 
 	// The rows of a custom binding can be drawn by the host. With plain DOM here, as any framework would do it: a node comes in,
 	// and an update and a destroy go out. Scribe keeps the button of the row, so the selection and the keyboard still work
@@ -51,6 +51,81 @@
 		}
 	};
 
+
+	// SHEET BINDING EXAMPLE (a picker drawn by the host)
+
+	// One id per cell, as a spreadsheet would give them. The picker below is plain DOM too: the contract needs no framework
+	const sheetColumns = ['A', 'B', 'C', 'D'];
+	const sheetRows = [1, 2, 3, 4, 5, 6];
+	const sheetValues: Record<string, PrimitiveValue> = {};
+	for (const row of sheetRows) {
+		for (const column of sheetColumns) {
+			sheetValues[`${column}${row}`] =
+				row === 1 ? { type: 'string', value: `Header ${column}` }
+				: column === 'D' ? { type: 'boolean', value: row % 2 === 0 }
+				: column === 'A' ? { type: 'string', value: `Item ${row - 1}` }
+				: { type: 'number', value: row * 10 + sheetColumns.indexOf(column) };
+		}
+	}
+
+	// Draws the sheet read only. A click on a cell tells Scribe the id, which ignores it when the component cannot take that type
+	function renderSheetPicker(node: HTMLElement, initial: BindingPickerProps) {
+		let props = initial;
+		const table = document.createElement('table');
+		table.style.cssText = 'border-collapse: collapse; width: 100%; font-size: 0.875rem;';
+		const buttons: Record<string, HTMLButtonElement> = {};
+
+		const header = table.createTHead().insertRow();
+		header.insertCell().textContent = '';
+		for (const column of sheetColumns) {
+			const cell = header.insertCell();
+			cell.textContent = column;
+			cell.style.cssText = 'padding: 0.5rem; text-align: center; opacity: 0.6;';
+		}
+
+		const body = table.createTBody();
+		for (const row of sheetRows) {
+			const tr = body.insertRow();
+			const label = tr.insertCell();
+			label.textContent = String(row);
+			label.style.cssText = 'padding: 0.5rem; text-align: center; opacity: 0.6;';
+			for (const column of sheetColumns) {
+				const id = `${column}${row}`;
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.textContent = String(sheetValues[id].value);
+				button.style.cssText = 'width: 100%; min-height: 2.25rem; padding: 0 0.5rem; border: 1px solid #8884; background: none; color: inherit; cursor: pointer; font: inherit;';
+				button.addEventListener('click', () => props.select(id));
+				tr.insertCell().append(button);
+				buttons[id] = button;
+			}
+		}
+
+		const paint = (next: BindingPickerProps) => {
+			props = next;
+			for (const [id, button] of Object.entries(buttons)) {
+				button.style.outline = id === next.selectedId ? '2px solid #2563eb' : 'none';
+				button.style.opacity = next.isTypeAccepted(sheetValues[id].type) ? '1' : '0.4';
+			}
+		};
+		paint(initial);
+		node.append(table);
+
+		return { update: paint, destroy: () => node.replaceChildren() };
+	}
+
+	const sheetBinding: CustomBinding = {
+		type: 'sheet',
+		name: 'Sheet',
+		description: 'One value per cell, chosen on the sheet itself',
+		renderItem: renderCustomRow,
+		renderPicker: renderSheetPicker,
+		getAvailableIds: () => Object.entries(sheetValues).map(([id, value]) => ({ id, label: id, type: value.type })),
+		getData: async (id) => {
+			if (!sheetValues[id]) throw new Error(`No cell found for ID: ${id}`);
+			return sheetValues[id];
+		}
+	};
 
 	// LIVE CLOCK BINDING EXAMPLE
 
@@ -135,6 +210,7 @@
 	const customBindings: ScribeProps['customBindings'] = {
 		'custom-binding': customBinding,
 		'live-clock': liveClockBinding,
+		'sheet': sheetBinding,
 	}
 
 	function handleBindingChange(event: CustomEvent<BindingChangeEventDetail>) {

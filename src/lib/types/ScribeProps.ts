@@ -69,7 +69,45 @@ export interface CustomBinding {
      * disabled, keyboard, search, focus ring, tooltip). It only has effect together with `renderItem`.
      */
     bareItems?: boolean;
+    /**
+     * Replaces the list of ids (and its search) in the value selector with a picker drawn by the host. The selector then shows the chosen
+     * item (drawn with `renderItem` when there is one) and a button that opens the picker in a large area of the dialog. The host calls
+     * `select(id)` when the user chooses one, and Scribe goes back to the summary with it as the pending choice (applied with "Apply",
+     * discarded with "Cancel"). If the renderer throws while mounting, the list is shown instead.
+     *
+     * The picker is drawn under `[data-scribe-host]` (excluded from the tag resets of Scribe, like `renderItem`) in a box with a defined
+     * width and height and its own scroll, so a big sheet does not need its own container. Unlike a row, it is not inside a Scribe button:
+     * it may hold buttons and links, and the keyboard handling and accessibility of what it draws are the host's.
+     */
+    renderPicker?: BindingPickerRenderer;
 }
+
+/** What Scribe tells the picker of a custom binding. It is plain data and functions: nothing here is a Svelte value or a store */
+export interface BindingPickerProps {
+    /** Key of the custom binding the picker belongs to */
+    bindingType: string;
+    /** Id currently chosen (pending, not applied yet), or null */
+    selectedId: string | null;
+    /** Whether an item type can be chosen for the component being edited (the rule that disables the rows of the list) */
+    isTypeAccepted: (type: string) => boolean;
+    /** The host calls it with the chosen id. Scribe ignores an id that `getAvailableIds` does not return or whose type is not accepted, and the picker stays open */
+    select: (id: string) => void;
+    /** The host calls it to leave the picker without choosing */
+    cancel: () => void;
+    lang: 'en' | 'es';
+}
+
+/** What a picker hands back to Scribe: how to give it the new props and how to clean up. Both are optional */
+export interface BindingPickerRendererHandle {
+    update?: (props: BindingPickerProps) => void;
+    destroy?: () => void;
+}
+
+/**
+ * Draws the picker into `node` and returns how to update and clean it up. It does not depend on any framework, like `BindingItemRenderer`.
+ * `update` runs when the selection or the language change, and `destroy` when the picker is left. If the renderer throws, the list is shown instead
+ */
+export type BindingPickerRenderer = (node: HTMLElement, props: BindingPickerProps) => BindingPickerRendererHandle | void;
 
 /** What Scribe tells the renderer of a row of a custom binding. It is plain data: nothing here is a Svelte value or a store */
 export interface BindingItemProps {

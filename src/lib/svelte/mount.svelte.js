@@ -63,3 +63,23 @@ export function createSvelteItemRenderer(SvelteComponent, context) {
         };
     };
 }
+
+/**
+ * Adapts a Svelte component to `CustomBinding.renderPicker`, which draws the picker that replaces the list of ids of a custom binding.
+ * The component gets the props of the picker (`BindingPickerProps`), mounted into the node it is given, updated in place when they change
+ * and unmounted when the picker is left. `context` is the Svelte context the component can read, as in `createSvelte5Mount`
+ * @param {import('svelte').Component<import('../types/ScribeProps.js').BindingPickerProps>} SvelteComponent
+ * @param {Map<unknown, unknown>} [context]
+ * @returns {import('../types/ScribeProps.js').BindingPickerRenderer}
+ */
+export function createSveltePickerRenderer(SvelteComponent, context) {
+    const component = createSvelte5Mount(SvelteComponent, context);
+
+    return (node, props) => {
+        const instance = component.mount(node, props);
+        return {
+            update: (next) => component.update(instance, next),
+            destroy: () => component.unmount(instance)
+        };
+    };
+}

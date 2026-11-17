@@ -59,6 +59,11 @@ export interface Translations {
 		emptySubtitleComponent: string;
 		emptySubtitleDocument: string;
 		incompatibleTooltip: string;
+		pick: string;
+		change: string;
+		back: string;
+		pickerEmptyTitle: string;
+		pickerEmptySubtitle: string;
 	};
 	bindingsPanel: {
 		title: string;

@@ -1,5 +1,5 @@
 import type { Component } from 'svelte';
-import type { BindingItemRenderer, BindingItemProps } from '../types/ScribeProps.js';
+import type { BindingItemRenderer, BindingItemProps, BindingPickerRenderer, BindingPickerProps } from '../types/ScribeProps.js';
 
 export type InstanceData<TProps> = {
     instance: Record<string, unknown>;
@@ -29,3 +29,13 @@ export function createSvelteItemRenderer(
     SvelteComponent: Component<BindingItemProps>,
     context?: Map<unknown, unknown>
 ): BindingItemRenderer;
+
+/**
+ * Adapts a Svelte component to `CustomBinding.renderPicker`, which draws the picker that replaces the list of ids of a custom binding.
+ * The component gets the props of the picker (`BindingPickerProps`), mounted into the node it is given, updated in place when they change
+ * and unmounted when the picker is left. `context` is the Svelte context the component can read, as in `createSvelte5Mount`
+ */
+export function createSveltePickerRenderer(
+    SvelteComponent: Component<BindingPickerProps>,
+    context?: Map<unknown, unknown>
+): BindingPickerRenderer;

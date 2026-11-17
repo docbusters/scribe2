@@ -1,5 +1,6 @@
-import type { BindingItemRenderer, CustomBinding, CustomBindingSubscribable } from '../types/ScribeProps.js';
+import type { BindingItemRenderer, BindingPickerRenderer, CustomBinding, CustomBindingSubscribable } from '../types/ScribeProps.js';
 import type { CollectionValue, DataValue, PrimitiveValue } from '../domain/data/DataValue.js';
+import { isBindingTypeAccepted } from '../utils/bindingPicker.js';
 import { compatibleFirst } from '../utils/compatibleFirst.js';
 
 interface CustomBindingInstance {
@@ -18,8 +19,12 @@ class CustomBindingsStore {
     // Triggers used to notify Svelte of changes in a safe way (outside the render cycle)
     private triggers = $state<Record<string, number>>({});
 
+    // The bindings whose picker threw while mounting
+    failedPickers = $state<Record<string, boolean>>({});
+
     initialize(bindings: Record<string, CustomBinding> | undefined) {
         this.destroy(); // Clean previous bindings
+        this.failedPickers = {};
         this.definitions = bindings || {};
     }
 
@@ -111,6 +116,16 @@ class CustomBindingsStore {
         return this.definitions[type]?.renderItem;
     }
 
+    /** The picker of a custom binding, or undefined when it has none or it threw while mounting (the list is shown then) */
+    getPickerRenderer(type: string): BindingPickerRenderer | undefined {
+        return this.failedPickers[type] ? undefined : this.definitions[type]?.renderPicker;
+    }
+
+    /** The picker of a binding threw while mounting: the list replaces it until the bindings are initialised again */
+    markPickerFailed(type: string) {
+        this.failedPickers[type] = true;
+    }
+
     /** Whether the host draws the frame of the rows of a custom binding itself (see `CustomBinding.bareItems`) */
     hasBareItems(type: string): boolean {
         return !!this.definitions[type]?.bareItems;
@@ -119,9 +134,8 @@ class CustomBindingsStore {
     getAvailableIds(type: string, supportedTypes?: Omit<DataValue['type'], 'binding'>[]): { value: string; label: string; disabled?: boolean; type: string }[] {
         const def = this.definitions[type];
         if (def && def.getAvailableIds) {
-            const allowedTypes = supportedTypes?.filter(t => t !== 'binding') || [];
             return compatibleFirst(def.getAvailableIds().map(item => {
-                const disabled = item.type && allowedTypes.length > 0 ? !allowedTypes.includes(item.type) : false;
+                const disabled = !isBindingTypeAccepted(item.type, supportedTypes);
                 return {
                     value: item.id,
                     label: item.label || item.id,
