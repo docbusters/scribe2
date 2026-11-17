@@ -108,6 +108,7 @@
     /**
      * Moves the caret to the editable text closest to the pointer position.
      * Returns true when the focus was moved (the native pointer behaviour should then be prevented).
+     * A click on an inline component that is not a text (and has no editable inside) is left alone, so the component gets selected.
      */
     function focusClosestText(event: MouseEvent): boolean {
         if (mode !== 'edit' || !container) return false;
@@ -136,6 +137,10 @@
                 return true;
             }
         }
+
+        // A click on a component with no editable of its own (a text binding) is a click on that component: leave the native behaviour,
+        // which blurs the text, and ComponentRenderer selects it. Moving the caret to a neighbouring text would replace that selection
+        if (closestOwned(target, '.component-edit-contents.is-inline-block')) return false;
 
         const clickX = event.clientX;
         const clickY = event.clientY;
